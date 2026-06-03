@@ -10,6 +10,8 @@
     "build": "tsc",
     "start": "NODE_ENV=production node --env-file-if-exists=.env dist/index.js",
     "dev": "NODE_ENV=development tsx watch --env-file=.env src/index.ts",
+    "deploy": "NODE_ENV=development tsx --env-file=.env src/deploy-commands.ts",
+    "deploy:prod": "NODE_ENV=production tsx --env-file=.env src/deploy-commands.ts",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
