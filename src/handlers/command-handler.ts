@@ -1,0 +1,29 @@
+import type { SlashCommand } from '@/types/command.js';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Type guard that checks whether a dynamically imported object is a
+ * usable SlashCommand (has a `data.name` and a callable `execute`).
+ * Lets the loader skip malformed files at startup instead of crashing
+ * later at runtime.
+ */
+function isSlashCommand(obj: unknown): obj is SlashCommand {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  const candidate = obj as Record<string, unknown>;
+  const data = candidate.data as Record<string, unknown> | undefined;
+  if (!data || typeof data.name !== 'string') {
+    return false;
+  }
+
+  if (typeof candidate.execute !== 'function') {
+    return false;
+  }
+
+  return true;
+}
