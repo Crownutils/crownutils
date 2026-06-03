@@ -1,6 +1,7 @@
 import type { SlashCommand } from '@/types/command.js';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readdir } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -26,4 +27,29 @@ function isSlashCommand(obj: unknown): obj is SlashCommand {
   }
 
   return true;
+}
+
+export async function loadSlashCommands(): Promise<Map<string, SlashCommand>> {
+  const commands = new Map<string, SlashCommand>();
+  const commandsPath = join(__dirname, '..', 'commands', 'slash');
+
+  const files = await readdir(commandsPath);
+  const commandFiles = files.filter((file) => file.endsWith('.js'));
+
+  for (const file of commandFiles) {
+    const fileUrl = pathToFileURL(join(commandsPath, file)).href;
+    const module = (await import(fileUrl)) as Record<string, unknown>;
+
+    const candidate = module.command;
+    if (!isSlashCommand(candidate)) {
+      console.warn(
+        `⚠️ ${file} does not export a valid SlashCommand, skipping.`,
+      );
+      continue;
+    }
+
+    commands.set(candidate.data.name, candidate);
+  }
+
+  return commands;
 }
