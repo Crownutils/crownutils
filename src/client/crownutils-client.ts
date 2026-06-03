@@ -1,6 +1,7 @@
 import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import { loadSlashCommands } from '@/handlers/command-handler.js';
 import type { SlashCommand } from '@/types/command.js';
+import { loadEvents } from '@/handlers/event-handler.js';
 
 export class CrownutilsClient {
   private readonly discord: Client;
@@ -27,6 +28,26 @@ export class CrownutilsClient {
    * Must be awaited before login().
    */
   public async init(): Promise<void> {
+    await this.registerEvents();
+    await this.loadCommands();
+  }
+
+  /** Loads event files and binds each one onto the discord client. */
+  private async registerEvents(): Promise<void> {
+    const events = await loadEvents();
+
+    for (const event of events) {
+      if (event.once) {
+        this.discord.once(event.name, (...args) => event.execute(...args));
+      } else {
+        this.discord.on(event.name, (...args) => event.execute(...args));
+      }
+    }
+
+    console.log(`Registered ${events.length} event(s).`);
+  }
+
+  private async loadCommands(): Promise<void> {
     const loaded = await loadSlashCommands();
     for (const [name, command] of loaded) {
       this.slashCommands.set(name, command);

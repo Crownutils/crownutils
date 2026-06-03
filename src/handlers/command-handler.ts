@@ -33,7 +33,14 @@ export async function loadSlashCommands(): Promise<Map<string, SlashCommand>> {
   const commands = new Map<string, SlashCommand>();
   const commandsPath = join(__dirname, '..', 'commands', 'slash');
 
-  const files = await readdir(commandsPath);
+  let files: string[];
+  try {
+    files = await readdir(commandsPath);
+  } catch (error) {
+    console.error('Cannot read slash commands directory:', error);
+    return commands;
+  }
+
   const commandFiles = files.filter(
     (file) =>
       (file.endsWith('.js') || file.endsWith('.ts')) && !file.endsWith('.d.ts'),
