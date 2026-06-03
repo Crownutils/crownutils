@@ -15,10 +15,10 @@ export class CrownutilsClient {
           {
             name: 'Crownutils',
             state: 'Helping players of Crownicles...',
-            type: ActivityType.Playing
-          }
-        ]
-      }
+            type: ActivityType.Playing,
+          },
+        ],
+      },
     });
   }
 
