@@ -1,7 +1,10 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { MessageBuilder } from '@/lib/message-builder.js';
 import { pingMessages } from '@/lang/index.js';
 import type { SlashCommand } from '@/types/command.js';
+import { Container } from '@/lib/components/container.js';
+import { Text } from '@/lib/components/text.js';
+import { Separator } from '@/lib/components/separator.js';
+import { Title } from '@/lib/components/title.js';
 
 export const command: SlashCommand = {
   data: new SlashCommandBuilder()
@@ -14,11 +17,13 @@ export const command: SlashCommand = {
     const totalLatency = Date.now() - before;
     const discordLatency = Math.round(interaction.client.ws.ping);
 
-    const message = new MessageBuilder()
+    const message = new Container()
       .color('info')
-      .title('Pong 🏓')
-      .separator()
-      .text(pingMessages.result(totalLatency, discordLatency))
+      .add(
+        new Title(pingMessages.title),
+        new Separator(),
+        new Text(pingMessages.result(totalLatency, discordLatency)),
+      )
       .build();
 
     await interaction.editReply(message);
