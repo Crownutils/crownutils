@@ -1,9 +1,8 @@
 import type { SlashCommand } from '@/types/command.js';
-import { readdir } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { slashCommands } from '@/registries/slash-registry.js';
-import { logger } from '@/lib/logger.js';
+import { loadModules } from './base-loader.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -32,31 +31,12 @@ function isSlashCommand(obj: unknown): obj is SlashCommand {
 }
 
 export async function loadSlashCommands(): Promise<void> {
-  const commandsPath = join(__dirname, '..', 'commands', 'slash');
-
-  let files: string[];
-  try {
-    files = await readdir(commandsPath);
-  } catch (error) {
-    logger.error({ error }, 'Cannot read slash commands directory');
-    return;
-  }
-
-  const commandFiles = files.filter(
-    (file) =>
-      (file.endsWith('.js') || file.endsWith('.ts')) && !file.endsWith('.d.ts'),
+  const commands = await loadModules(
+    'commands/slash',
+    'command',
+    isSlashCommand,
   );
-
-  for (const file of commandFiles) {
-    const fileUrl = pathToFileURL(join(commandsPath, file)).href;
-    const module = (await import(fileUrl)) as Record<string, unknown>;
-
-    const candidate = module.command;
-    if (!isSlashCommand(candidate)) {
-      logger.warn(`${file} does not export a valid SlashCommand, skipping.`);
-      continue;
-    }
-
-    slashCommands.set(candidate.data.name, candidate);
+  for (const command of commands) {
+    slashCommands.set(command.data.name, command);
   }
 }
