@@ -18,7 +18,9 @@ if (!isProduction && !guildId) {
 }
 
 await loadSlashCommands();
-const body = [...slashCommands.values()].map((command) => command.data.toJSON());
+const body = [...slashCommands.values()].map((command) =>
+  command.data.toJSON(),
+);
 
 const rest = new REST().setToken(token);
 
