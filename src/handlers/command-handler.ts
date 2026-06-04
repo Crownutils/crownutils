@@ -3,6 +3,7 @@ import { readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { slashCommands } from '@/registries/slash-registry.js';
+import { logger } from '@/lib/logger.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -37,7 +38,7 @@ export async function loadSlashCommands(): Promise<void> {
   try {
     files = await readdir(commandsPath);
   } catch (error) {
-    console.error('Cannot read slash commands directory:', error);
+    logger.error({ error }, 'Cannot read slash commands directory');
     return;
   }
 
@@ -52,9 +53,7 @@ export async function loadSlashCommands(): Promise<void> {
 
     const candidate = module.command;
     if (!isSlashCommand(candidate)) {
-      console.warn(
-        `⚠️ ${file} does not export a valid SlashCommand, skipping.`,
-      );
+      logger.warn(`${file} does not export a valid SlashCommand, skipping.`);
       continue;
     }
 

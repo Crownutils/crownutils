@@ -3,6 +3,7 @@ import { loadSlashCommands } from '@/handlers/command-handler.js';
 import type { SlashCommand } from '@/types/command.js';
 import { loadEvents } from '@/handlers/event-handler.js';
 import { slashCommands } from '@/registries/slash-registry.js';
+import { logger } from '@/lib/logger.js';
 
 export class CrownutilsClient {
   private readonly discord: Client;
@@ -45,12 +46,12 @@ export class CrownutilsClient {
       }
     }
 
-    console.log(`Registered ${events.length} event(s).`);
+    logger.info(`Registered ${events.length} event(s).`);
   }
 
   private async loadCommands(): Promise<void> {
     await loadSlashCommands();
-    console.log(`Loaded ${slashCommands.size} slash command(s).`);
+    logger.info(`Loaded ${slashCommands.size} slash command(s).`);
   }
 
   /**
