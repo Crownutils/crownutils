@@ -2,6 +2,7 @@ import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import { loadSlashCommands } from '@/handlers/command-handler.js';
 import type { SlashCommand } from '@/types/command.js';
 import { loadEvents } from '@/handlers/event-handler.js';
+import { slashCommands } from '@/registries/slash-registry.js';
 
 export class CrownutilsClient {
   private readonly discord: Client;
@@ -48,11 +49,8 @@ export class CrownutilsClient {
   }
 
   private async loadCommands(): Promise<void> {
-    const loaded = await loadSlashCommands();
-    for (const [name, command] of loaded) {
-      this.slashCommands.set(name, command);
-    }
-    console.log(`Loaded ${this.slashCommands.size} slash command(s).`);
+    await loadSlashCommands();
+    console.log(`Loaded ${slashCommands.size} slash command(s).`);
   }
 
   /**

@@ -2,6 +2,7 @@ import type { SlashCommand } from '@/types/command.js';
 import { readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { slashCommands } from '@/registries/slash-registry.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -29,8 +30,7 @@ function isSlashCommand(obj: unknown): obj is SlashCommand {
   return true;
 }
 
-export async function loadSlashCommands(): Promise<Map<string, SlashCommand>> {
-  const commands = new Map<string, SlashCommand>();
+export async function loadSlashCommands(): Promise<void> {
   const commandsPath = join(__dirname, '..', 'commands', 'slash');
 
   let files: string[];
@@ -38,7 +38,7 @@ export async function loadSlashCommands(): Promise<Map<string, SlashCommand>> {
     files = await readdir(commandsPath);
   } catch (error) {
     console.error('Cannot read slash commands directory:', error);
-    return commands;
+    return;
   }
 
   const commandFiles = files.filter(
@@ -58,8 +58,6 @@ export async function loadSlashCommands(): Promise<Map<string, SlashCommand>> {
       continue;
     }
 
-    commands.set(candidate.data.name, candidate);
+    slashCommands.set(candidate.data.name, candidate);
   }
-
-  return commands;
 }

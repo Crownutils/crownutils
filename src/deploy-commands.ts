@@ -1,5 +1,6 @@
 import { REST, Routes } from 'discord.js';
 import { loadSlashCommands } from '@/handlers/command-handler.js';
+import { slashCommands } from './registries/slash-registry.js';
 
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.DISCORD_CLIENT_ID;
@@ -16,8 +17,8 @@ if (!isProduction && !guildId) {
   throw new Error('Missing DISCORD_GUILD_ID for development deployment');
 }
 
-const commands = await loadSlashCommands();
-const body = [...commands.values()].map((command) => command.data.toJSON());
+await loadSlashCommands();
+const body = [...slashCommands.values()].map((command) => command.data.toJSON());
 
 const rest = new REST().setToken(token);
 
