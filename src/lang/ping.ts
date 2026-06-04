@@ -1,5 +1,5 @@
 export const pingMessages = {
-  calculating: '🏓 Pong',
+  title: '🏓 Pong',
   result: (totalMs: number, discordMs: number): string =>
-    `🏓 Pong\nLatence totale : ${totalMs} ms\nLatence Discord : ${discordMs} ms`,
+    `Latence totale : ${totalMs} ms\nLatence Discord : ${discordMs} ms`,
 } as const;
