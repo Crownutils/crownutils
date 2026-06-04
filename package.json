@@ -1,5 +1,5 @@
 {
-  "name": "selkyye",
+  "name": "crownutils",
   "version": "1.0.0",
   "description": "A Discord bot",
   "main": "dist/index.js",
