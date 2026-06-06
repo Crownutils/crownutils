@@ -1,4 +1,4 @@
-import { pingMessages } from '@/lang/ping.js';
+import { pingDescription, pingMessages } from '@/lang/ping.js';
 import { Container, render } from '@/lib/components/container.js';
 import { Separator } from '@/lib/components/separator.js';
 import { Text } from '@/lib/components/text.js';
@@ -7,6 +7,7 @@ import { PrefixCommand } from '@/types/command.js';
 
 export const command: PrefixCommand = {
   name: 'ping',
+  description: pingDescription,
   aliases: ['p', 'latency'],
 
   async execute(message, _args) {
