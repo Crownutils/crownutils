@@ -2,6 +2,8 @@ import { Events } from 'discord.js';
 import type { Event } from '@/types/event.js';
 import { prefixCommands } from '@/registries/prefix-registry.js';
 import { logger } from '@/lib/logger.js';
+import { buildCommandPermissionsErrorContainer } from '@/lib/errors.js';
+import { checkCommandRequirements } from '@/lib/command-requirements.js';
 
 const PREFIX = '!';
 
@@ -29,6 +31,23 @@ export const event: Event<Events.MessageCreate> = {
     const command = prefixCommands.get(commandName);
     if (!command) {
       return;
+    }
+
+    if (command.requirements) {
+      const isRequirementsValid = checkCommandRequirements(
+        command.requirements,
+        message.guildId,
+        message.author.id,
+      );
+
+      if (!isRequirementsValid.canBeExecuted) {
+        const reply = buildCommandPermissionsErrorContainer(
+          isRequirementsValid.missing_permissions,
+        ).build();
+
+        await message.reply(reply);
+        return;
+      }
     }
 
     try {
