@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { pingMessages } from '@/lang/index.js';
+import { pingDescription, pingMessages } from '@/lang/index.js';
 import type { SlashCommand } from '@/types/command.js';
 import { Container } from '@/lib/components/container.js';
 import { Text } from '@/lib/components/text.js';
@@ -9,7 +9,7 @@ import { Title } from '@/lib/components/title.js';
 export const command: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('ping')
-    .setDescription('Affiche la latence du bot.'),
+    .setDescription(pingDescription),
 
   async execute(interaction) {
     const before = Date.now();

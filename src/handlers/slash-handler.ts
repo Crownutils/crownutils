@@ -1,10 +1,6 @@
 import type { SlashCommand } from '@/types/command.js';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { slashCommands } from '@/registries/slash-registry.js';
 import { loadModules } from './base-loader.js';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * Type guard that checks whether a dynamically imported object is a

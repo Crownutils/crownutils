@@ -1,11 +1,6 @@
-import { readdir } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { ClientEvents } from 'discord.js';
 import type { Event } from '@/types/event.js';
 import { loadModules } from './base-loader.js';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
  * Type guard ensuring a dynamically imported value is a usable Event

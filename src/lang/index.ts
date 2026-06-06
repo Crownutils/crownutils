@@ -1,1 +1,1 @@
-export { pingMessages } from './ping.js';
+export { pingMessages, pingDescription } from './ping.js';
