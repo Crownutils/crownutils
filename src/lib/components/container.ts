@@ -1,4 +1,5 @@
-import { ContainerBuilder, MessageFlags, TextDisplayBuilder } from 'discord.js';
+import type { TextDisplayBuilder } from 'discord.js';
+import { ContainerBuilder, MessageFlags } from 'discord.js';
 import type { TextComponent, V2Component } from './component.js';
 
 const COLORS = {
@@ -24,7 +25,10 @@ export class Container {
     return this;
   }
 
-  public build(): { components: ContainerBuilder[]; flags: number } {
+  public build(options?: { ephemeral?: boolean }): {
+    components: ContainerBuilder[];
+    flags: number;
+  } {
     const container = new ContainerBuilder();
     if (this.accentColor !== undefined) {
       container.setAccentColor(this.accentColor);
@@ -44,9 +48,13 @@ export class Container {
       }
     }
 
+    const flags = options?.ephemeral
+      ? MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
+      : MessageFlags.IsComponentsV2;
+
     return {
       components: [container],
-      flags: MessageFlags.IsComponentsV2,
+      flags: flags,
     };
   }
 }

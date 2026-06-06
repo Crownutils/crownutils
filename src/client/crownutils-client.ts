@@ -47,9 +47,13 @@ export class CrownutilsClient {
 
     for (const event of events) {
       if (event.once) {
-        this.discord.once(event.name, (...args) => event.execute(...args));
+        this.discord.once(event.name, (...args) => {
+          void event.execute(...args);
+        });
       } else {
-        this.discord.on(event.name, (...args) => event.execute(...args));
+        this.discord.on(event.name, (...args) => {
+          void event.execute(...args);
+        });
       }
     }
 
