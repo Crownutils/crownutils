@@ -1,5 +1,5 @@
 import { REST, Routes } from 'discord.js';
-import { loadSlashCommands } from '@/handlers/command-handler.js';
+import { loadSlashCommands } from '@/handlers/slash-handler.js';
 import { slashCommands } from './registries/slash-registry.js';
 
 const token = process.env.DISCORD_TOKEN;
