@@ -12,6 +12,7 @@ export interface SlashCommand {
 
 export interface PrefixCommand {
   name: string;
+  description: string;
   aliases?: string[];
   execute(interaction: Message, args: string[]): Promise<void>;
 }
