@@ -28,7 +28,15 @@ export async function loadModules<T>(
 
   for (const file of moduleFiles) {
     const fileUrl = pathToFileURL(join(dirPath, file)).href;
-    const module = (await import(fileUrl)) as Record<string, unknown>;
+
+    let module: Record<string, unknown>;
+    try {
+      module = (await import(fileUrl)) as Record<string, unknown>;
+    } catch (error) {
+      logger.error({ error }, `Error when importing file: ${fileUrl}, skipping.`);
+      continue;
+    }
+
     const candidate = module[exportName];
 
     if (!isValid(candidate)) {
