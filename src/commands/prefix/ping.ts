@@ -3,7 +3,7 @@ import { Container, render } from '@/lib/components/container.js';
 import { Separator } from '@/lib/components/separator.js';
 import { Text } from '@/lib/components/text.js';
 import { Title } from '@/lib/components/title.js';
-import { PrefixCommand } from '@/types/command.js';
+import type { PrefixCommand } from '@/types/command.js';
 
 export const command: PrefixCommand = {
   name: 'ping',
