@@ -33,7 +33,8 @@ export async function loadModules<T>(
     try {
       module = (await import(fileUrl)) as Record<string, unknown>;
     } catch (error) {
-      logger.error({ error }, `Error when importing file: ${fileUrl}, skipping.`);
+      const err = error instanceof Error ? error : new Error(String(error));
+      logger.error({ err }, `Failed to import file: ${fileUrl}, skipping.`);
       continue;
     }
 
