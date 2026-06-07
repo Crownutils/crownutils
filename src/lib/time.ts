@@ -5,7 +5,18 @@ const UNIT_TO_MS = {
   d: 1000 * 60 * 60 * 24,
 } as const;
 
-export function parseDuration(input: string): number | null {
+type Milliseconds = number & { readonly __brand: 'Milliseconds' };
+type Seconds = number & { readonly __brand: 'Seconds' };
+
+function ms(n: number): Milliseconds {
+  return n as Milliseconds;
+}
+
+function seconds(n: number): Seconds {
+  return n as Seconds;
+}
+
+export function parseDuration(input: string): Milliseconds | null {
   const pattern = /(\d+)(s|m|h|d)/g;
   const validPattern = /^(\d+(s|m|h|d))+$/;
   if (!validPattern.test(input)) {
@@ -19,5 +30,9 @@ export function parseDuration(input: string): number | null {
     total += value * UNIT_TO_MS[unit];
   }
 
-  return total;
+  return ms(total);
+}
+
+export function msToUnixSeconds(value: Milliseconds): Seconds {
+  return seconds(Math.floor(value / 1000));
 }
