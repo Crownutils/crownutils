@@ -4,62 +4,58 @@ import type {
   CommandRequirements,
   CommandScope,
   CommandValidation,
+  ExecutionContext,
 } from '@/types/command.js';
-import { AUTHORIZATION_LEVELS, SCOPE_LEVELS } from '@/types/command.js';
+import {
+  AUTHORIZATION_LEVELS,
+  SCOPE_ALLOWED_CONTEXTS,
+} from '@/lib/permissions.js';
+import { env } from '@/lib/env.js';
+
+function resolveExecutionContext(guildId: string | null): ExecutionContext {
+  if (guildId === null) {
+    return 'dm';
+  }
+  if (guildId === env.mainGuildId) {
+    return 'main_guild';
+  }
+  return 'other_guild';
+}
+
+function resolveAuthorization(userId: string): CommandAuthorization {
+  if (userId === env.ownerId) {
+    return 'owner';
+  }
+  if (env.privilegedIds.includes(userId)) {
+    return 'privileged';
+  }
+  return 'public';
+}
 
 export function checkCommandScope(
   requiredScope: CommandScope,
   guildId: string | null,
 ): CommandValidation {
-  const currentScope: CommandScope =
-    guildId === null
-      ? 'everywhere'
-      : guildId === process.env.MAIN_GUILD_ID
-        ? 'main_guild_only'
-        : 'global';
+  const context = resolveExecutionContext(guildId);
+  const isAllowed = SCOPE_ALLOWED_CONTEXTS[requiredScope].includes(context);
 
-  const currentScopeLevel = SCOPE_LEVELS[currentScope];
-  const requiredScopeLevel = SCOPE_LEVELS[requiredScope];
-
-  if (currentScopeLevel >= requiredScopeLevel) {
-    return {
-      canBeExecuted: true,
-      missing_permissions: [],
-    };
-  }
-
-  return {
-    canBeExecuted: false,
-    missing_permissions: [requiredScope],
-  };
+  return isAllowed
+    ? { canBeExecuted: true, missingPermissions: [] }
+    : { canBeExecuted: false, missingPermissions: [requiredScope] };
 }
 
 export function checkCommandAuthorization(
   requiredAuthorization: CommandAuthorization,
   userId: string,
 ): CommandValidation {
-  const currentAuthorization: CommandAuthorization =
-    userId === process.env.OWNER_ID
-      ? 'owner'
-      : process.env.PRIVILEGED_IDS?.split(',').filter(Boolean).includes(userId)
-        ? 'privileged'
-        : 'public';
-
-  const currentAuthorizationLevel = AUTHORIZATION_LEVELS[currentAuthorization];
-  const requiredAuthorizationLevel =
+  const currentAuthorization = resolveAuthorization(userId);
+  const isAllowed =
+    AUTHORIZATION_LEVELS[currentAuthorization] >=
     AUTHORIZATION_LEVELS[requiredAuthorization];
 
-  if (currentAuthorizationLevel >= requiredAuthorizationLevel) {
-    return {
-      canBeExecuted: true,
-      missing_permissions: [],
-    };
-  }
-
-  return {
-    canBeExecuted: false,
-    missing_permissions: [requiredAuthorization],
-  };
+  return isAllowed
+    ? { canBeExecuted: true, missingPermissions: [] }
+    : { canBeExecuted: false, missingPermissions: [requiredAuthorization] };
 }
 
 export function checkCommandRequirements(
@@ -67,27 +63,30 @@ export function checkCommandRequirements(
   guildId: string | null,
   userId: string,
 ): CommandValidation {
-  const missing_permissions: CommandPermission[] = [];
+  const missingPermissions: CommandPermission[] = [];
 
-  const isScopeValid: CommandValidation = commandRequirements.scope
-    ? checkCommandScope(commandRequirements.scope, guildId)
-    : { canBeExecuted: true, missing_permissions: [] };
-  const isAuthorizationValid: CommandValidation =
-    commandRequirements.authorizations
-      ? checkCommandAuthorization(commandRequirements.authorizations, userId)
-      : { canBeExecuted: true, missing_permissions: [] };
-
-  if (!isScopeValid.canBeExecuted) {
-    missing_permissions.push(...isScopeValid.missing_permissions);
+  if (commandRequirements.scope) {
+    const scopeValidation = checkCommandScope(
+      commandRequirements.scope,
+      guildId,
+    );
+    if (!scopeValidation.canBeExecuted) {
+      missingPermissions.push(...scopeValidation.missingPermissions);
+    }
   }
 
-  if (!isAuthorizationValid.canBeExecuted) {
-    missing_permissions.push(...isAuthorizationValid.missing_permissions);
+  if (commandRequirements.authorization) {
+    const authorizationValidation = checkCommandAuthorization(
+      commandRequirements.authorization,
+      userId,
+    );
+    if (!authorizationValidation.canBeExecuted) {
+      missingPermissions.push(...authorizationValidation.missingPermissions);
+    }
   }
 
   return {
-    canBeExecuted:
-      isScopeValid.canBeExecuted && isAuthorizationValid.canBeExecuted,
-    missing_permissions,
+    canBeExecuted: missingPermissions.length === 0,
+    missingPermissions,
   };
 }

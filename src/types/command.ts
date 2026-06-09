@@ -7,28 +7,17 @@ import type {
 
 export type CommandAuthorization = 'owner' | 'privileged' | 'public';
 export type CommandScope = 'main_guild_only' | 'global' | 'everywhere';
+export type ExecutionContext = 'dm' | 'main_guild' | 'other_guild';
 export type CommandPermission = CommandScope | CommandAuthorization;
-
-export const AUTHORIZATION_LEVELS = {
-  owner: 3,
-  privileged: 2,
-  public: 1,
-} as const;
-
-export const SCOPE_LEVELS = {
-  main_guild_only: 3,
-  global: 2,
-  everywhere: 1,
-} as const;
 
 export interface CommandRequirements {
   scope?: CommandScope;
-  authorizations?: CommandAuthorization;
+  authorization?: CommandAuthorization;
 }
 
 export interface CommandValidation {
   canBeExecuted: boolean;
-  missing_permissions: CommandPermission[];
+  missingPermissions: CommandPermission[];
 }
 
 export interface SlashCommand {
