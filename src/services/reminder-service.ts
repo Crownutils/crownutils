@@ -1,60 +1,135 @@
 import type { Reminder } from '@/generated/prisma/client.js';
-import { reminderMessages } from '@/lang/reminder.js';
-import { Container } from '@/lib/components/container.js';
-import { Text } from '@/lib/components/text.js';
-import { Title } from '@/lib/components/title.js';
+import { logger } from '@/lib/logger.js';
 import { prisma } from '@/lib/prisma.js';
+import { buildReminderTriggeredContainer } from '@/lib/reminder-presentation.js';
+import { MAX_TIMEOUT_MS, parseDurationMs } from '@/lib/time.js';
 import type { Client } from 'discord.js';
 
-export async function createReminder(
+export const DEFAULT_REMINDER_DURATION = '9m45s';
+
+export type ReminderInputError = 'invalid_format' | 'duration_too_long';
+
+export type CreateReminderResult =
+  | { ok: true; reminder: Reminder }
+  | { ok: false; error: ReminderInputError };
+
+const timers = new Map<string, NodeJS.Timeout>();
+
+async function createReminder(
   channelId: string,
   userId: string,
   triggerAt: Date,
   message: string,
 ): Promise<Reminder> {
-  const reminder = await prisma.reminder.create({
-    data: {
-      channelId,
-      userId,
-      triggerAt,
-      message,
-    },
+  return prisma.reminder.create({
+    data: { channelId, userId, triggerAt, message },
   });
+}
 
-  return reminder;
+export async function createReminderFromInput(
+  client: Client,
+  channelId: string,
+  userId: string,
+  durationInput: string,
+  message: string,
+): Promise<CreateReminderResult> {
+  const durationMs = parseDurationMs(durationInput);
+  if (durationMs === null || durationMs <= 0 || message.length === 0) {
+    return { ok: false, error: 'invalid_format' };
+  }
+  if (durationMs > MAX_TIMEOUT_MS) {
+    return { ok: false, error: 'duration_too_long' };
+  }
+
+  const triggerAt = new Date(Date.now() + durationMs);
+  const reminder = await createReminder(channelId, userId, triggerAt, message);
+  scheduleReminder(client, reminder);
+
+  return { ok: true, reminder };
+}
+
+export function listReminders(userId: string): Promise<Reminder[]> {
+  return prisma.reminder.findMany({
+    where: { userId },
+    orderBy: { triggerAt: 'asc' },
+  });
+}
+
+export async function cancelReminder(id: string): Promise<boolean> {
+  const timer = timers.get(id);
+  if (timer) {
+    clearTimeout(timer);
+    timers.delete(id);
+  }
+
+  try {
+    await prisma.reminder.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function triggerReminder(
   client: Client,
   reminder: Reminder,
 ): Promise<void> {
-  const channel = await client.channels.fetch(reminder.channelId);
+  timers.delete(reminder.id);
 
-  if (channel?.isSendable()) {
-    const payload = new Container()
-      .color('info')
-      .add(
-        new Title(reminderMessages.triggered.title),
-        new Text(reminder.message),
-        new Text(`<@${reminder.userId}>`),
-      )
-      .build();
-
-    await channel.send({
-      ...payload,
-      allowedMentions: { users: [reminder.userId] },
-    });
+  try {
+    const channel = await client.channels.fetch(reminder.channelId);
+    if (channel?.isSendable()) {
+      const payload = buildReminderTriggeredContainer(reminder).build();
+      await channel.send({
+        ...payload,
+        allowedMentions: { users: [reminder.userId] },
+      });
+    }
+  } catch (error) {
+    logger.error(
+      { error, reminderId: reminder.id },
+      'Failed to deliver reminder.',
+    );
   }
 
-  await prisma.reminder.delete({
-    where: { id: reminder.id },
-  });
+  try {
+    await prisma.reminder.delete({ where: { id: reminder.id } });
+  } catch (error) {
+    logger.error(
+      { error, reminderId: reminder.id },
+      'Failed to delete reminder after trigger.',
+    );
+  }
 }
 
 function scheduleReminder(client: Client, reminder: Reminder): void {
-  const delay = Math.max(0, reminder.triggerAt.getTime() - Date.now());
+  const existing = timers.get(reminder.id);
+  if (existing) {
+    clearTimeout(existing);
+  }
 
-  setTimeout(() => {
+  const remaining = reminder.triggerAt.getTime() - Date.now();
+  const delay = Math.min(Math.max(0, remaining), MAX_TIMEOUT_MS);
+
+  const timer = setTimeout(() => {
     void triggerReminder(client, reminder);
   }, delay);
+
+  timers.set(reminder.id, timer);
+}
+
+export async function rehydrateReminders(client: Client): Promise<void> {
+  let reminders: Reminder[];
+  try {
+    reminders = await prisma.reminder.findMany();
+  } catch (error) {
+    logger.error({ error }, 'Failed to load reminders for rehydration.');
+    return;
+  }
+
+  for (const reminder of reminders) {
+    scheduleReminder(client, reminder);
+  }
+
+  logger.info(`Rehydrated ${reminders.length} reminder(s).`);
 }
