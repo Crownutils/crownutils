@@ -1,6 +1,6 @@
 import { loadModules } from '@/handlers/base-loader.js';
 import { prefixCommands } from '@/registries/prefix-registry.js';
-import type { PrefixCommand } from '@/types/command.js';
+import type { PrefixCommand } from '@/types/command/command.js';
 
 function isPrefixCommand(obj: unknown): obj is PrefixCommand {
   if (typeof obj !== 'object' || obj === null) {

@@ -1,12 +1,13 @@
-import type { CommandPermission } from '@/types/command.js';
-import { Container } from './components/container.js';
-import { buildCommandPermissionsErrorReply } from '@/lang/errors.js';
-import { Text } from './components/text.js';
+import type { CommandPermissionError } from '@/types/command/command-permission.js';
+import { formatPermissionErrors } from '@/lang/index.js';
+import { Container, Text } from './components/index.js';
+
+export function buildErrorContainer(message: string): Container {
+  return new Container().color('error').add(new Text(message));
+}
 
 export function buildCommandPermissionsErrorContainer(
-  missing_permissions: CommandPermission[],
+  permissionErrors: CommandPermissionError[],
 ): Container {
-  return new Container()
-    .color('error')
-    .add(new Text(buildCommandPermissionsErrorReply(missing_permissions)));
+  return buildErrorContainer(formatPermissionErrors(permissionErrors));
 }

@@ -1,31 +1,35 @@
-import { pingDescription, pingMessages } from '@/lang/ping.js';
-import { Container, render } from '@/lib/components/container.js';
-import { Separator } from '@/lib/components/separator.js';
-import { Text } from '@/lib/components/text.js';
-import { Title } from '@/lib/components/title.js';
-import type { PrefixCommand } from '@/types/command.js';
+import { lang } from '@/lang/index.js';
+import { Container, Text, Separator, Title } from '@/lib/components/index.js';
+import type { PrefixCommand } from '@/types/command/command.js';
 
-export const command: PrefixCommand = {
+export const command = {
   name: 'ping',
-  description: pingDescription,
+  description: lang.ping.description,
   aliases: ['p', 'latency'],
+  requirements: {
+    scope: 'global',
+  },
 
   async execute(message, _args) {
     const before = Date.now();
-    const sent = await message.reply(
-      render(new Text(pingMessages.calculating)),
-    );
-    const totalLatency = sent.createdTimestamp - before;
-    const discordLatency = Math.round(message.client.ws.ping);
+    const interim = new Container()
+      .color('info')
+      .add(new Text(lang.ping.messages.calculating))
+      .build();
+    const sent = await message.reply(interim);
+
+    const totalMs = sent.createdTimestamp - before;
+    const discordMs = Math.round(message.client.ws.ping);
+
     const final = new Container()
       .color('info')
       .add(
-        new Title(pingMessages.title),
+        new Title(lang.ping.messages.title),
         new Separator(),
-        new Text(pingMessages.result(totalLatency, discordLatency)),
+        new Text(lang.ping.messages.result({ totalMs, discordMs })),
       )
       .build();
 
-    await sent.edit({ ...final, content: null });
+    await sent.edit(final);
   },
-};
+} satisfies PrefixCommand;
