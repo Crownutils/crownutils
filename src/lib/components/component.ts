@@ -1,14 +1,16 @@
 import type {
-  ContainerBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  SectionBuilder,
   SeparatorBuilder,
   TextDisplayBuilder,
 } from 'discord.js';
 
-/** The discriminated union of all V2 components.
- * "kind" is the discriminant: it tells Container which native
- * discord.js method to call when assembling the component.
- */
-export type V2Component = TextComponent | SeparatorComponent | RawComponent;
+export type V2Component =
+  | TextComponent
+  | SeparatorComponent
+  | SectionComponent
+  | ActionRowComponent;
 
 export interface TextComponent {
   kind: 'text';
@@ -20,11 +22,12 @@ export interface SeparatorComponent {
   toBuilder(): SeparatorBuilder;
 }
 
-/** Escape hatch: wraps any native component the model doesn't cover
- * (sections, galleries, buttons...). "apply" adds it to the container
- *directly, since each native type needs its own add method.
- */
-export interface RawComponent {
-  kind: 'raw';
-  apply(container: ContainerBuilder): void;
+export interface SectionComponent {
+  kind: 'section';
+  toBuilder(): SectionBuilder;
+}
+
+export interface ActionRowComponent {
+  kind: 'action-row';
+  toBuilder(): ActionRowBuilder<ButtonBuilder>;
 }

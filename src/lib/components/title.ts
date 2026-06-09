@@ -1,17 +1,25 @@
 import { TextDisplayBuilder } from 'discord.js';
 import type { TextComponent } from './component.js';
 
-/**
- * A heading component. It is a Text under the hood (kind: 'text')
- * since Discord renders titles as markdown headers inside a
- * TextDisplay — there is no dedicated "title" component in V2.
- */
+export type TitleSize = 'small' | 'medium' | 'large';
+
+const TITLE_PREFIX = {
+  small: '###',
+  medium: '##',
+  large: '#',
+} as const satisfies Record<TitleSize, string>;
+
 export class Title implements TextComponent {
   public readonly kind = 'text';
 
-  public constructor(private readonly content: string) {}
+  public constructor(
+    private readonly content: string,
+    private readonly size: TitleSize = 'medium',
+  ) {}
 
   public toBuilder(): TextDisplayBuilder {
-    return new TextDisplayBuilder().setContent(`## ${this.content}`);
+    return new TextDisplayBuilder().setContent(
+      `${TITLE_PREFIX[this.size]} ${this.content}`,
+    );
   }
 }

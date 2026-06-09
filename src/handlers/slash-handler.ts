@@ -1,13 +1,7 @@
-import type { SlashCommand } from '@/types/command.js';
+import type { SlashCommand } from '@/types/command/command.js';
 import { slashCommands } from '@/registries/slash-registry.js';
 import { loadModules } from './base-loader.js';
 
-/**
- * Type guard that checks whether a dynamically imported object is a
- * usable SlashCommand (has a `data.name` and a callable `execute`).
- * Lets the loader skip malformed files at startup instead of crashing
- * later at runtime.
- */
 function isSlashCommand(obj: unknown): obj is SlashCommand {
   if (typeof obj !== 'object' || obj === null) {
     return false;

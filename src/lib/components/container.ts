@@ -1,12 +1,12 @@
-import type { TextDisplayBuilder } from 'discord.js';
 import { ContainerBuilder, MessageFlags } from 'discord.js';
-import type { TextComponent, V2Component } from './component.js';
+import type { V2Component } from './component.js';
 
 const COLORS = {
   success: 0x57f287,
   error: 0xed4245,
   info: 0x5865f2,
   warning: 0xfee75c,
+  cancelled: 0xe74c3c,
 } as const;
 
 type ColorName = keyof typeof COLORS;
@@ -15,8 +15,8 @@ export class Container {
   private readonly components: V2Component[] = [];
   private accentColor?: number;
 
-  public color(color: ColorName | number): this {
-    this.accentColor = typeof color === 'number' ? color : COLORS[color];
+  public color(color: ColorName): this {
+    this.accentColor = COLORS[color];
     return this;
   }
 
@@ -42,8 +42,11 @@ export class Container {
         case 'separator':
           container.addSeparatorComponents(component.toBuilder());
           break;
-        case 'raw':
-          component.apply(container);
+        case 'section':
+          container.addSectionComponents(component.toBuilder());
+          break;
+        case 'action-row':
+          container.addActionRowComponents(component.toBuilder());
           break;
       }
     }
@@ -54,17 +57,7 @@ export class Container {
 
     return {
       components: [container],
-      flags: flags,
+      flags,
     };
   }
-}
-
-export function render(component: TextComponent): {
-  components: TextDisplayBuilder[];
-  flags: number;
-} {
-  return {
-    components: [component.toBuilder()],
-    flags: MessageFlags.IsComponentsV2,
-  };
 }
