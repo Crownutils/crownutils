@@ -1,7 +1,17 @@
 import type { CommandPermission } from '@/types/command.js';
+import { PERMISSION_LABELS } from './permissions.js';
 
-export function buildCommandPermissionsErrorReply(
-  missing_permissions: CommandPermission[],
+export const errors = {
+  unexpected:
+    'Une erreur inattendue est survenue. Veuillez réessayer plus tard.',
+} as const;
+
+export function formatMissingPermissions(
+  missingPermissions: CommandPermission[],
 ): string {
-  return `La commande n'a pas pu être exécutée. (\`${missing_permissions.length > 1 ? 'erreurs' : 'erreur'}: ${missing_permissions.join(', ')}\`)`;
+  const labels = missingPermissions.map(
+    (permission) => PERMISSION_LABELS[permission],
+  );
+  const noun = labels.length > 1 ? 'erreurs' : 'erreur';
+  return `La commande n'a pas pu être exécutée. (\`${noun} : ${labels.join(', ')}\`)`;
 }
