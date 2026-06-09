@@ -1,29 +1,22 @@
 import { REST, Routes } from 'discord.js';
 import { loadSlashCommands } from '@/handlers/slash-handler.js';
-import { slashCommands } from './registries/slash-registry.js';
+import { slashCommands } from '@/registries/slash-registry.js';
+import { env, requireEnv } from '@/lib/env.js';
+import { logger } from '@/lib/logger.js';
 
-const token = process.env.DISCORD_TOKEN;
-const clientId = process.env.DISCORD_CLIENT_ID;
-const testGuildId = process.env.TEST_GUILD_ID;
-const isProduction = process.env.NODE_ENV === 'production';
+const token = requireEnv('discordToken');
+const clientId = requireEnv('discordClientId');
 
-// In production we deploy globally (no guild needed).
-// In development we deploy to the test guild (instant).
-if (!token || !clientId) {
-  throw new Error('Missing DISCORD_TOKEN or DISCORD_CLIENT_ID in .env');
-}
-
-if (!isProduction && !testGuildId) {
-  throw new Error('Missing DISCORD_GUILD_ID for development deployment');
+if (!env.isProduction && !env.testGuildId) {
+  throw new Error('Missing TEST_GUILD_ID for development deployment');
 }
 
 await loadSlashCommands();
 
 const rest = new REST().setToken(token);
 
-if (isProduction) {
-  const mainGuildId = process.env.MAIN_GUILD_ID;
-  if (!mainGuildId) throw new Error('Missing MAIN_GUILD_ID in .env');
+if (env.isProduction) {
+  const mainGuildId = requireEnv('mainGuildId');
 
   const allCommands = [...slashCommands.values()];
 
@@ -41,19 +34,18 @@ if (isProduction) {
     Routes.applicationGuildCommands(clientId, mainGuildId),
     { body: guildBody },
   )) as unknown[];
-  console.log(
-    `✅ Deployed ${guildData.length} guild command(s) to main guild.`,
-  );
+  logger.info(`Deployed ${guildData.length} guild command(s) to main guild.`);
 
   const globalData = (await rest.put(Routes.applicationCommands(clientId), {
     body: globalBody,
   })) as unknown[];
-  console.log(`✅ Deployed ${globalData.length} global command(s).`);
+  logger.info(`Deployed ${globalData.length} global command(s).`);
 } else {
+  const testGuildId = requireEnv('testGuildId');
   const body = [...slashCommands.values()].map((cmd) => cmd.data.toJSON());
   const data = (await rest.put(
-    Routes.applicationGuildCommands(clientId, testGuildId!),
+    Routes.applicationGuildCommands(clientId, testGuildId),
     { body },
   )) as unknown[];
-  console.log(`✅ Deployed ${data.length} command(s) to test guild.`);
+  logger.info(`Deployed ${data.length} command(s) to test guild.`);
 }

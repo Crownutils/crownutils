@@ -1,16 +1,10 @@
 import pino from 'pino';
+import { env } from '@/lib/env.js';
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = env.isProduction;
 
-/**
- * Application-wide logger.
- * In development: pretty, colorized, human-readable output.
- * In production: raw JSON for performance and log aggregation.
- */
 export const logger = pino({
   level: isProduction ? 'info' : 'debug',
-  // In dev we want debug-level verbosity; in prod, info and above.
-
   transport: isProduction
     ? undefined
     : {
