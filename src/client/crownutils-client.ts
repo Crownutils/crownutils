@@ -1,6 +1,6 @@
 import { ActivityType, Client, GatewayIntentBits } from 'discord.js';
 import { loadSlashCommands } from '@/handlers/slash-handler.js';
-import type { SlashCommand } from '@/types/command.js';
+import type { SlashCommand } from '@/types/command/command.js';
 import { loadEvents } from '@/handlers/event-handler.js';
 import { slashCommands } from '@/registries/slash-registry.js';
 import { logger } from '@/lib/logger.js';

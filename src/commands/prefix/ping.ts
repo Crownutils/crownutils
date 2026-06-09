@@ -1,11 +1,14 @@
 import { lang } from '@/lang/index.js';
 import { Container, Text, Separator, Title } from '@/lib/components/index.js';
-import type { PrefixCommand } from '@/types/command.js';
+import type { PrefixCommand } from '@/types/command/command.js';
 
-export const command: PrefixCommand = {
+export const command = {
   name: 'ping',
   description: lang.ping.description,
   aliases: ['p', 'latency'],
+  requirements: {
+    scope: 'global',
+  },
 
   async execute(message, _args) {
     const before = Date.now();
@@ -29,4 +32,4 @@ export const command: PrefixCommand = {
 
     await sent.edit(final);
   },
-};
+} satisfies PrefixCommand;

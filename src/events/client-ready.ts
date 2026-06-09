@@ -3,11 +3,11 @@ import type { Event } from '@/types/event.js';
 import { logger } from '@/lib/logger.js';
 import { rehydrateReminders } from '@/services/reminder-service.js';
 
-export const event: Event<Events.ClientReady> = {
+export const event = {
   name: Events.ClientReady,
   once: true,
   async execute(client) {
     logger.info(`Logged in as ${client.user.tag}`);
     await rehydrateReminders(client);
   },
-};
+} satisfies Event<Events.ClientReady>;

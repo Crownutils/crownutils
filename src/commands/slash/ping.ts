@@ -1,12 +1,15 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/lang/index.js';
-import type { SlashCommand } from '@/types/command.js';
+import type { SlashCommand } from '@/types/command/command.js';
 import { Container, Text, Separator, Title } from '@/lib/components/index.js';
 
-export const command: SlashCommand = {
+export const command = {
   data: new SlashCommandBuilder()
     .setName('ping')
     .setDescription(lang.ping.description),
+  requirements: {
+    scope: 'global',
+  },
 
   async execute(interaction) {
     const before = Date.now();
@@ -25,4 +28,4 @@ export const command: SlashCommand = {
 
     await interaction.editReply(message);
   },
-};
+} satisfies SlashCommand;

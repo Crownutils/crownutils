@@ -1,4 +1,4 @@
-import type { SlashCommand } from '@/types/command.js';
+import type { SlashCommand } from '@/types/command/command.js';
 import { slashCommands } from '@/registries/slash-registry.js';
 import { loadModules } from './base-loader.js';
 
