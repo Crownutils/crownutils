@@ -31,17 +31,12 @@ export class CrownutilsClient {
     });
   }
 
-  /**
-   * Async initialization: loads commands into the registry.
-   * Must be awaited before login().
-   */
   public async init(): Promise<void> {
     await this.registerEvents();
     await this.loadCommands();
     await this.loadPrefixCommands();
   }
 
-  /** Loads event files and binds each one onto the discord client. */
   private async registerEvents(): Promise<void> {
     const events = await loadEvents();
 
@@ -70,9 +65,6 @@ export class CrownutilsClient {
     logger.info(`Loaded ${prefixCommands.size} prefix command(s).`);
   }
 
-  /**
-   * Connects the bot to Discord.
-   */
   public async login(token: string): Promise<void> {
     await this.discord.login(token);
   }
