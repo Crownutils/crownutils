@@ -7,7 +7,8 @@ import { env } from '@/lib/env.js';
 import type { Client } from 'discord.js';
 
 export const DEFAULT_REMINDER_DURATION = '9m45s';
-export const MAX_REMINDERS_PER_USER = 5;
+export const MAX_REMINDER_PER_PRIVILEGED_USER = 5;
+export const MAX_REMINDERS_PER_USER = 1;
 
 export type ReminderInputError =
   | 'invalid_format'
@@ -47,8 +48,10 @@ export async function createReminderFromInput(
   }
 
   if (userId !== env.ownerId) {
+    const isPrivilegedUser = env.privilegedIds.includes(userId);
+    const maxReminders = isPrivilegedUser ? MAX_REMINDER_PER_PRIVILEGED_USER : MAX_REMINDERS_PER_USER;
     const reminderCount = await prisma.reminder.count({ where: { userId } });
-    if (reminderCount >= MAX_REMINDERS_PER_USER) {
+    if (reminderCount >= maxReminders) {
       return { ok: false, error: 'limit_reached' };
     }
   }
