@@ -2,10 +2,6 @@ import type { ClientEvents } from 'discord.js';
 import type { Event } from '@/types/event.js';
 import { loadModules } from './base-loader.js';
 
-/**
- * Type guard ensuring a dynamically imported value is a usable Event
- * (has a string name and a callable execute).
- */
 function isEvent(obj: unknown): obj is Event<keyof ClientEvents> {
   if (typeof obj !== 'object' || obj === null) {
     return false;

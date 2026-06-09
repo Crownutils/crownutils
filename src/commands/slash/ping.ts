@@ -1,31 +1,31 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { pingDescription, pingMessages } from '@/lang/index.js';
-import type { SlashCommand } from '@/types/command.js';
-import { Container } from '@/lib/components/container.js';
-import { Text } from '@/lib/components/text.js';
-import { Separator } from '@/lib/components/separator.js';
-import { Title } from '@/lib/components/title.js';
+import { lang } from '@/lang/index.js';
+import type { SlashCommand } from '@/types/command/command.js';
+import { Container, Text, Separator, Title } from '@/lib/components/index.js';
 
-export const command: SlashCommand = {
+export const command = {
   data: new SlashCommandBuilder()
     .setName('ping')
-    .setDescription(pingDescription),
+    .setDescription(lang.ping.description),
+  requirements: {
+    scope: 'global',
+  },
 
   async execute(interaction) {
     const before = Date.now();
     await interaction.deferReply();
-    const totalLatency = Date.now() - before;
-    const discordLatency = Math.round(interaction.client.ws.ping);
+    const totalMs = Date.now() - before;
+    const discordMs = Math.round(interaction.client.ws.ping);
 
     const message = new Container()
       .color('info')
       .add(
-        new Title(pingMessages.title),
+        new Title(lang.ping.messages.title),
         new Separator(),
-        new Text(pingMessages.result(totalLatency, discordLatency)),
+        new Text(lang.ping.messages.result({ totalMs, discordMs })),
       )
       .build();
 
     await interaction.editReply(message);
   },
-};
+} satisfies SlashCommand;

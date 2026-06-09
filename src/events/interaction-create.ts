@@ -1,10 +1,19 @@
 import { Events } from 'discord.js';
 import { slashCommands } from '@/registries/slash-registry.js';
 import type { Event } from '@/types/event.js';
-import { checkCommandRequirements } from '@/lib/command-requirements.js';
-import { buildCommandPermissionsErrorContainer } from '@/lib/errors.js';
+import {
+  checkCommandRequirements,
+  resolveAuthorization,
+  resolveExecutionContext,
+} from '@/lib/permissions/index.js';
+import {
+  buildCommandPermissionsErrorContainer,
+  buildErrorContainer,
+} from '@/lib/errors.js';
+import { lang } from '@/lang/index.js';
+import { logger } from '@/lib/logger.js';
 
-export const event: Event<Events.InteractionCreate> = {
+export const event = {
   name: Events.InteractionCreate,
   async execute(interaction) {
     if (!interaction.isChatInputCommand()) return;
@@ -13,15 +22,15 @@ export const event: Event<Events.InteractionCreate> = {
     if (!command) return;
 
     if (command.requirements) {
-      const isRequirementsValid = checkCommandRequirements(
+      const validation = checkCommandRequirements(
         command.requirements,
-        interaction.guildId,
-        interaction.user.id,
+        resolveExecutionContext(interaction.guildId),
+        resolveAuthorization(interaction.user.id),
       );
 
-      if (!isRequirementsValid.canBeExecuted) {
+      if (!validation.canBeExecuted) {
         const reply = buildCommandPermissionsErrorContainer(
-          isRequirementsValid.missing_permissions,
+          validation.errors,
         ).build({ ephemeral: true });
 
         await interaction.reply(reply);
@@ -29,6 +38,23 @@ export const event: Event<Events.InteractionCreate> = {
       }
     }
 
-    return command.execute(interaction);
+    try {
+      await command.execute(interaction);
+    } catch (error) {
+      logger.error(
+        { error, command: interaction.commandName },
+        'Slash command execution failed.',
+      );
+
+      const reply = buildErrorContainer(lang.errors.unexpected).build({
+        ephemeral: true,
+      });
+
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(reply).catch(() => {});
+      } else {
+        await interaction.reply(reply).catch(() => {});
+      }
+    }
   },
-};
+} satisfies Event<Events.InteractionCreate>;
