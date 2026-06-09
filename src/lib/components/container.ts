@@ -6,6 +6,7 @@ const COLORS = {
   error: 0xed4245,
   info: 0x5865f2,
   warning: 0xfee75c,
+  cancelled: 0xe74c3c,
 } as const;
 
 type ColorName = keyof typeof COLORS;
@@ -40,6 +41,12 @@ export class Container {
           break;
         case 'separator':
           container.addSeparatorComponents(component.toBuilder());
+          break;
+        case 'section':
+          container.addSectionComponents(component.toBuilder());
+          break;
+        case 'action-row':
+          container.addActionRowComponents(component.toBuilder());
           break;
       }
     }
