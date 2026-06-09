@@ -6,47 +6,43 @@ import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,
 } from '@/lib/errors.js';
-import { checkCommandRequirements } from '@/lib/command-requirements.js';
+import {
+  checkCommandRequirements,
+  resolveAuthorization,
+  resolveExecutionContext,
+} from '@/lib/permissions/index.js';
 import { lang } from '@/lang/index.js';
 
 const PREFIX = '!';
 
-export const event: Event<Events.MessageCreate> = {
+export const event = {
   name: Events.MessageCreate,
 
   async execute(message) {
-    if (message.author.bot) {
-      return;
-    }
+    if (message.author.bot) return;
 
-    if (!message.content.startsWith(PREFIX)) {
-      return;
-    }
+    if (!message.content.startsWith(PREFIX)) return;
 
     const withoutPrefix = message.content.slice(PREFIX.length);
     const parts = withoutPrefix.trim().split(/\s+/);
     const commandName = parts.shift()?.toLowerCase();
     const args = parts;
 
-    if (!commandName) {
-      return;
-    }
+    if (!commandName) return;
 
     const command = prefixCommands.get(commandName);
-    if (!command) {
-      return;
-    }
+    if (!command) return;
 
     if (command.requirements) {
-      const requirementValidation = checkCommandRequirements(
+      const validation = checkCommandRequirements(
         command.requirements,
-        message.guildId,
-        message.author.id,
+        resolveExecutionContext(message.guildId),
+        resolveAuthorization(message.author.id),
       );
 
-      if (!requirementValidation.canBeExecuted) {
+      if (!validation.canBeExecuted) {
         const reply = buildCommandPermissionsErrorContainer(
-          requirementValidation.missingPermissions,
+          validation.errors,
         ).build();
 
         await message.reply(reply);
@@ -58,9 +54,10 @@ export const event: Event<Events.MessageCreate> = {
       await command.execute(message, args);
     } catch (error) {
       logger.error({ error }, `Error in prefix command: ${commandName}`);
+
       await message
         .reply(buildErrorContainer(lang.errors.unexpected).build())
         .catch(() => {});
     }
   },
-};
+} satisfies Event<Events.MessageCreate>;

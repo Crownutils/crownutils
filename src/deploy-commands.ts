@@ -21,10 +21,10 @@ if (env.isProduction) {
   const allCommands = [...slashCommands.values()];
 
   const guildCommands = allCommands.filter(
-    (cmd) => cmd.requirements?.scope === 'main_guild_only',
+    (cmd) => cmd.requirements?.scope === 'main_guild',
   );
   const globalCommands = allCommands.filter(
-    (cmd) => cmd.requirements?.scope !== 'main_guild_only',
+    (cmd) => cmd.requirements?.scope !== 'main_guild',
   );
 
   const guildBody = guildCommands.map((cmd) => cmd.data.toJSON());

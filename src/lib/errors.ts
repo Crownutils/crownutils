@@ -1,5 +1,5 @@
-import type { CommandPermission } from '@/types/command.js';
-import { formatMissingPermissions } from '@/lang/index.js';
+import type { CommandPermissionError } from '@/types/command/command-permission.js';
+import { formatPermissionErrors } from '@/lang/index.js';
 import { Container, Text } from './components/index.js';
 
 export function buildErrorContainer(message: string): Container {
@@ -7,7 +7,7 @@ export function buildErrorContainer(message: string): Container {
 }
 
 export function buildCommandPermissionsErrorContainer(
-  missingPermissions: CommandPermission[],
+  permissionErrors: CommandPermissionError[],
 ): Container {
-  return buildErrorContainer(formatMissingPermissions(missingPermissions));
+  return buildErrorContainer(formatPermissionErrors(permissionErrors));
 }

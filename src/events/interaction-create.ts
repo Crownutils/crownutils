@@ -1,7 +1,11 @@
 import { Events } from 'discord.js';
 import { slashCommands } from '@/registries/slash-registry.js';
 import type { Event } from '@/types/event.js';
-import { checkCommandRequirements } from '@/lib/command-requirements.js';
+import {
+  checkCommandRequirements,
+  resolveAuthorization,
+  resolveExecutionContext,
+} from '@/lib/permissions/index.js';
 import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,
@@ -9,7 +13,7 @@ import {
 import { lang } from '@/lang/index.js';
 import { logger } from '@/lib/logger.js';
 
-export const event: Event<Events.InteractionCreate> = {
+export const event = {
   name: Events.InteractionCreate,
   async execute(interaction) {
     if (!interaction.isChatInputCommand()) return;
@@ -18,15 +22,15 @@ export const event: Event<Events.InteractionCreate> = {
     if (!command) return;
 
     if (command.requirements) {
-      const requirementValidation = checkCommandRequirements(
+      const validation = checkCommandRequirements(
         command.requirements,
-        interaction.guildId,
-        interaction.user.id,
+        resolveExecutionContext(interaction.guildId),
+        resolveAuthorization(interaction.user.id),
       );
 
-      if (!requirementValidation.canBeExecuted) {
+      if (!validation.canBeExecuted) {
         const reply = buildCommandPermissionsErrorContainer(
-          requirementValidation.missingPermissions,
+          validation.errors,
         ).build({ ephemeral: true });
 
         await interaction.reply(reply);
@@ -53,4 +57,4 @@ export const event: Event<Events.InteractionCreate> = {
       }
     }
   },
-};
+} satisfies Event<Events.InteractionCreate>;

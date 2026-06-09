@@ -6,18 +6,11 @@ import type {
 } from 'discord.js';
 
 export type CommandAuthorization = 'owner' | 'privileged' | 'public';
-export type CommandScope = 'main_guild_only' | 'global' | 'everywhere';
-export type ExecutionContext = 'dm' | 'main_guild' | 'other_guild';
-export type CommandPermission = CommandScope | CommandAuthorization;
+export type CommandScope = 'everywhere' | 'global' | 'main_guild';
 
 export interface CommandRequirements {
   scope?: CommandScope;
   authorization?: CommandAuthorization;
-}
-
-export interface CommandValidation {
-  canBeExecuted: boolean;
-  missingPermissions: CommandPermission[];
 }
 
 export interface SlashCommand {

@@ -4,4 +4,4 @@ import { errors } from './errors.js';
 
 export const lang = { ping, reminder, errors } as const;
 
-export { formatMissingPermissions } from './errors.js';
+export { formatPermissionErrors } from './errors.js';
