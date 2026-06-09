@@ -2,8 +2,12 @@ import { Events } from 'discord.js';
 import type { Event } from '@/types/event.js';
 import { prefixCommands } from '@/registries/prefix-registry.js';
 import { logger } from '@/lib/logger.js';
-import { buildCommandPermissionsErrorContainer } from '@/lib/errors.js';
+import {
+  buildCommandPermissionsErrorContainer,
+  buildErrorContainer,
+} from '@/lib/errors.js';
 import { checkCommandRequirements } from '@/lib/command-requirements.js';
+import { lang } from '@/lang/index.js';
 
 const PREFIX = '!';
 
@@ -34,15 +38,15 @@ export const event: Event<Events.MessageCreate> = {
     }
 
     if (command.requirements) {
-      const isRequirementsValid = checkCommandRequirements(
+      const requirementValidation = checkCommandRequirements(
         command.requirements,
         message.guildId,
         message.author.id,
       );
 
-      if (!isRequirementsValid.canBeExecuted) {
+      if (!requirementValidation.canBeExecuted) {
         const reply = buildCommandPermissionsErrorContainer(
-          isRequirementsValid.missing_permissions,
+          requirementValidation.missingPermissions,
         ).build();
 
         await message.reply(reply);
@@ -54,6 +58,9 @@ export const event: Event<Events.MessageCreate> = {
       await command.execute(message, args);
     } catch (error) {
       logger.error({ error }, `Error in prefix command: ${commandName}`);
+      await message
+        .reply(buildErrorContainer(lang.errors.unexpected).build())
+        .catch(() => {});
     }
   },
 };
