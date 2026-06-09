@@ -3,11 +3,16 @@ import { logger } from '@/lib/logger.js';
 import { prisma } from '@/lib/prisma.js';
 import { buildReminderTriggeredContainer } from '@/lib/reminder-presentation.js';
 import { MAX_TIMEOUT_MS, parseDurationMs } from '@/lib/time.js';
+import { env } from '@/lib/env.js';
 import type { Client } from 'discord.js';
 
 export const DEFAULT_REMINDER_DURATION = '9m45s';
+export const MAX_REMINDERS_PER_USER = 5;
 
-export type ReminderInputError = 'invalid_format' | 'duration_too_long';
+export type ReminderInputError =
+  | 'invalid_format'
+  | 'duration_too_long'
+  | 'limit_reached';
 
 export type CreateReminderResult =
   | { ok: true; reminder: Reminder }
@@ -41,6 +46,13 @@ export async function createReminderFromInput(
     return { ok: false, error: 'duration_too_long' };
   }
 
+  if (userId !== env.ownerId) {
+    const reminderCount = await prisma.reminder.count({ where: { userId } });
+    if (reminderCount >= MAX_REMINDERS_PER_USER) {
+      return { ok: false, error: 'limit_reached' };
+    }
+  }
+
   const triggerAt = new Date(Date.now() + durationMs);
   const reminder = await createReminder(channelId, userId, triggerAt, message);
   scheduleReminder(client, reminder);
@@ -68,6 +80,17 @@ export async function cancelReminder(id: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export async function deleteUserReminder(
+  id: string,
+  userId: string,
+): Promise<boolean> {
+  const reminder = await prisma.reminder.findUnique({ where: { id } });
+  if (!reminder || reminder.userId !== userId) {
+    return false;
+  }
+  return cancelReminder(id);
 }
 
 async function triggerReminder(

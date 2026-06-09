@@ -3,11 +3,13 @@ import type { ChatInputCommandInteraction } from 'discord.js';
 import { lang } from '@/lang/index.js';
 import { buildErrorContainer } from '@/lib/errors.js';
 import { buildReminderCreatedContainer } from '@/lib/reminder-presentation.js';
+import { attachReminderCancelCollector } from '@/interactions/reminder-cancel.js';
 import {
   DEFAULT_REMINDER_DURATION,
+  MAX_REMINDERS_PER_USER,
   createReminderFromInput,
 } from '@/services/reminder-service.js';
-import type { SlashCommand } from '@/types/command.js';
+import type { SlashCommand } from '@/types/command/command.js';
 
 function getReminderArgs(interaction: ChatInputCommandInteraction): {
   durationInput: string;
@@ -29,7 +31,7 @@ function getReminderArgs(interaction: ChatInputCommandInteraction): {
   };
 }
 
-export const command: SlashCommand = {
+export const command = {
   data: new SlashCommandBuilder()
     .setName('remind')
     .setDescription(lang.reminder.description)
@@ -45,6 +47,9 @@ export const command: SlashCommand = {
         .setDescription(lang.reminder.options.message)
         .setRequired(false),
     ),
+  requirements: {
+    scope: 'global',
+  },
 
   async execute(interaction) {
     const { durationInput, remindMessage } = getReminderArgs(interaction);
@@ -58,12 +63,15 @@ export const command: SlashCommand = {
     );
 
     if (!result.ok) {
-      const text =
-        result.error === 'duration_too_long'
-          ? lang.reminder.messages.durationTooLong
-          : lang.reminder.messages.invalidFormat.slash;
+      const errorText = {
+        invalid_format: lang.reminder.messages.invalidFormat.slash,
+        duration_too_long: lang.reminder.messages.durationTooLong,
+        limit_reached: lang.reminder.messages.limitReached({
+          max: MAX_REMINDERS_PER_USER,
+        }),
+      };
       await interaction.reply(
-        buildErrorContainer(text).build({ ephemeral: true }),
+        buildErrorContainer(errorText[result.error]).build({ ephemeral: true }),
       );
       return;
     }
@@ -71,5 +79,7 @@ export const command: SlashCommand = {
     await interaction.reply(
       buildReminderCreatedContainer(result.reminder).build(),
     );
+    const reply = await interaction.fetchReply();
+    attachReminderCancelCollector(reply, result.reminder);
   },
-};
+} satisfies SlashCommand;
