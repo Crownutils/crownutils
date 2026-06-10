@@ -7,7 +7,7 @@ import {
   buildReminderCancelledContainer,
   buildReminderCreatedContainer,
   parseReminderCancelButtonId,
-} from '@/lib/reminder-presentation.js';
+} from '@/services/presentations/reminder-presentation.js';
 import { cancelReminder } from '@/services/reminder-service.js';
 
 const CANCEL_WINDOW_MS = 120_000;

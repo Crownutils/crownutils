@@ -5,7 +5,7 @@ import { buildErrorContainer } from '@/lib/errors.js';
 import {
   buildReminderListContainer,
   parseReminderDeleteButtonId,
-} from '@/lib/reminder-presentation.js';
+} from '@/services/presentations/reminder-presentation.js';
 import {
   deleteUserReminder,
   listReminders,

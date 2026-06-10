@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/lang/index.js';
-import { buildReminderListContainer } from '@/lib/reminder-presentation.js';
+import { buildReminderListContainer } from '@/services/presentations/reminder-presentation.js';
 import { attachReminderListCollector } from '@/interactions/reminder-list.js';
 import { listReminders } from '@/services/reminder-service.js';
 import type { SlashCommand } from '@/types/command/command.js';
@@ -8,7 +8,7 @@ import type { SlashCommand } from '@/types/command/command.js';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('reminders')
-    .setDescription(lang.reminder.listDescription),
+    .setDescription(lang.reminder.commandListDescription),
   requirements: {
     scope: 'global',
   },

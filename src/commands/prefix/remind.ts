@@ -1,6 +1,6 @@
 import { lang } from '@/lang/index.js';
 import { buildErrorContainer } from '@/lib/errors.js';
-import { buildReminderCreatedContainer } from '@/lib/reminder-presentation.js';
+import { buildReminderCreatedContainer } from '@/services/presentations/reminder-presentation.js';
 import { attachReminderCancelCollector } from '@/interactions/reminder-cancel.js';
 import {
   DEFAULT_REMINDER_DURATION,
@@ -29,7 +29,7 @@ function getReminderArgs(args: string[]): {
 
 export const command = {
   name: 'remind',
-  description: lang.reminder.description,
+  description: lang.reminder.commandDescription,
   aliases: ['r', 'rm', 'remindme', 'rappel'],
   requirements: {
     scope: 'global',
