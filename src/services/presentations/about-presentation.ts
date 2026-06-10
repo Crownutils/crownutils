@@ -12,7 +12,7 @@ export function buildBotInfoContainer(): Container {
         .newLine(
           new Text(
             lang.about.description.license.compatibilityWithCrownicles,
-          ).size('subtle'),
+          ).size('subtle').quote().italic(),
         )
         .newLine(lang.about.description.githubUrl(env.githubUrl)),
     );
