@@ -10,8 +10,8 @@ export const command = {
     scope: 'global',
   },
 
-  async execute(interaction) {
+  async execute(message) {
     const reply = buildBotInfoContainer().build();
-    await interaction.reply(reply);
+    await message.reply(reply);
   },
 } satisfies PrefixCommand;
