@@ -1,5 +1,5 @@
 export const ping = {
-  description: 'Affiche la latence du bot.',
+  commandDescription: 'Affiche la latence du bot.',
   messages: {
     title: '🏓 Pong',
     calculating: 'Calcul en cours...',

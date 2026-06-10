@@ -4,7 +4,7 @@ import type { PrefixCommand } from '@/types/command/command.js';
 
 export const command = {
   name: 'ping',
-  description: lang.ping.description,
+  description: lang.ping.commandDescription,
   aliases: ['p', 'latency'],
   requirements: {
     scope: 'global',

@@ -6,7 +6,7 @@ import { Container, Text, Separator, Title } from '@/lib/components/index.js';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('ping')
-    .setDescription(lang.ping.description),
+    .setDescription(lang.ping.commandDescription),
   requirements: {
     scope: 'global',
   },

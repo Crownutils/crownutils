@@ -1,12 +1,12 @@
 import { lang } from '@/lang/index.js';
-import { buildReminderListContainer } from '@/lib/reminder-presentation.js';
+import { buildReminderListContainer } from '@/services/presentations/reminder-presentation.js';
 import { attachReminderListCollector } from '@/interactions/reminder-list.js';
 import { listReminders } from '@/services/reminder-service.js';
 import type { PrefixCommand } from '@/types/command/command.js';
 
 export const command = {
   name: 'reminders',
-  description: lang.reminder.listDescription,
+  description: lang.reminder.commandListDescription,
   aliases: ['rl'],
   requirements: {
     scope: 'global',

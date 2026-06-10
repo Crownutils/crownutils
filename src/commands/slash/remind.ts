@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import type { ChatInputCommandInteraction } from 'discord.js';
 import { lang } from '@/lang/index.js';
 import { buildErrorContainer } from '@/lib/errors.js';
-import { buildReminderCreatedContainer } from '@/lib/reminder-presentation.js';
+import { buildReminderCreatedContainer } from '@/services/presentations/reminder-presentation.js';
 import { attachReminderCancelCollector } from '@/interactions/reminder-cancel.js';
 import {
   DEFAULT_REMINDER_DURATION,
@@ -34,7 +34,7 @@ function getReminderArgs(interaction: ChatInputCommandInteraction): {
 export const command = {
   data: new SlashCommandBuilder()
     .setName('remind')
-    .setDescription(lang.reminder.description)
+    .setDescription(lang.reminder.commandDescription)
     .addStringOption((option) =>
       option
         .setName('time')

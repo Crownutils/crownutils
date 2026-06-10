@@ -1,8 +1,16 @@
+import { readFileSync } from 'node:fs';
+
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
+
+const packageJson = JSON.parse(
+  readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+) as { version: string; license: string };
 
 export const env = {
   nodeEnv: NODE_ENV,
   isProduction: NODE_ENV === 'production',
+  botVersion: packageJson.version,
+  license: packageJson.license,
   discordToken: process.env.DISCORD_TOKEN,
   discordClientId: process.env.DISCORD_CLIENT_ID,
   testGuildId: process.env.TEST_GUILD_ID,
@@ -13,6 +21,7 @@ export const env = {
     .map((id) => id.trim())
     .filter(Boolean),
   databaseUrl: process.env.DATABASE_URL ?? 'file:./dev.db',
+  githubUrl: 'https://github.com/Crownutils/crownutils',
 } as const;
 
 type RequirableEnvKey =
