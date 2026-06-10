@@ -1,6 +1,8 @@
+import { md } from '@/lib/markdown.js';
+
 export const reminder = {
-  description: 'Définir un rappel.',
-  listDescription: 'Affiche vos rappels en cours.',
+  commandDescription: 'Définir un rappel.',
+  commandListDescription: 'Affiche vos rappels en cours.',
   options: {
     time: 'La durée avant le rappel. Ex : 1h30m, 30s.',
     message: 'Le message du rappel.',
@@ -17,12 +19,12 @@ export const reminder = {
         message: string;
         when: string;
       }): string =>
-        `Votre rappel pour \`${message}\` a été défini pour : ${when}.`,
+        `Votre rappel pour ${md.code(message)} a été défini pour : ${when}.`,
     },
     cancelled: {
       title: 'Rappel annulé',
       description: ({ message }: { message: string }): string =>
-        `Votre rappel pour \`${message}\` a été annulé.`,
+        `Votre rappel pour ${md.code(message)} a été annulé.`,
     },
     triggeredTitle: '🔔 DRING !',
     durationTooLong: 'Un rappel ne peut pas dépasser 24 jours.',
@@ -34,12 +36,11 @@ export const reminder = {
       cannotDelete: 'Vous ne pouvez pas supprimer ce rappel.',
       notAuthor: 'Ce bouton est réservé à la personne qui a lancé la commande.',
       item: ({ message, when }: { message: string; when: string }): string =>
-        `\`${message}\` — ${when}`,
+        `${md.code(message)} — ${when}`,
     },
     invalidFormat: {
-      prefix: 'Format invalide. Exemples : `!r`, `!r 1h30m faire les courses`',
-      slash:
-        'Format invalide. Exemples : `/remind`, `/remind time:1h30m message:faire les courses`',
+      prefix: `Format invalide. Exemples : ${md.code('!r')}, ${md.code('!r 1h30m faire les courses')}`,
+      slash: `Format invalide. Exemples : ${md.code('/remind')}, ${md.code('/remind time:1h30m message:faire les courses')}`,
     },
   },
 } as const;

@@ -7,11 +7,11 @@ export const about = {
     version: (botVersion: string): string =>
       `Version actuelle : ${md.bold(botVersion)}`,
     githubUrl: (url: string) =>
-      `Le code source du bot est ${md.bold('entièrement')} public, retrouvez le ${md.link('ici', url)}.`,
+      `Le code source du bot est ${md.bold('entièrement')} public, retrouvez le sur le ${md.link('dépôt officiel', url)}.`,
     license: {
       licenseName: (license: string) => `Licence : ${md.bold(license)}`,
       compatibilityWithCrownicles:
-        'La notice de compatbilité avec la licence de Crownicles est disponible sur le dépôt officiel.',
+        'La notice de compatibilité avec la licence de Crownicles est disponible sur le dépôt officiel.',
     },
   },
 } as const;
