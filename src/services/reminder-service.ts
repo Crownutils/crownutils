@@ -1,7 +1,7 @@
 import type { Reminder } from '@/generated/prisma/client.js';
 import { logger } from '@/lib/logger.js';
 import { prisma } from '@/lib/prisma.js';
-import { buildReminderTriggeredContainer } from '@/lib/reminder-presentation.js';
+import { buildReminderTriggeredContainer } from '@/services/presentations/reminder-presentation.js';
 import { MAX_TIMEOUT_MS, parseDurationMs } from '@/lib/time.js';
 import { env } from '@/lib/env.js';
 import type { Client } from 'discord.js';
@@ -49,7 +49,9 @@ export async function createReminderFromInput(
 
   if (userId !== env.ownerId) {
     const isPrivilegedUser = env.privilegedIds.includes(userId);
-    const maxReminders = isPrivilegedUser ? MAX_REMINDER_PER_PRIVILEGED_USER : MAX_REMINDERS_PER_USER;
+    const maxReminders = isPrivilegedUser
+      ? MAX_REMINDER_PER_PRIVILEGED_USER
+      : MAX_REMINDERS_PER_USER;
     const reminderCount = await prisma.reminder.count({ where: { userId } });
     if (reminderCount >= maxReminders) {
       return { ok: false, error: 'limit_reached' };
