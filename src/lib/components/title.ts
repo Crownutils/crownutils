@@ -1,13 +1,8 @@
-import { TextDisplayBuilder } from 'discord.js';
+import type { TextDisplayBuilder } from 'discord.js';
 import type { TextComponent } from './component.js';
+import { Text } from './text.js';
 
 export type TitleSize = 'small' | 'medium' | 'large';
-
-const TITLE_PREFIX = {
-  small: '###',
-  medium: '##',
-  large: '#',
-} as const satisfies Record<TitleSize, string>;
 
 export class Title implements TextComponent {
   public readonly kind = 'text';
@@ -18,8 +13,6 @@ export class Title implements TextComponent {
   ) {}
 
   public toBuilder(): TextDisplayBuilder {
-    return new TextDisplayBuilder().setContent(
-      `${TITLE_PREFIX[this.size]} ${this.content}`,
-    );
+    return new Text(this.content).size(this.size).toBuilder();
   }
 }
