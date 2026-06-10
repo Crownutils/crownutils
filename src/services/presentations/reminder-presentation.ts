@@ -52,15 +52,15 @@ export function buildReminderCreatedContainer(
 ): Container {
   const cancelButton = new Button(reminderCancelButtonId(reminder.id))
     .color('danger')
-    .label(lang.reminder.messages.created.cancelButton);
+    .label(lang.commands.reminder.messages.created.cancelButton);
   if (options?.disabled) {
     cancelButton.disabled();
   }
 
   return new Container().color('success').add(
-    new Title(lang.reminder.messages.created.title),
+    new Title(lang.commands.reminder.messages.created.title),
     new Text(
-      lang.reminder.messages.created.description({
+      lang.commands.reminder.messages.created.description({
         message: reminder.message,
         when: time(reminder.triggerAt, TimestampStyles.RelativeTime),
       }),
@@ -71,9 +71,9 @@ export function buildReminderCreatedContainer(
 
 export function buildReminderCancelledContainer(reminder: Reminder): Container {
   return new Container().color('cancelled').add(
-    new Title(lang.reminder.messages.cancelled.title),
+    new Title(lang.commands.reminder.messages.cancelled.title),
     new Text(
-      lang.reminder.messages.cancelled.description({
+      lang.commands.reminder.messages.cancelled.description({
         message: reminder.message,
       }),
     ),
@@ -84,7 +84,7 @@ export function buildReminderTriggeredContainer(reminder: Reminder): Container {
   return new Container()
     .color('info')
     .add(
-      new Title(lang.reminder.messages.triggeredTitle),
+      new Title(lang.commands.reminder.messages.triggeredTitle),
       new Text(reminder.message),
       new Text(`<@${reminder.userId}>`),
     );
@@ -97,12 +97,12 @@ export function buildReminderListContainer(
   if (reminders.length === 0) {
     return new Container()
       .color('info')
-      .add(new Text(lang.reminder.messages.list.empty));
+      .add(new Text(lang.commands.reminder.messages.list.empty));
   }
 
   const container = new Container()
     .color('info')
-    .add(new Title(lang.reminder.messages.list.title));
+    .add(new Title(lang.commands.reminder.messages.list.title));
 
   for (const reminder of reminders) {
     const deleteButton = new Button(
@@ -118,7 +118,7 @@ export function buildReminderListContainer(
       new Section()
         .add(
           new Text(
-            lang.reminder.messages.list.item({
+            lang.commands.reminder.messages.list.item({
               message: reminder.message,
               when: time(reminder.triggerAt, TimestampStyles.RelativeTime),
             }),

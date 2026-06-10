@@ -5,12 +5,12 @@ import type { PrefixCommand } from '@/types/command/command.js';
 export const command = {
   name: 'about',
   aliases: ['botinfo'],
-  description: lang.about.commandDescription,
+  description: lang.commands.about.commandDescription,
   requirements: {
     scope: 'global',
   },
 
-  async execute(message) {
+  async execute(message, _args) {
     const reply = buildBotInfoContainer().build();
     await message.reply(reply);
   },

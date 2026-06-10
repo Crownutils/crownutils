@@ -4,7 +4,7 @@ import type { PrefixCommand } from '@/types/command/command.js';
 
 export const command = {
   name: 'ping',
-  description: lang.ping.commandDescription,
+  description: lang.commands.ping.commandDescription,
   aliases: ['p', 'latency'],
   requirements: {
     scope: 'global',
@@ -14,7 +14,7 @@ export const command = {
     const before = Date.now();
     const interim = new Container()
       .color('info')
-      .add(new Text(lang.ping.messages.calculating))
+      .add(new Text(lang.commands.ping.messages.calculating))
       .build();
     const sent = await message.reply(interim);
 
@@ -24,9 +24,9 @@ export const command = {
     const final = new Container()
       .color('info')
       .add(
-        new Title(lang.ping.messages.title),
+        new Title(lang.commands.ping.messages.title),
         new Separator(),
-        new Text(lang.ping.messages.result({ totalMs, discordMs })),
+        new Text(lang.commands.ping.messages.result({ totalMs, discordMs })),
       )
       .build();
 

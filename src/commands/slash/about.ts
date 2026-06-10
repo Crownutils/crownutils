@@ -6,7 +6,7 @@ import { SlashCommandBuilder } from 'discord.js';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('about')
-    .setDescription(lang.about.commandDescription),
+    .setDescription(lang.commands.about.commandDescription),
   requirements: {
     scope: 'global',
   },
