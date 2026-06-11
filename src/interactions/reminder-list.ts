@@ -30,7 +30,7 @@ export function attachReminderListCollector(
     if (interaction.user.id !== parsed.authorId) {
       await interaction
         .reply(
-          buildErrorContainer(lang.reminder.messages.list.notAuthor).build({
+          buildErrorContainer(lang.commands.reminder.messages.list.notAuthor).build({
             ephemeral: true,
           }),
         )
@@ -45,7 +45,7 @@ export function attachReminderListCollector(
     if (!deleted) {
       await interaction
         .reply(
-          buildErrorContainer(lang.reminder.messages.list.cannotDelete).build({
+          buildErrorContainer(lang.commands.reminder.messages.list.cannotDelete).build({
             ephemeral: true,
           }),
         )

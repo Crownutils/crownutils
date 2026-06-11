@@ -1,5 +1,6 @@
 import { TimestampStyles, time } from 'discord.js';
 import type { Reminder } from '@/generated/prisma/client.js';
+import { icons } from '@/lib/icons.js';
 import { lang } from '@/lang/index.js';
 import {
   ActionRow,
@@ -109,7 +110,7 @@ export function buildReminderListContainer(
       reminderDeleteButtonId(reminder.userId, reminder.id),
     )
       .color('danger')
-      .emoji('🗑️');
+      .emoji(icons.trash);
     if (options?.disabled) {
       deleteButton.disabled();
     }

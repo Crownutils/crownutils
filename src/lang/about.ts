@@ -1,8 +1,9 @@
+import { icons } from '@/lib/icons.js';
 import { md } from '@/lib/markdown.js';
 
 export const about = {
   commandDescription: 'Voir diverses informations à propos du bot.',
-  title: 'Informations du bot',
+  title: `${icons.info} Informations du bot`,
   description: {
     version: (botVersion: string): string =>
       `Version actuelle : ${md.bold(botVersion)}`,
