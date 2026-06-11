@@ -1,6 +1,6 @@
 import { lang } from '@/lang/index.js';
 import { buildBotInfoContainer } from '@/services/presentations/about-presentation.js';
-import { SlashCommand } from '@/types/command/command.js';
+import type { SlashCommand } from '@/types/command/command.js';
 import { SlashCommandBuilder } from 'discord.js';
 
 export const command = {
