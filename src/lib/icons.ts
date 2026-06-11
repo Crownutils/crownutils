@@ -6,5 +6,5 @@ export const icons = {
   ticket: '🎟️',
   worldMap: '🗺️',
   forward: '▶️',
-  info: 'ℹ️'
+  info: 'ℹ️',
 } as const;
