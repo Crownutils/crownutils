@@ -1,7 +1,9 @@
+import { icons } from '@/lib/icons.js';
+
 export const ping = {
   commandDescription: 'Affiche la latence du bot.',
   messages: {
-    title: '🏓 Pong',
+    title: `${icons.pingPong} Pong`,
     calculating: 'Calcul en cours...',
     result: ({
       totalMs,

@@ -8,7 +8,7 @@ import type { SlashCommand } from '@/types/command/command.js';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('reminders')
-    .setDescription(lang.reminder.commandListDescription),
+    .setDescription(lang.commands.reminder.commandListDescription),
   requirements: {
     scope: 'global',
   },

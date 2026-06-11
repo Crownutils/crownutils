@@ -31,7 +31,9 @@ export function attachReminderCancelCollector(
     if (interaction.user.id !== reminder.userId) {
       await interaction
         .reply(
-          buildErrorContainer(lang.reminder.messages.list.notAuthor).build({
+          buildErrorContainer(
+            lang.commands.reminder.messages.list.notAuthor,
+          ).build({
             ephemeral: true,
           }),
         )

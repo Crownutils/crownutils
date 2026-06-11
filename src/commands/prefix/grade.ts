@@ -1,17 +1,18 @@
 import { lang } from '@/lang/index.js';
-import { buildBotInfoContainer } from '@/services/presentations/about-presentation.js';
+import { buildGradeContainer } from '@/services/presentations/grade-presentation.js';
 import type { PrefixCommand } from '@/types/command/command.js';
 
 export const command = {
-  name: 'about',
-  aliases: ['botinfo'],
-  description: lang.commands.about.commandDescription,
+  name: 'grade',
+  description: lang.commands.grade.commandDescription,
+  aliases: ['permission', 'rank'],
   requirements: {
     scope: 'global',
   },
 
   async execute(message, _args) {
-    const reply = buildBotInfoContainer().build();
+    const reply = buildGradeContainer(message.author.id).build();
+
     await message.reply(reply);
   },
 } satisfies PrefixCommand;

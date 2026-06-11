@@ -1,3 +1,4 @@
+import { icons } from '@/lib/icons.js';
 import { md } from '@/lib/markdown.js';
 
 export const reminder = {
@@ -26,7 +27,7 @@ export const reminder = {
       description: ({ message }: { message: string }): string =>
         `Votre rappel pour ${md.code(message)} a été annulé.`,
     },
-    triggeredTitle: '🔔 DRING !',
+    triggeredTitle: `${icons.bell} DRING !`,
     durationTooLong: 'Un rappel ne peut pas dépasser 24 jours.',
     limitReached: ({ max }: { max: number }): string =>
       `Vous avez atteint la limite de ${max} rappels simultanés.`,

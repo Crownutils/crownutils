@@ -6,7 +6,7 @@ import { Container, Text, Separator, Title } from '@/lib/components/index.js';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('ping')
-    .setDescription(lang.ping.commandDescription),
+    .setDescription(lang.commands.ping.commandDescription),
   requirements: {
     scope: 'global',
   },
@@ -20,9 +20,9 @@ export const command = {
     const message = new Container()
       .color('info')
       .add(
-        new Title(lang.ping.messages.title),
+        new Title(lang.commands.ping.messages.title),
         new Separator(),
-        new Text(lang.ping.messages.result({ totalMs, discordMs })),
+        new Text(lang.commands.ping.messages.result({ totalMs, discordMs })),
       )
       .build();
 

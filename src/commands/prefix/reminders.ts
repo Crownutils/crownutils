@@ -6,13 +6,13 @@ import type { PrefixCommand } from '@/types/command/command.js';
 
 export const command = {
   name: 'reminders',
-  description: lang.reminder.commandListDescription,
+  description: lang.commands.reminder.commandListDescription,
   aliases: ['rl'],
   requirements: {
     scope: 'global',
   },
 
-  async execute(message) {
+  async execute(message, _args) {
     const reminders = await listReminders(message.author.id);
     const sent = await message.reply(
       buildReminderListContainer(reminders).build(),
