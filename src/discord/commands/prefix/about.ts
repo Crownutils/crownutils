@@ -1,3 +1,4 @@
+import { PREFIX } from '@/discord/constants.js';
 import { lang } from '@/discord/lang/index.js';
 import { buildBotInfoContainer } from '@/discord/presentations/about-presentation.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
@@ -8,6 +9,9 @@ export const command = {
   description: lang.commands.about.commandDescription,
   requirements: {
     scope: 'global',
+  },
+  help: {
+    usagePrefix: `${PREFIX}about`,
   },
 
   async execute(message, _args) {

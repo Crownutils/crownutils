@@ -1,9 +1,10 @@
 import type {
   CollectedInteraction,
-  CollectorFilter,
   Message,
   ReadonlyCollection,
 } from 'discord.js';
+import { buildErrorContainer } from '../errors.js';
+import { lang } from '../lang/index.js';
 import type { Container } from '../components/index.js';
 
 type CollectorIdleTimeoutMs = number;
@@ -19,7 +20,6 @@ type CollectorEndHandler = (
 interface CollectorOptions {
   idle?: CollectorIdleTimeoutMs;
   time?: CollectorTimeoutMs;
-  filter?: CollectorFilter<[CollectedInteraction]>;
   onCollect: CollectorCollectHandler;
   onEnd?: CollectorEndHandler;
 }
@@ -31,7 +31,6 @@ class Collector {
     this.collector = message.createMessageComponentCollector({
       idle: options.idle,
       time: options.time,
-      filter: options.filter,
     });
 
     this.collector.on('collect', (i) => void options.onCollect(i));
@@ -58,6 +57,7 @@ export class InteractiveMessage<S> {
   private state: S;
   private finished = false;
   private readonly collector: Collector;
+  private readonly allowedIds: string[];
 
   public constructor(
     private readonly message: Message,
@@ -71,14 +71,11 @@ export class InteractiveMessage<S> {
     },
   ) {
     this.state = initial;
+    this.allowedIds = options.allowedIds;
 
     this.collector = new Collector(message, {
       idle: options.idle,
       time: options.time,
-      filter:
-        options.allowedIds.length === 0
-          ? undefined
-          : (i) => options.allowedIds!.includes(i.user.id),
       onCollect: (i) => this.onCollect(i),
       onEnd: () => {
         if (this.finished) {
@@ -92,6 +89,20 @@ export class InteractiveMessage<S> {
   }
 
   private async onCollect(interaction: CollectedInteraction) {
+    if (
+      this.allowedIds.length > 0 &&
+      !this.allowedIds.includes(interaction.user.id)
+    ) {
+      await interaction
+        .reply(
+          buildErrorContainer(lang.errors.interactionNotAllowed).build({
+            ephemeral: true,
+          }),
+        )
+        .catch(() => {});
+      return;
+    }
+
     let stopped = false;
     this.state = await this.reduce(interaction, this.state, () => {
       stopped = true;

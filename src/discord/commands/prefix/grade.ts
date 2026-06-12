@@ -1,3 +1,4 @@
+import { PREFIX } from '@/discord/constants.js';
 import { lang } from '@/discord/lang/index.js';
 import { buildGradeContainer } from '@/discord/presentations/grade-presentation.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
@@ -8,6 +9,9 @@ export const command = {
   aliases: ['permission', 'rank'],
   requirements: {
     scope: 'global',
+  },
+  help: {
+    usagePrefix: `${PREFIX}grade`,
   },
 
   async execute(message, _args) {

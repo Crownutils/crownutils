@@ -10,6 +10,9 @@ export const command = {
   requirements: {
     scope: 'global',
   },
+  help: {
+    usageSlash: '/about',
+  },
 
   async execute(interaction) {
     const reply = buildBotInfoContainer().build();

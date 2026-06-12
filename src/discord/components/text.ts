@@ -98,7 +98,6 @@ export class Text implements TextComponent {
     if (this.isUnderline) text = `__${text}__`;
     if (this.isStrikethrough) text = `~~${text}~~`;
     if (this.linkUrl !== undefined) text = `[${text}](${this.linkUrl})`;
-    if (this.isQuote) text = `> ${text}`;
 
     const prefix = SIZE_PREFIX[this.textSize];
     return prefix ? `${prefix} ${text}` : text;

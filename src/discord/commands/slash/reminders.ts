@@ -8,9 +8,12 @@ import type { SlashCommand } from '@/discord/types/command.js';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('reminders')
-    .setDescription(lang.commands.reminder.commandListDescription),
+    .setDescription(lang.commands.reminders.commandDescription),
   requirements: {
     scope: 'global',
+  },
+  help: {
+    usageSlash: '/reminders',
   },
 
   async execute(interaction) {

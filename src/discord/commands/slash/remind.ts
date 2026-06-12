@@ -21,7 +21,7 @@ function getReminderArgs(interaction: ChatInputCommandInteraction): {
   if (!timeOption && !messageOption) {
     return {
       durationInput: DEFAULT_REMINDER_DURATION,
-      remindMessage: lang.commands.reminder.messages.defaultMessage,
+      remindMessage: lang.commands.remind.messages.defaultMessage,
     };
   }
 
@@ -34,21 +34,24 @@ function getReminderArgs(interaction: ChatInputCommandInteraction): {
 export const command = {
   data: new SlashCommandBuilder()
     .setName('remind')
-    .setDescription(lang.commands.reminder.commandDescription)
+    .setDescription(lang.commands.remind.commandDescription)
     .addStringOption((option) =>
       option
         .setName('time')
-        .setDescription(lang.commands.reminder.options.time)
+        .setDescription(lang.commands.remind.options.time)
         .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName('message')
-        .setDescription(lang.commands.reminder.options.message)
+        .setDescription(lang.commands.remind.options.message)
         .setRequired(false),
     ),
   requirements: {
     scope: 'global',
+  },
+  help: {
+    usageSlash: '/remind [time] [message]',
   },
 
   async execute(interaction) {
@@ -64,9 +67,9 @@ export const command = {
 
     if (!result.ok) {
       const errorText = {
-        invalid_format: lang.commands.reminder.messages.invalidFormat.slash,
-        duration_too_long: lang.commands.reminder.messages.durationTooLong,
-        limit_reached: lang.commands.reminder.messages.limitReached({
+        invalid_format: lang.commands.remind.messages.invalidFormat.slash,
+        duration_too_long: lang.commands.remind.messages.durationTooLong,
+        limit_reached: lang.commands.remind.messages.limitReached({
           max: MAX_REMINDERS_PER_USER,
         }),
       };

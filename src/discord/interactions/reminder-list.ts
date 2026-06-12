@@ -35,7 +35,7 @@ export function attachReminderListCollector(
         await interaction
           .reply(
             buildErrorContainer(
-              lang.commands.reminder.messages.list.cannotDelete,
+              lang.commands.reminders.messages.cannotDelete,
             ).build({ ephemeral: true }),
           )
           .catch(() => {});

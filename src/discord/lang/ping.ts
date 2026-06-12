@@ -1,4 +1,5 @@
 import { icons } from '@/discord/icons.js';
+import type { CommandLang } from './types.js';
 
 export const ping = {
   commandDescription: 'Affiche la latence du bot.',
@@ -14,4 +15,4 @@ export const ping = {
     }): string =>
       `Latence totale : ${totalMs} ms\nLatence Discord : ${discordMs} ms`,
   },
-} as const;
+} as const satisfies CommandLang;
