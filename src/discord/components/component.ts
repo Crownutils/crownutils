@@ -3,6 +3,7 @@ import type {
   ButtonBuilder,
   SectionBuilder,
   SeparatorBuilder,
+  StringSelectMenuBuilder,
   TextDisplayBuilder,
 } from 'discord.js';
 
@@ -10,7 +11,8 @@ export type V2Component =
   | TextComponent
   | SeparatorComponent
   | SectionComponent
-  | ActionRowComponent;
+  | ActionRowComponent
+  | SelectComponent;
 
 export interface TextComponent {
   kind: 'text';
@@ -30,4 +32,9 @@ export interface SectionComponent {
 export interface ActionRowComponent {
   kind: 'action-row';
   toBuilder(): ActionRowBuilder<ButtonBuilder>;
+}
+
+export interface SelectComponent {
+  kind: 'select';
+  toBuilder(): ActionRowBuilder<StringSelectMenuBuilder>;
 }

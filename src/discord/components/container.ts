@@ -48,6 +48,9 @@ export class Container {
         case 'action-row':
           container.addActionRowComponents(component.toBuilder());
           break;
+        case 'select':
+          container.addActionRowComponents(component.toBuilder());
+          break;
       }
     }
 

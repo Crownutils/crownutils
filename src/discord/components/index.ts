@@ -6,6 +6,7 @@ export { Separator } from './separator.js';
 export { Section } from './section.js';
 export { Button } from './button.js';
 export { ActionRow } from './action-row.js';
+export { Select } from './select.js';
 export type { TextSize } from './text.js';
 export type { TitleSize } from './title.js';
 export type {
@@ -14,4 +15,5 @@ export type {
   SeparatorComponent,
   SectionComponent,
   ActionRowComponent,
+  SelectComponent,
 } from './component.js';

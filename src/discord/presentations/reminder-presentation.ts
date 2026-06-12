@@ -1,5 +1,6 @@
 import { TimestampStyles, time } from 'discord.js';
 import type { Reminder } from '@/core/persistence/prisma/client.js';
+import { CustomId } from '@/discord/custom-id.js';
 import { icons } from '@/discord/icons.js';
 import { lang } from '@/discord/lang/index.js';
 import {
@@ -11,29 +12,31 @@ import {
   Title,
 } from '@/discord/components/index.js';
 
-const REMINDER_DELETE_PREFIX = 'reminder-delete:';
-const REMINDER_CANCEL_PREFIX = 'reminder-cancel:';
+const REMINDER_DELETE_CONTEXT = 'reminder-delete';
+const REMINDER_CANCEL_CONTEXT = 'reminder-cancel';
 
 export function reminderDeleteButtonId(reminderId: string): string {
-  return `${REMINDER_DELETE_PREFIX}${reminderId}`;
+  return new CustomId(REMINDER_DELETE_CONTEXT, reminderId).value;
 }
 
 export function parseReminderDeleteButtonId(customId: string): string | null {
-  if (!customId.startsWith(REMINDER_DELETE_PREFIX)) {
+  const parsed = CustomId.parse(customId);
+  if (!parsed || parsed.ctx !== REMINDER_DELETE_CONTEXT) {
     return null;
   }
-  return customId.slice(REMINDER_DELETE_PREFIX.length) || null;
+  return parsed.id;
 }
 
 export function reminderCancelButtonId(reminderId: string): string {
-  return `${REMINDER_CANCEL_PREFIX}${reminderId}`;
+  return new CustomId(REMINDER_CANCEL_CONTEXT, reminderId).value;
 }
 
 export function parseReminderCancelButtonId(customId: string): string | null {
-  if (!customId.startsWith(REMINDER_CANCEL_PREFIX)) {
+  const parsed = CustomId.parse(customId);
+  if (!parsed || parsed.ctx !== REMINDER_CANCEL_CONTEXT) {
     return null;
   }
-  return customId.slice(REMINDER_CANCEL_PREFIX.length) || null;
+  return parsed.id;
 }
 
 export function buildReminderCreatedContainer(
