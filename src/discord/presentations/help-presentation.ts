@@ -6,6 +6,7 @@ import { md } from '../markdown.js';
 import type { PrefixCommand, SlashCommand } from '../types/command.js';
 
 export const HELP_SELECT_ID = 'help-select';
+const MAIN_MENU = 'Menu Principal';
 
 export function buildHelpContainer(
   commands: SlashCommand[] | PrefixCommand[],
@@ -15,6 +16,8 @@ export function buildHelpContainer(
   const selectMenu = new Select(HELP_SELECT_ID).placeholder(
     lang.commands.help.messages.selectMenu.placeholder,
   );
+
+  selectMenu.option(MAIN_MENU, MAIN_MENU);
   for (const command of commands) {
     if ('data' in command) {
       selectMenu.option(
@@ -31,7 +34,7 @@ export function buildHelpContainer(
     selectMenu.disabled();
   }
 
-  const selected = selectedCommand
+  const selected = selectedCommand && selectedCommand !== MAIN_MENU
     ? commands.find(
         (command) =>
           ('data' in command ? command.data.name : command.name) ===
@@ -64,6 +67,10 @@ export function buildHelpContainer(
     : undefined;
 
   const components: V2Component[] = [new Title(title), new Text(description)];
+
+  if (!selectedCommand || selectedCommand === MAIN_MENU) {
+    components.push(new Text(lang.commands.help.messages.myPrefix).quote());
+  }
 
   if (selected) {
     components.push(
