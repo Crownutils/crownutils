@@ -12,33 +12,33 @@ const projectGithubUrl = 'https://github.com/Crownutils';
 
 export function buildBotInfoContainer(): Container {
   return new Container().color('info').add(
-    new Title(lang.commands.about.title),
-    new Text(lang.commands.about.description.presentation),
+    new Title(lang.commands.about.messages.title),
+    new Text(lang.commands.about.messages.presentation),
     new Separator(),
-    new Text(lang.commands.about.description.version(env.botVersion))
-      .newLine(lang.commands.about.description.license.licenseName(env.license))
+    new Text(lang.commands.about.messages.version(env.botVersion))
+      .newLine(lang.commands.about.messages.license.licenseName(env.license))
       .newLine(
         new Text(
-          lang.commands.about.description.license.compatibilityWithCrownicles,
+          lang.commands.about.messages.license.compatibilityWithCrownicles,
         )
           .size('subtle')
           .quote()
           .italic(),
       )
-      .newLine(lang.commands.about.description.githubUrl(env.githubUrl)),
+      .newLine(lang.commands.about.messages.githubUrl(env.githubUrl)),
     new Separator(),
-    new Text(lang.commands.about.description.usefulLinks.title)
+    new Text(lang.commands.about.messages.usefulLinks.title)
       .size('small')
       .newLine(
         new Text(
-          lang.commands.about.description.usefulLinks.projectGithubPage(
+          lang.commands.about.messages.usefulLinks.projectGithubPage(
             projectGithubUrl,
           ),
         ).quote(),
       )
       .newLine(
         new Text(
-          lang.commands.about.description.usefulLinks.ownerGithubPage(
+          lang.commands.about.messages.usefulLinks.ownerGithubPage(
             ownerGithubLink,
           ),
         ).quote(),

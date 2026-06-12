@@ -6,7 +6,7 @@ import type { PrefixCommand } from '@/discord/types/command.js';
 
 export const command = {
   name: 'reminders',
-  description: lang.commands.reminder.commandListDescription,
+  description: lang.commands.reminders.commandDescription,
   aliases: ['rl'],
   requirements: {
     scope: 'global',

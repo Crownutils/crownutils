@@ -12,8 +12,7 @@ import {
   resolveExecutionContext,
 } from '@/core/permissions/index.js';
 import { lang } from '@/discord/lang/index.js';
-
-const PREFIX = '!';
+import { PREFIX } from '@/discord/constants.js';
 
 export const event = {
   name: Events.MessageCreate,

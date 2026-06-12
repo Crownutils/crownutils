@@ -3,8 +3,8 @@ import { md } from '@/discord/markdown.js';
 
 export const about = {
   commandDescription: 'Voir diverses informations à propos du bot.',
-  title: `${icons.info} Informations du bot`,
-  description: {
+  messages: {
+    title: `${icons.info} Informations du bot`,
     version: (botVersion: string): string =>
       `Version actuelle : ${md.bold(botVersion)}`,
     githubUrl: (url: string) =>

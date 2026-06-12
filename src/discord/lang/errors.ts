@@ -5,6 +5,7 @@ import { md } from '@/discord/markdown.js';
 export const errors = {
   unexpected:
     'Une erreur inattendue est survenue. Veuillez réessayer plus tard.',
+  interactionNotAllowed: 'Vous ne pouvez pas interagir avec cette interaction.',
 } as const;
 
 export function formatPermissionErrors(

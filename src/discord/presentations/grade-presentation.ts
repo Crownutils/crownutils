@@ -23,10 +23,10 @@ export function buildGradeContainer(userId: string): Container {
   return new Container()
     .color('info')
     .add(
-      new Text(lang.commands.grade.description.explication),
+      new Text(lang.commands.grade.messages.explication),
       new Separator(),
       new Text(
-        lang.commands.grade.description.userGrade(userGradeDisplay, gradeIcon),
-      ).newLine(lang.commands.grade.description.gradeRank(gradeRank)),
+        lang.commands.grade.messages.userGrade(userGradeDisplay, gradeIcon),
+      ).newLine(lang.commands.grade.messages.gradeRank(gradeRank)),
     );
 }

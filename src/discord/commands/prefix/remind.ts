@@ -16,7 +16,7 @@ function getReminderArgs(args: string[]): {
   if (args.length === 0) {
     return {
       durationInput: DEFAULT_REMINDER_DURATION,
-      remindMessage: lang.commands.reminder.messages.defaultMessage,
+      remindMessage: lang.commands.remind.messages.defaultMessage,
     };
   }
 
@@ -29,7 +29,7 @@ function getReminderArgs(args: string[]): {
 
 export const command = {
   name: 'remind',
-  description: lang.commands.reminder.commandDescription,
+  description: lang.commands.remind.commandDescription,
   aliases: ['r', 'rm', 'remindme', 'rappel'],
   requirements: {
     scope: 'global',
@@ -48,9 +48,9 @@ export const command = {
 
     if (!result.ok) {
       const errorText = {
-        invalid_format: lang.commands.reminder.messages.invalidFormat.prefix,
-        duration_too_long: lang.commands.reminder.messages.durationTooLong,
-        limit_reached: lang.commands.reminder.messages.limitReached({
+        invalid_format: lang.commands.remind.messages.invalidFormat.prefix,
+        duration_too_long: lang.commands.remind.messages.durationTooLong,
+        limit_reached: lang.commands.remind.messages.limitReached({
           max: MAX_REMINDERS_PER_USER,
         }),
       };
