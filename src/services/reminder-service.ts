@@ -1,9 +1,9 @@
-import type { Reminder } from '@/generated/prisma/client.js';
+import type { Reminder } from '@/core/persistence/prisma/client.js';
 import { logger } from '@/lib/logger.js';
-import { prisma } from '@/lib/prisma.js';
+import { prisma } from '@/core/persistence/client.js';
 import { buildReminderTriggeredContainer } from '@/services/presentations/reminder-presentation.js';
-import { MAX_TIMEOUT_MS, parseDurationMs } from '@/lib/time.js';
-import { env } from '@/lib/env.js';
+import { MAX_TIMEOUT_MS, parseDurationMs } from '@/core/time/index.js';
+import { env } from '@/core/config/index.js';
 import type { Client } from 'discord.js';
 
 export const DEFAULT_REMINDER_DURATION = '9m45s';

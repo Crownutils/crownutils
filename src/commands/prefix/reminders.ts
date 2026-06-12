@@ -17,6 +17,6 @@ export const command = {
     const sent = await message.reply(
       buildReminderListContainer(reminders).build(),
     );
-    attachReminderListCollector(sent, message.author.id);
+    attachReminderListCollector(sent, message.author.id, reminders);
   },
 } satisfies PrefixCommand;

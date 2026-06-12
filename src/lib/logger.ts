@@ -1,5 +1,5 @@
 import pino from 'pino';
-import { env } from '@/lib/env.js';
+import { env } from '@/core/config/index.js';
 
 const isProduction = env.isProduction;
 

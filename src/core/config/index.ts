@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
 
 const packageJson = JSON.parse(
-  readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+  readFileSync(new URL('../../../package.json', import.meta.url), 'utf8'),
 ) as { version: string; license: string };
 
 export const env = {

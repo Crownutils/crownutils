@@ -17,6 +17,6 @@ export const command = {
     const reminders = await listReminders(interaction.user.id);
     await interaction.reply(buildReminderListContainer(reminders).build());
     const reply = await interaction.fetchReply();
-    attachReminderListCollector(reply, interaction.user.id);
+    attachReminderListCollector(reply, interaction.user.id, reminders);
   },
 } satisfies SlashCommand;

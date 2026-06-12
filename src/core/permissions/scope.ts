@@ -1,6 +1,5 @@
-import type { ExecutionContext } from '@/types/command/command-context.js';
-import { env } from '../env.js';
-import type { CommandScope } from '@/types/command/command.js';
+import { env } from '@/core/config/index.js';
+import type { CommandScope, ExecutionContext } from './types.js';
 
 export function resolveExecutionContext(
   guildId: string | null,

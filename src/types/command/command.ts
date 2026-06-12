@@ -4,14 +4,7 @@ import type {
   SlashCommandBuilder,
   SlashCommandOptionsOnlyBuilder,
 } from 'discord.js';
-
-export type CommandAuthorization = 'owner' | 'privileged' | 'public';
-export type CommandScope = 'everywhere' | 'global' | 'main_guild';
-
-export interface CommandRequirements {
-  scope?: CommandScope;
-  authorization?: CommandAuthorization;
-}
+import type { CommandRequirements } from '@/core/permissions/types.js';
 
 export interface SlashCommand {
   data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;

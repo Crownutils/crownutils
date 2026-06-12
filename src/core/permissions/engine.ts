@@ -1,13 +1,11 @@
-import type { ExecutionContext } from '@/types/command/command-context.js';
-import type {
-  CommandPermissionError,
-  CommandValidation,
-} from '@/types/command/command-permission.js';
 import type {
   CommandAuthorization,
+  CommandPermissionError,
   CommandRequirements,
   CommandScope,
-} from '@/types/command/command.js';
+  CommandValidation,
+  ExecutionContext,
+} from './types.js';
 import { isScopeAllowed } from './scope.js';
 import { isAuthorizationAllowed } from './authorization.js';
 

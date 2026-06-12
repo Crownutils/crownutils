@@ -1,4 +1,4 @@
-import type { CommandPermissionError } from '@/types/command/command-permission.js';
+import type { CommandPermissionError } from '@/core/permissions/types.js';
 import { formatPermissionErrors } from '@/lang/index.js';
 import { Container, Text } from './components/index.js';
 

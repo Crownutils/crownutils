@@ -1,6 +1,7 @@
-import { ComponentType } from 'discord.js';
-import type { ButtonInteraction, Message } from 'discord.js';
+import type { Message } from 'discord.js';
+import type { Reminder } from '@/core/persistence/prisma/client.js';
 import { lang } from '@/lang/index.js';
+import { InteractiveMessage } from '@/lib/collector.js';
 import { buildErrorContainer } from '@/lib/errors.js';
 import {
   buildReminderListContainer,
@@ -16,63 +17,37 @@ const LIST_WINDOW_MS = 120_000;
 export function attachReminderListCollector(
   message: Message,
   authorId: string,
+  reminders: Reminder[],
 ): void {
-  const collector = message.createMessageComponentCollector({
-    componentType: ComponentType.Button,
-    time: LIST_WINDOW_MS,
-  });
+  new InteractiveMessage(
+    message,
+    reminders,
+    (current, { disabled }) =>
+      buildReminderListContainer(current, { disabled }),
+    async (interaction, current, stop) => {
+      const reminderId = parseReminderDeleteButtonId(interaction.customId);
+      if (reminderId === null) {
+        return current;
+      }
 
-  async function onCollect(interaction: ButtonInteraction): Promise<void> {
-    const parsed = parseReminderDeleteButtonId(interaction.customId);
-    if (parsed === null) {
-      return;
-    }
-    if (interaction.user.id !== parsed.authorId) {
-      await interaction
-        .reply(
-          buildErrorContainer(
-            lang.commands.reminder.messages.list.notAuthor,
-          ).build({
-            ephemeral: true,
-          }),
-        )
-        .catch(() => {});
-      return;
-    }
+      const deleted = await deleteUserReminder(reminderId, authorId);
+      if (!deleted) {
+        await interaction
+          .reply(
+            buildErrorContainer(
+              lang.commands.reminder.messages.list.cannotDelete,
+            ).build({ ephemeral: true }),
+          )
+          .catch(() => {});
+        return current;
+      }
 
-    const deleted = await deleteUserReminder(
-      parsed.reminderId,
-      interaction.user.id,
-    );
-    if (!deleted) {
-      await interaction
-        .reply(
-          buildErrorContainer(
-            lang.commands.reminder.messages.list.cannotDelete,
-          ).build({
-            ephemeral: true,
-          }),
-        )
-        .catch(() => {});
-      return;
-    }
-
-    const remaining = await listReminders(interaction.user.id);
-    await interaction
-      .update(buildReminderListContainer(remaining).build())
-      .catch(() => {});
-  }
-
-  collector.on('collect', (interaction) => void onCollect(interaction));
-
-  collector.on('end', () => {
-    void disableList(message, authorId);
-  });
-}
-
-async function disableList(message: Message, authorId: string): Promise<void> {
-  const remaining = await listReminders(authorId);
-  await message
-    .edit(buildReminderListContainer(remaining, { disabled: true }).build())
-    .catch(() => {});
+      const remaining = await listReminders(authorId);
+      if (remaining.length === 0) {
+        stop();
+      }
+      return remaining;
+    },
+    { idle: LIST_WINDOW_MS, allowedIds: [authorId] },
+  );
 }

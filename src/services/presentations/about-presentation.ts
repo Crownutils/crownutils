@@ -1,6 +1,6 @@
 import { lang } from '@/lang/index.js';
 import { Container, Separator, Text, Title } from '@/lib/components/index.js';
-import { env } from '@/lib/env.js';
+import { env } from '@/core/config/index.js';
 
 const ownerGithubLink = 'https://github.com/Ntalcme';
 const projectGithubUrl = 'https://github.com/Crownutils';

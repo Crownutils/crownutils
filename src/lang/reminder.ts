@@ -35,7 +35,6 @@ export const reminder = {
       title: 'Vos rappels',
       empty: 'Aucun rappel en cours.',
       cannotDelete: 'Vous ne pouvez pas supprimer ce rappel.',
-      notAuthor: 'Ce bouton est réservé à la personne qui a lancé la commande.',
       item: ({ message, when }: { message: string; when: string }): string =>
         `${md.code(message)} — ${when}`,
     },

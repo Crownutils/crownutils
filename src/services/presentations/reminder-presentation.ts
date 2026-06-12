@@ -1,5 +1,5 @@
 import { TimestampStyles, time } from 'discord.js';
-import type { Reminder } from '@/generated/prisma/client.js';
+import type { Reminder } from '@/core/persistence/prisma/client.js';
 import { icons } from '@/lib/icons.js';
 import { lang } from '@/lang/index.js';
 import {
@@ -14,26 +14,15 @@ import {
 const REMINDER_DELETE_PREFIX = 'reminder-delete:';
 const REMINDER_CANCEL_PREFIX = 'reminder-cancel:';
 
-export function reminderDeleteButtonId(
-  authorId: string,
-  reminderId: string,
-): string {
-  return `${REMINDER_DELETE_PREFIX}${authorId}:${reminderId}`;
+export function reminderDeleteButtonId(reminderId: string): string {
+  return `${REMINDER_DELETE_PREFIX}${reminderId}`;
 }
 
-export function parseReminderDeleteButtonId(
-  customId: string,
-): { authorId: string; reminderId: string } | null {
+export function parseReminderDeleteButtonId(customId: string): string | null {
   if (!customId.startsWith(REMINDER_DELETE_PREFIX)) {
     return null;
   }
-  const [authorId, reminderId] = customId
-    .slice(REMINDER_DELETE_PREFIX.length)
-    .split(':');
-  if (!authorId || !reminderId) {
-    return null;
-  }
-  return { authorId, reminderId };
+  return customId.slice(REMINDER_DELETE_PREFIX.length) || null;
 }
 
 export function reminderCancelButtonId(reminderId: string): string {
@@ -106,9 +95,7 @@ export function buildReminderListContainer(
     .add(new Title(lang.commands.reminder.messages.list.title));
 
   for (const reminder of reminders) {
-    const deleteButton = new Button(
-      reminderDeleteButtonId(reminder.userId, reminder.id),
-    )
+    const deleteButton = new Button(reminderDeleteButtonId(reminder.id))
       .color('danger')
       .emoji(icons.trash);
     if (options?.disabled) {

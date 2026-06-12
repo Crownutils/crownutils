@@ -1,5 +1,5 @@
-import type { CommandAuthorization } from '@/types/command/command.js';
-import { env } from '../env.js';
+import { env } from '@/core/config/index.js';
+import type { CommandAuthorization } from './types.js';
 
 export const AUTHORIZATION_LEVELS = {
   owner: 3,

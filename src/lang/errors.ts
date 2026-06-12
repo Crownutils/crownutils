@@ -1,4 +1,4 @@
-import type { CommandPermissionError } from '@/types/command/command-permission.js';
+import type { CommandPermissionError } from '@/core/permissions/types.js';
 import { PERMISSION_LABELS } from './permissions.js';
 import { md } from '@/lib/markdown.js';
 

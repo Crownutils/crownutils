@@ -5,8 +5,8 @@ import { icons } from '@/lib/icons.js';
 import {
   resolveAuthorization,
   AUTHORIZATION_LEVELS,
-} from '@/lib/permissions/authorization.js';
-import type { CommandAuthorization } from '@/types/command/command.js';
+} from '@/core/permissions/authorization.js';
+import type { CommandAuthorization } from '@/core/permissions/types.js';
 
 const GRADE_ICONS = {
   owner: icons.crown,

@@ -10,7 +10,7 @@ import {
   checkCommandRequirements,
   resolveAuthorization,
   resolveExecutionContext,
-} from '@/lib/permissions/index.js';
+} from '@/core/permissions/index.js';
 import { lang } from '@/lang/index.js';
 
 const PREFIX = '!';

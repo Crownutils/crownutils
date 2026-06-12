@@ -1,7 +1,7 @@
 import { REST, Routes } from 'discord.js';
 import { loadSlashCommands } from '@/handlers/slash-handler.js';
 import { slashCommands } from '@/registries/slash-registry.js';
-import { env, requireEnv } from '@/lib/env.js';
+import { env, requireEnv } from '@/core/config/index.js';
 import { logger } from '@/lib/logger.js';
 
 const token = requireEnv('discordToken');

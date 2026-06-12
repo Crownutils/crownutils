@@ -1,7 +1,7 @@
 import type {
   CommandAuthorization,
   CommandScope,
-} from '@/types/command/command.js';
+} from '@/core/permissions/types.js';
 
 export const PERMISSION_LABELS = {
   owner: 'propriétaire',
