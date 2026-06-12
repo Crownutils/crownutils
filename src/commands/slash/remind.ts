@@ -8,7 +8,7 @@ import {
   DEFAULT_REMINDER_DURATION,
   MAX_REMINDERS_PER_USER,
   createReminderFromInput,
-} from '@/services/reminder-service.js';
+} from '@/discord/reminders/reminder-bridge.js';
 import type { SlashCommand } from '@/types/command/command.js';
 
 function getReminderArgs(interaction: ChatInputCommandInteraction): {

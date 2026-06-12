@@ -1,7 +1,7 @@
 import { Events } from 'discord.js';
 import type { Event } from '@/types/event.js';
 import { logger } from '@/lib/logger.js';
-import { rehydrateReminders } from '@/services/reminder-service.js';
+import { rehydrateReminders } from '@/discord/reminders/reminder-bridge.js';
 
 export const event = {
   name: Events.ClientReady,

@@ -10,7 +10,7 @@ import {
 import {
   deleteUserReminder,
   listReminders,
-} from '@/services/reminder-service.js';
+} from '@/discord/reminders/reminder-bridge.js';
 
 const LIST_WINDOW_MS = 120_000;
 

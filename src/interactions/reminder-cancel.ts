@@ -5,7 +5,7 @@ import {
   buildReminderCancelledContainer,
   buildReminderCreatedContainer,
 } from '@/services/presentations/reminder-presentation.js';
-import { cancelReminder } from '@/services/reminder-service.js';
+import { cancelReminder } from '@/discord/reminders/reminder-bridge.js';
 
 const CANCEL_WINDOW_MS = 120_000;
 
