@@ -7,4 +7,5 @@ export const icons = {
   worldMap: '🗺️',
   forward: '▶️',
   info: 'ℹ️',
-} as const;
+  question: '❓',
+} as const satisfies Record<string, string>;

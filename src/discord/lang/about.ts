@@ -1,5 +1,6 @@
 import { icons } from '@/discord/icons.js';
 import { md } from '@/discord/markdown.js';
+import type { CommandLang } from './types.js';
 
 export const about = {
   commandDescription: 'Voir diverses informations à propos du bot.',
@@ -21,4 +22,4 @@ export const about = {
       projectGithubPage: (url: string) => `GitHub du projet : ${url}`,
     },
   },
-} as const;
+} as const satisfies CommandLang;

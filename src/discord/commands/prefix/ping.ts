@@ -1,3 +1,4 @@
+import { PREFIX } from '@/discord/constants.js';
 import { lang } from '@/discord/lang/index.js';
 import {
   Container,
@@ -13,6 +14,9 @@ export const command = {
   aliases: ['p', 'latency'],
   requirements: {
     scope: 'global',
+  },
+  help: {
+    usagePrefix: `${PREFIX}ping`,
   },
 
   async execute(message, _args) {

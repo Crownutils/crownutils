@@ -50,6 +50,9 @@ export const command = {
   requirements: {
     scope: 'global',
   },
+  help: {
+    usageSlash: '/remind [time] [message]',
+  },
 
   async execute(interaction) {
     const { durationInput, remindMessage } = getReminderArgs(interaction);

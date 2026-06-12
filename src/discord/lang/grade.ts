@@ -1,4 +1,5 @@
 import { md } from '@/discord/markdown.js';
+import type { CommandLang } from './types.js';
 
 export const grade = {
   commandDescription: 'Affiche votre niveau de permission sur le bot.',
@@ -10,4 +11,4 @@ export const grade = {
     gradeRank: (gradeRank: number) =>
       `${md.bold('Niveau de permission :')} ${gradeRank}`,
   },
-} as const;
+} as const satisfies CommandLang;

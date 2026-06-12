@@ -15,6 +15,9 @@ export const command = {
   requirements: {
     scope: 'global',
   },
+  help: {
+    usageSlash: '/ping',
+  },
 
   async execute(interaction) {
     const before = Date.now();

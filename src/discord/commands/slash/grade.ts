@@ -10,6 +10,9 @@ export const command = {
   requirements: {
     scope: 'global',
   },
+  help: {
+    usageSlash: '/grade',
+  },
 
   async execute(interaction) {
     const reply = buildGradeContainer(interaction.user.id).build();

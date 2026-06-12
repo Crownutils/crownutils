@@ -1,4 +1,5 @@
 import { md } from '@/discord/markdown.js';
+import type { CommandLang } from './types.js';
 
 export const reminders = {
   commandDescription: 'Affiche vos rappels en cours.',
@@ -9,4 +10,4 @@ export const reminders = {
     item: ({ message, when }: { message: string; when: string }): string =>
       `${md.code(message)} — ${when}`,
   },
-} as const;
+} as const satisfies CommandLang;

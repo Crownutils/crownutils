@@ -1,6 +1,7 @@
 import { PREFIX } from '@/discord/constants.js';
 import { icons } from '@/discord/icons.js';
 import { md } from '@/discord/markdown.js';
+import type { CommandLang } from './types.js';
 
 export const remind = {
   commandDescription: 'Définir un rappel.',
@@ -38,4 +39,4 @@ export const remind = {
       slash: `Format invalide. Exemples : ${md.code('/remind')}, ${md.code('/remind time:1h30m message:faire les courses')}`,
     },
   },
-} as const;
+} as const satisfies CommandLang;

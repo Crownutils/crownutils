@@ -12,6 +12,9 @@ export const command = {
   requirements: {
     scope: 'global',
   },
+  help: {
+    usageSlash: '/reminders',
+  },
 
   async execute(interaction) {
     const reminders = await listReminders(interaction.user.id);

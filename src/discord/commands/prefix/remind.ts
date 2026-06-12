@@ -1,3 +1,4 @@
+import { PREFIX } from '@/discord/constants.js';
 import { lang } from '@/discord/lang/index.js';
 import { buildErrorContainer } from '@/discord/errors.js';
 import { buildReminderCreatedContainer } from '@/discord/presentations/reminder-presentation.js';
@@ -33,6 +34,9 @@ export const command = {
   aliases: ['r', 'rm', 'remindme', 'rappel'],
   requirements: {
     scope: 'global',
+  },
+  help: {
+    usagePrefix: `${PREFIX}remind [durée] [message]`,
   },
 
   async execute(message, args) {
