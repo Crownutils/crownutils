@@ -14,6 +14,10 @@ import {
 import { lang } from '@/discord/lang/index.js';
 import { PREFIX } from '@/discord/constants.js';
 
+/**
+ * Dispatches prefix commands: parses `PREFIX`-prefixed messages, checks
+ * permission requirements, and reports unexpected errors back to the user.
+ */
 export const event = {
   name: Events.MessageCreate,
 

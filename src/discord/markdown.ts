@@ -1,3 +1,4 @@
+/** Discord Markdown formatting helpers. */
 export const md = {
   code: (content: string): string => `\`${content}\``,
   bold: (content: string): string => `**${content}**`,

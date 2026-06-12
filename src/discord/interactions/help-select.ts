@@ -8,6 +8,11 @@ import {
 
 const IDLE_TIME_MS = 120_000;
 
+/**
+ * Attaches a select-menu collector to a `/help` message, limited to
+ * `authorId`. Selecting a command re-renders the container to show its
+ * details; the collector disables itself after `IDLE_TIME_MS` of inactivity.
+ */
 export function attachHelpSelectCollector(
   message: Message,
   authorId: string,

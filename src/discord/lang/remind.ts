@@ -3,6 +3,7 @@ import { icons } from '@/discord/icons.js';
 import { md } from '@/discord/markdown.js';
 import type { CommandLang } from './types.js';
 
+/** Strings for the `/remind` command. */
 export const remind = {
   commandDescription: 'Définir un rappel.',
   options: {

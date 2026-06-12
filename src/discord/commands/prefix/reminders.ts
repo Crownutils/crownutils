@@ -5,6 +5,7 @@ import { attachReminderListCollector } from '@/discord/interactions/reminder-lis
 import { listReminders } from '@/discord/reminders/reminder-bridge.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
+/** `c!reminders` (alias `rl`): lists the caller's reminders with delete buttons. */
 export const command = {
   name: 'reminders',
   description: lang.commands.reminders.commandDescription,

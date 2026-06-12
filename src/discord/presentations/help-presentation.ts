@@ -5,9 +5,15 @@ import { lang } from '../lang/index.js';
 import { md } from '../markdown.js';
 import type { PrefixCommand, SlashCommand } from '../types/command.js';
 
+/** Custom id of the `/help` command select menu. */
 export const HELP_SELECT_ID = 'help-select';
 const MAIN_MENU = 'Menu Principal';
 
+/**
+ * Builds the `/help` container. With no `selectedCommand` (or `MAIN_MENU`),
+ * shows the welcome message; otherwise shows the matching command's
+ * description, usage, and aliases (prefix commands only).
+ */
 export function buildHelpContainer(
   commands: SlashCommand[] | PrefixCommand[],
   options?: { disabled?: boolean },

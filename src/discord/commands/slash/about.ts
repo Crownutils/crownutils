@@ -3,6 +3,7 @@ import { buildBotInfoContainer } from '@/discord/presentations/about-presentatio
 import type { SlashCommand } from '@/discord/types/command.js';
 import { SlashCommandBuilder } from 'discord.js';
 
+/** `/about`: shows bot info. */
 export const command = {
   data: new SlashCommandBuilder()
     .setName('about')

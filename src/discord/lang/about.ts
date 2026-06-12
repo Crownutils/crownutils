@@ -2,6 +2,7 @@ import { icons } from '@/discord/icons.js';
 import { md } from '@/discord/markdown.js';
 import type { CommandLang } from './types.js';
 
+/** Strings for the `/about` command. */
 export const about = {
   commandDescription: 'Voir diverses informations à propos du bot.',
   messages: {

@@ -1,3 +1,4 @@
+/** Emoji used across command presentations. */
 export const icons = {
   pingPong: '🏓',
   bell: '🔔',

@@ -20,6 +20,7 @@ function isSlashCommand(obj: unknown): obj is SlashCommand {
   return true;
 }
 
+/** Loads all slash command modules and registers each one in {@link slashCommands}. */
 export async function loadSlashCommands(): Promise<void> {
   const commands = await loadModules(
     'commands/slash',

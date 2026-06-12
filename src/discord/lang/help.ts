@@ -2,6 +2,7 @@ import { PREFIX } from '../constants.js';
 import { md } from '../markdown.js';
 import type { CommandLang } from './types.js';
 
+/** Strings for the `/help` command. */
 export const help = {
   commandDescription: "Affiche le menu d'aide du bot.",
   messages: {

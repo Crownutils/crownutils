@@ -1,6 +1,7 @@
 import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
 import type { SelectComponent } from './component.js';
 
+/** A string select menu wrapped in its own action row. */
 export class Select implements SelectComponent {
   public readonly kind = 'select';
   private readonly builder: StringSelectMenuBuilder;
@@ -14,6 +15,7 @@ export class Select implements SelectComponent {
     return this;
   }
 
+  /** Adds one option. `value` must be unique among this select's options. */
   public option(label: string, value: string, description?: string): this {
     this.builder.addOptions({ label, value, description });
     return this;

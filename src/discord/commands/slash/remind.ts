@@ -31,6 +31,7 @@ function getReminderArgs(interaction: ChatInputCommandInteraction): {
   };
 }
 
+/** `/remind`: creates a reminder. */
 export const command = {
   data: new SlashCommandBuilder()
     .setName('remind')

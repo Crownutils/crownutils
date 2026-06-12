@@ -9,6 +9,7 @@ const BUTTON_STYLES: Record<ButtonColor, ButtonStyle> = {
   danger: ButtonStyle.Danger,
 };
 
+/** A button; use as a {@link Section} accessory or inside an {@link ActionRow}. */
 export class Button {
   private readonly builder: ButtonBuilder;
 

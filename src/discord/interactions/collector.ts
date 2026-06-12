@@ -53,12 +53,25 @@ type Reduce<S> = (
   stop: () => void,
 ) => Promise<S> | S;
 
+/**
+ * Drives a Components V2 message that re-renders on each interaction.
+ *
+ * `reduce` updates state and `render` rebuilds the container from it —
+ * the message is edited in place on every collected interaction until
+ * `stop()` is called from within `reduce`, after which it's re-rendered
+ * once more with `disabled: true`.
+ */
 export class InteractiveMessage<S> {
   private state: S;
   private finished = false;
   private readonly collector: Collector;
   private readonly allowedIds: string[];
 
+  /**
+   * @param options.allowedIds - User ids allowed to interact with the
+   * message. Other users get an ephemeral "not allowed" reply instead of
+   * triggering `reduce`/`render`. Pass an empty array to allow everyone.
+   */
   public constructor(
     private readonly message: Message,
     initial: S,

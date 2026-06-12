@@ -8,6 +8,7 @@ import {
   Title,
 } from '@/discord/components/index.js';
 
+/** `/ping`: shows bot and Discord latency. */
 export const command = {
   data: new SlashCommandBuilder()
     .setName('ping')

@@ -10,6 +10,7 @@ import { env } from '@/core/config/index.js';
 const ownerGithubLink = 'https://github.com/Ntalcme';
 const projectGithubUrl = 'https://github.com/Crownutils';
 
+/** Builds the `/about` container: bot version, license, and useful links. */
 export function buildBotInfoContainer(): Container {
   return new Container().color('info').add(
     new Title(lang.commands.about.messages.title),

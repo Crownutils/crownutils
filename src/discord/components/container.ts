@@ -11,6 +11,11 @@ const COLORS = {
 
 type ColorName = keyof typeof COLORS;
 
+/**
+ * Components V2 message builder. Components are added via `add()` in
+ * display order, then `build()` produces the `components`/`flags` payload
+ * to pass directly to `reply`/`edit`/`update`.
+ */
 export class Container {
   private readonly components: V2Component[] = [];
   private accentColor?: number;
@@ -25,6 +30,10 @@ export class Container {
     return this;
   }
 
+  /**
+   * Builds the `{ components, flags }` payload. `IsComponentsV2` is always
+   * set; pass `ephemeral: true` to also set the `Ephemeral` flag.
+   */
   public build(options?: { ephemeral?: boolean }): {
     components: ContainerBuilder[];
     flags: number;

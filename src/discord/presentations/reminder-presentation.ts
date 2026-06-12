@@ -19,6 +19,7 @@ function reminderDeleteButtonId(reminderId: string): string {
   return new CustomId(REMINDER_DELETE_CONTEXT, reminderId).value;
 }
 
+/** Extracts the reminder id from a delete button's custom id, or `null` if it doesn't match. */
 export function parseReminderDeleteButtonId(customId: string): string | null {
   const parsed = CustomId.parse(customId);
   if (!parsed || parsed.ctx !== REMINDER_DELETE_CONTEXT) {
@@ -27,6 +28,10 @@ export function parseReminderDeleteButtonId(customId: string): string | null {
   return parsed.id;
 }
 
+/**
+ * Builds the reminder confirmation container, with a cancel button. Pass
+ * `disabled: true` once the cancel window has expired.
+ */
 export function buildReminderCreatedContainer(
   reminder: Reminder,
   options?: { disabled?: boolean },
@@ -50,6 +55,7 @@ export function buildReminderCreatedContainer(
   );
 }
 
+/** Builds the container shown after a reminder is cancelled. */
 export function buildReminderCancelledContainer(reminder: Reminder): Container {
   return new Container().color('cancelled').add(
     new Title(lang.commands.remind.messages.cancelled.title),
@@ -61,6 +67,7 @@ export function buildReminderCancelledContainer(reminder: Reminder): Container {
   );
 }
 
+/** Builds the container sent when a reminder fires, mentioning its owner. */
 export function buildReminderTriggeredContainer(reminder: Reminder): Container {
   return new Container()
     .color('info')
@@ -71,6 +78,10 @@ export function buildReminderTriggeredContainer(reminder: Reminder): Container {
     );
 }
 
+/**
+ * Builds the `/reminders` list container, with a delete button per reminder.
+ * Shows an empty-state message if `reminders` is empty.
+ */
 export function buildReminderListContainer(
   reminders: Reminder[],
   options?: { disabled?: boolean },

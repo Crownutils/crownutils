@@ -29,6 +29,10 @@ export type CreateReminderResult =
   | { ok: true; reminder: Reminder }
   | { ok: false; error: ReminderInputError };
 
+/**
+ * Validates and persists a reminder, then schedules its delivery.
+ * Returns `{ ok: false }` without side effects if validation fails.
+ */
 export async function createReminderFromInput(
   client: Client,
   channelId: string,
@@ -56,11 +60,16 @@ export async function createReminderFromInput(
   return { ok: true, reminder };
 }
 
+/** Unschedules and deletes a reminder, regardless of its owner. */
 export function cancelReminder(id: string): Promise<boolean> {
   unscheduleReminder(id);
   return deleteReminder(id);
 }
 
+/**
+ * Cancels a reminder, but only if it belongs to `userId`.
+ * Returns `false` if the reminder doesn't exist or belongs to someone else.
+ */
 export async function deleteUserReminder(
   id: string,
   userId: string,
@@ -99,6 +108,10 @@ async function sendReminder(client: Client, reminder: Reminder): Promise<void> {
   }
 }
 
+/**
+ * Re-schedules all reminders persisted in the database.
+ * Called on startup to recover reminders across bot restarts.
+ */
 export async function rehydrateReminders(client: Client): Promise<void> {
   let reminders: Reminder[];
   try {

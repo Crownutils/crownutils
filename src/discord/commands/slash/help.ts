@@ -5,6 +5,7 @@ import { slashCommands } from '@/discord/registries/slash-registry.js';
 import type { SlashCommand } from '@/discord/types/command.js';
 import { SlashCommandBuilder } from 'discord.js';
 
+/** `/help`: shows the interactive help menu. */
 export const command = {
   data: new SlashCommandBuilder()
     .setName('help')
