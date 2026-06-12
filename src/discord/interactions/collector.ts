@@ -67,7 +67,7 @@ export class InteractiveMessage<S> {
     options: {
       idle?: CollectorIdleTimeoutMs;
       time?: CollectorTimeoutMs;
-      allowedIds?: string[];
+      allowedIds: string[];
     },
   ) {
     this.state = initial;
@@ -76,7 +76,7 @@ export class InteractiveMessage<S> {
       idle: options.idle,
       time: options.time,
       filter:
-        !options.allowedIds || options.allowedIds.length === 0
+        options.allowedIds.length === 0
           ? undefined
           : (i) => options.allowedIds!.includes(i.user.id),
       onCollect: (i) => this.onCollect(i),
