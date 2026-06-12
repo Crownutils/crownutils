@@ -4,7 +4,7 @@ import { countReminders } from './reminder-repository.js';
 
 export const DEFAULT_REMINDER_DURATION = '9m45s';
 export const MAX_REMINDER_PER_PRIVILEGED_USER = 5;
-export const MAX_REMINDERS_PER_USER = 1;
+export const MAX_REMINDERS_PER_USER = 3;
 
 export type ReminderInputError =
   | 'invalid_format'
@@ -14,6 +14,12 @@ export type ReminderInputError =
 export type ValidateReminderInputResult =
   | { ok: true; triggerAt: Date }
   | { ok: false; error: ReminderInputError };
+
+export function getMaxRemindersForUser(userId: string): number {
+  return env.privilegedIds.includes(userId)
+    ? MAX_REMINDER_PER_PRIVILEGED_USER
+    : MAX_REMINDERS_PER_USER;
+}
 
 export async function validateReminderInput(
   userId: string,
@@ -29,10 +35,7 @@ export async function validateReminderInput(
   }
 
   if (userId !== env.ownerId) {
-    const isPrivilegedUser = env.privilegedIds.includes(userId);
-    const maxReminders = isPrivilegedUser
-      ? MAX_REMINDER_PER_PRIVILEGED_USER
-      : MAX_REMINDERS_PER_USER;
+    const maxReminders = getMaxRemindersForUser(userId);
     const reminderCount = await countReminders(userId);
     if (reminderCount >= maxReminders) {
       return { ok: false, error: 'limit_reached' };

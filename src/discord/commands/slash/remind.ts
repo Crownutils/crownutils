@@ -6,8 +6,8 @@ import { buildReminderCreatedContainer } from '@/discord/presentations/reminder-
 import { attachReminderCancelCollector } from '@/discord/interactions/reminder-cancel.js';
 import {
   DEFAULT_REMINDER_DURATION,
-  MAX_REMINDERS_PER_USER,
   createReminderFromInput,
+  getMaxRemindersForUser,
 } from '@/discord/reminders/reminder-bridge.js';
 import type { SlashCommand } from '@/discord/types/command.js';
 
@@ -70,7 +70,7 @@ export const command = {
         invalid_format: lang.commands.remind.messages.invalidFormat.slash,
         duration_too_long: lang.commands.remind.messages.durationTooLong,
         limit_reached: lang.commands.remind.messages.limitReached({
-          max: MAX_REMINDERS_PER_USER,
+          max: getMaxRemindersForUser(interaction.user.id),
         }),
       };
       await interaction.reply(
