@@ -1,6 +1,6 @@
 import { CrownutilsClient } from '@/discord/client/crownutils-client.js';
 import { requireEnv } from '@/core/config/index.js';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 import { prisma } from '@/core/persistence/client.js';
 
 const token = requireEnv('discordToken');

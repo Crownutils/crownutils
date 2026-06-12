@@ -14,7 +14,7 @@ import {
   validateReminderInput,
   type ReminderInputError,
 } from '@/core/reminders/reminder-validation.js';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 import { buildReminderTriggeredContainer } from '@/discord/presentations/reminder-presentation.js';
 
 export { listReminders } from '@/core/reminders/reminder-repository.js';

@@ -1,7 +1,7 @@
 import { Events } from 'discord.js';
 import type { Event } from '@/discord/types/event.js';
 import { prefixCommands } from '@/discord/registries/prefix-registry.js';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,

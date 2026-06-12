@@ -2,7 +2,7 @@ import { REST, Routes } from 'discord.js';
 import { loadSlashCommands } from '@/discord/handlers/slash-handler.js';
 import { slashCommands } from '@/discord/registries/slash-registry.js';
 import { env, requireEnv } from '@/core/config/index.js';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 
 const token = requireEnv('discordToken');
 const clientId = requireEnv('discordClientId');

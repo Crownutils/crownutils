@@ -11,7 +11,7 @@ import {
   buildErrorContainer,
 } from '@/discord/errors.js';
 import { lang } from '@/discord/lang/index.js';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 
 export const event = {
   name: Events.InteractionCreate,

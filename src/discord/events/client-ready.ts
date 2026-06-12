@@ -1,6 +1,6 @@
 import { Events } from 'discord.js';
 import type { Event } from '@/discord/types/event.js';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 import { rehydrateReminders } from '@/discord/reminders/reminder-bridge.js';
 
 export const event = {

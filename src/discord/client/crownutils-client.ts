@@ -3,7 +3,7 @@ import { loadSlashCommands } from '@/discord/handlers/slash-handler.js';
 import type { SlashCommand } from '@/discord/types/command.js';
 import { loadEvents } from '@/discord/handlers/event-handler.js';
 import { slashCommands } from '@/discord/registries/slash-registry.js';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 import { loadPrefixCommands } from '@/discord/handlers/prefix-handler.js';
 import { prefixCommands } from '@/discord/registries/prefix-registry.js';
 

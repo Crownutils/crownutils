@@ -1,7 +1,7 @@
 import { readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { logger } from '@/lib/logger.js';
+import { logger } from '@/shared/logger.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
