@@ -19,3 +19,9 @@ model Reminder {
   triggerAt DateTime
   message   String
 }
+
+// Singleton row (id always 1) holding bot-wide toggles.
+model BotState {
+  id                 Int     @id @default(1)
+  maintenanceEnabled Boolean @default(false)
+}

@@ -6,6 +6,7 @@ import {
   resolveAuthorization,
   resolveExecutionContext,
 } from '@/core/permissions/index.js';
+import { isMaintenanceEnabled } from '@/core/maintenance/maintenance-repository.js';
 import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,
@@ -14,8 +15,9 @@ import { lang } from '@/discord/lang/index.js';
 import { logger } from '@/shared/logger.js';
 
 /**
- * Dispatches slash command interactions: checks permission requirements,
- * runs the command, and reports unexpected errors back to the user.
+ * Dispatches slash command interactions: checks maintenance mode and
+ * permission requirements, runs the command, and reports unexpected errors
+ * back to the user.
  */
 export const event = {
   name: Events.InteractionCreate,
@@ -25,11 +27,22 @@ export const event = {
     const command = slashCommands.get(interaction.commandName);
     if (!command) return;
 
+    const userAuthorization = resolveAuthorization(interaction.user.id);
+
+    if (userAuthorization !== 'owner' && (await isMaintenanceEnabled())) {
+      const reply = buildErrorContainer(lang.errors.maintenance).build({
+        ephemeral: true,
+      });
+
+      await interaction.reply(reply);
+      return;
+    }
+
     if (command.requirements) {
       const validation = checkCommandRequirements(
         command.requirements,
         resolveExecutionContext(interaction.guildId),
-        resolveAuthorization(interaction.user.id),
+        userAuthorization,
       );
 
       if (!validation.canBeExecuted) {
