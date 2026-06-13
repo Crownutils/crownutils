@@ -14,6 +14,13 @@ import {
 
 const LIST_WINDOW_MS = 120_000;
 
+/**
+ * Attaches delete-button collectors to a reminder list message, limited to
+ * `authorId`. Deleting a reminder re-renders the list with it removed; if it
+ * was already gone (or belongs to someone else), replies with an ephemeral
+ * error instead. Stops automatically once the list becomes empty, or after
+ * `LIST_WINDOW_MS` of inactivity.
+ */
 export function attachReminderListCollector(
   message: Message,
   authorId: string,

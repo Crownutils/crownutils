@@ -7,6 +7,10 @@ import { logger } from '@/shared/logger.js';
 import { loadPrefixCommands } from '@/discord/handlers/prefix-handler.js';
 import { prefixCommands } from '@/discord/registries/prefix-registry.js';
 
+/**
+ * Wires up the Discord client: registers events, then loads slash and prefix
+ * commands into their registries. Call {@link init} before {@link login}.
+ */
 export class CrownutilsClient {
   private readonly discord: Client;
   public readonly slashCommands = new Map<string, SlashCommand>();

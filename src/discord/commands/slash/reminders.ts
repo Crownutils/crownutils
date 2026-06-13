@@ -5,6 +5,7 @@ import { attachReminderListCollector } from '@/discord/interactions/reminder-lis
 import { listReminders } from '@/discord/reminders/reminder-bridge.js';
 import type { SlashCommand } from '@/discord/types/command.js';
 
+/** `/reminders`: lists the caller's reminders with delete buttons. */
 export const command = {
   data: new SlashCommandBuilder()
     .setName('reminders')

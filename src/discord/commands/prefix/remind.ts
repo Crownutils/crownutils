@@ -28,6 +28,7 @@ function getReminderArgs(args: string[]): {
   };
 }
 
+/** `c!remind [durée] [message]` (aliases `r`, `rm`, `remindme`, `rappel`): creates a reminder. */
 export const command = {
   name: 'remind',
   description: lang.commands.remind.commandDescription,

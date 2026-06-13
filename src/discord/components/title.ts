@@ -4,6 +4,7 @@ import { Text } from './text.js';
 
 export type TitleSize = 'small' | 'medium' | 'large';
 
+/** A {@link Text} preset as a Markdown heading; defaults to `'medium'`. */
 export class Title implements TextComponent {
   public readonly kind = 'text';
 

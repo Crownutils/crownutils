@@ -19,6 +19,7 @@ function isEvent(obj: unknown): obj is Event<keyof ClientEvents> {
   return true;
 }
 
+/** Loads all event modules from `src/discord/events/`. */
 export async function loadEvents(): Promise<Event<keyof ClientEvents>[]> {
   return loadModules('events', 'event', isEvent);
 }

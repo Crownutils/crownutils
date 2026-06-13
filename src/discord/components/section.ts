@@ -2,6 +2,7 @@ import { SectionBuilder } from 'discord.js';
 import type { SectionComponent, TextComponent } from './component.js';
 import type { Button } from './button.js';
 
+/** A group of text components with an optional button accessory alongside them. */
 export class Section implements SectionComponent {
   public readonly kind = 'section';
   private readonly texts: TextComponent[] = [];
@@ -12,6 +13,7 @@ export class Section implements SectionComponent {
     return this;
   }
 
+  /** Sets the button shown alongside this section's text. */
   public button(button: Button): this {
     this.accessory = button;
     return this;

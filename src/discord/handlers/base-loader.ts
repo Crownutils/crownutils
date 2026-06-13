@@ -5,6 +5,11 @@ import { logger } from '@/shared/logger.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/**
+ * Dynamically imports every module file in `directory` and collects the
+ * `exportName` export from each, skipping files where it's missing or fails
+ * `isValid`.
+ */
 export async function loadModules<T>(
   directory: string,
   exportName: string,

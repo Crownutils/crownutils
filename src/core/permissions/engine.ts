@@ -43,6 +43,10 @@ function checkCommandAuthorization(
     : { ok: false, commandPermissionError };
 }
 
+/**
+ * Checks a command's scope and authorization requirements against the
+ * current execution context and user, collecting every failed check.
+ */
 export function checkCommandRequirements(
   commandRequirements: CommandRequirements,
   context: ExecutionContext,

@@ -7,6 +7,11 @@ import type {
   TextDisplayBuilder,
 } from 'discord.js';
 
+/**
+ * Anything that can be added to a {@link Container}. `kind` lets
+ * `Container.build()` dispatch to the matching `addXxxComponents` call on
+ * the underlying `ContainerBuilder`.
+ */
 export type V2Component =
   | TextComponent
   | SeparatorComponent

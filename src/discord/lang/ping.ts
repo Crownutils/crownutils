@@ -1,6 +1,7 @@
 import { icons } from '@/discord/icons.js';
 import type { CommandLang } from './types.js';
 
+/** Strings for the `/ping` command. */
 export const ping = {
   commandDescription: 'Affiche la latence du bot.',
   messages: {

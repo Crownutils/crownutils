@@ -13,6 +13,10 @@ import {
 import { lang } from '@/discord/lang/index.js';
 import { logger } from '@/shared/logger.js';
 
+/**
+ * Dispatches slash command interactions: checks permission requirements,
+ * runs the command, and reports unexpected errors back to the user.
+ */
 export const event = {
   name: Events.InteractionCreate,
   async execute(interaction) {

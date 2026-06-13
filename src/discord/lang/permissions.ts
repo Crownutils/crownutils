@@ -3,6 +3,7 @@ import type {
   CommandScope,
 } from '@/core/permissions/types.js';
 
+/** French labels for each {@link CommandScope}/{@link CommandAuthorization} value. */
 export const PERMISSION_LABELS = {
   owner: 'propriétaire',
   privileged: 'privilégié',

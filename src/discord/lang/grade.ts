@@ -1,6 +1,7 @@
 import { md } from '@/discord/markdown.js';
 import type { CommandLang } from './types.js';
 
+/** Strings for the `/grade` command. */
 export const grade = {
   commandDescription: 'Affiche votre niveau de permission sur le bot.',
   messages: {

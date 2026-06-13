@@ -14,6 +14,7 @@ const GRADE_ICONS = {
   public: icons.worldMap,
 } as const satisfies Record<CommandAuthorization, string>;
 
+/** Builds the `/grade` container showing `userId`'s permission level, rank, and icon. */
 export function buildGradeContainer(userId: string): Container {
   const userGrade = resolveAuthorization(userId);
   const userGradeDisplay = PERMISSION_LABELS[userGrade];

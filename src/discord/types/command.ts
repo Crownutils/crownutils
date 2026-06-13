@@ -6,6 +6,7 @@ import type {
 } from 'discord.js';
 import type { CommandRequirements } from '@/core/permissions/types.js';
 
+/** Usage hint shown in `/help`; exactly one of `usageSlash`/`usagePrefix` is set. */
 export type CommandHelp =
   | {
       usageSlash: string;
@@ -16,6 +17,7 @@ export type CommandHelp =
       usagePrefix: string;
     };
 
+/** A slash command module, loaded by `slash-handler.ts`. */
 export interface SlashCommand {
   data: SlashCommandBuilder | SlashCommandOptionsOnlyBuilder;
   requirements?: CommandRequirements;
@@ -23,6 +25,7 @@ export interface SlashCommand {
   execute(interaction: ChatInputCommandInteraction): Promise<void>;
 }
 
+/** A prefix command module, loaded by `prefix-handler.ts`. */
 export interface PrefixCommand {
   name: string;
   description: string;

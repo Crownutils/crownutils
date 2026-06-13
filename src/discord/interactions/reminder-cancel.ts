@@ -9,6 +9,12 @@ import { cancelReminder } from '@/discord/reminders/reminder-bridge.js';
 
 const CANCEL_WINDOW_MS = 120_000;
 
+/**
+ * Attaches a "cancel" button collector to a reminder confirmation message,
+ * limited to `reminder.userId`. Clicking the button cancels the reminder and
+ * stops the collector; after `CANCEL_WINDOW_MS` the button is disabled and
+ * the cancel option is no longer available.
+ */
 export function attachReminderCancelCollector(
   message: Message,
   reminder: Reminder,

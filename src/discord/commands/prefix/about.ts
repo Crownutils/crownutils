@@ -3,6 +3,7 @@ import { lang } from '@/discord/lang/index.js';
 import { buildBotInfoContainer } from '@/discord/presentations/about-presentation.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
+/** `c!about` (alias `c!botinfo`): shows bot info. */
 export const command = {
   name: 'about',
   aliases: ['botinfo'],

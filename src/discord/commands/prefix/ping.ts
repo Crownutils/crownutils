@@ -8,6 +8,7 @@ import {
 } from '@/discord/components/index.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
+/** `c!ping` (aliases `p`, `latency`): shows bot and Discord latency. */
 export const command = {
   name: 'ping',
   description: lang.commands.ping.commandDescription,

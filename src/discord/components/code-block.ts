@@ -1,6 +1,7 @@
 import { TextDisplayBuilder } from 'discord.js';
 import type { TextComponent } from './component.js';
 
+/** A fenced code block, rendered as ` ```language\ncontent\n``` `. */
 export class CodeBlock implements TextComponent {
   public readonly kind = 'text';
 

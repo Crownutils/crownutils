@@ -5,6 +5,7 @@ import { buildHelpContainer } from '@/discord/presentations/help-presentation.js
 import { prefixCommands } from '@/discord/registries/prefix-registry.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
+/** `c!help` (aliases `aide`, `h`): shows the interactive help menu. */
 export const command = {
   name: 'help',
   description: lang.commands.help.commandDescription,

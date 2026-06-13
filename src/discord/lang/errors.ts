@@ -2,12 +2,14 @@ import type { CommandPermissionError } from '@/core/permissions/types.js';
 import { PERMISSION_LABELS } from './permissions.js';
 import { md } from '@/discord/markdown.js';
 
+/** Shared error strings used across commands. */
 export const errors = {
   unexpected:
     'Une erreur inattendue est survenue. Veuillez réessayer plus tard.',
   interactionNotAllowed: 'Vous ne pouvez pas interagir avec cette interaction.',
 } as const;
 
+/** Formats a list of failed permission checks into a single error message. */
 export function formatPermissionErrors(
   permissionErrors: CommandPermissionError[],
 ): string {

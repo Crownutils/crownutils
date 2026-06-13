@@ -6,6 +6,7 @@ const packageJson = JSON.parse(
   readFileSync(new URL('../../../package.json', import.meta.url), 'utf8'),
 ) as { version: string; license: string };
 
+/** Runtime configuration sourced from environment variables and `package.json`. */
 export const env = {
   nodeEnv: NODE_ENV,
   isProduction: NODE_ENV === 'production',
@@ -39,6 +40,10 @@ const ENV_VAR_NAMES: Record<RequirableEnvKey, string> = {
   ownerId: 'OWNER_ID',
 };
 
+/**
+ * Returns `env[key]`, throwing if it's unset. Use for variables required at
+ * startup (Discord credentials, guild/owner ids).
+ */
 export function requireEnv(key: RequirableEnvKey): string {
   const value = env[key];
   if (!value) {

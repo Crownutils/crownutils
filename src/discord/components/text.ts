@@ -1,6 +1,7 @@
 import { TextDisplayBuilder } from 'discord.js';
 import type { TextComponent } from './component.js';
 
+/** `subtle` renders as a small, dimmed line; the others map to Markdown headings. */
 export type TextSize = 'normal' | 'subtle' | 'small' | 'medium' | 'large';
 
 const SIZE_PREFIX = {
@@ -11,6 +12,12 @@ const SIZE_PREFIX = {
   large: '#',
 } as const satisfies Record<TextSize, string>;
 
+/**
+ * A text display component. Formatting methods (`bold`, `italic`, `code`,
+ * etc.) only affect the first line; use `newLine()` to add further lines,
+ * each rendered with its own formatting. `quote()` applies `> ` to every
+ * line of the final content, including lines added via `newLine()`.
+ */
 export class Text implements TextComponent {
   public readonly kind = 'text';
 
@@ -61,11 +68,16 @@ export class Text implements TextComponent {
     return this;
   }
 
+  /** Prefixes every line of the rendered content with `> ` (blockquote). */
   public quote(): this {
     this.isQuote = true;
     return this;
   }
 
+  /**
+   * Appends another line below the current content. Pass a `Text` instance
+   * to apply its own formatting (bold, code, etc.) independently.
+   */
   public newLine(line: string | Text = ''): this {
     this.nextLines.push(line instanceof Text ? line : new Text(line));
     return this;

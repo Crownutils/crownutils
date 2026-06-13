@@ -1,6 +1,7 @@
 import { env } from '@/core/config/index.js';
 import type { CommandScope, ExecutionContext } from './types.js';
 
+/** Resolves the {@link ExecutionContext} for a guild id (`null` means a DM). */
 export function resolveExecutionContext(
   guildId: string | null,
 ): ExecutionContext {
@@ -16,6 +17,7 @@ export function resolveExecutionContext(
   }
 }
 
+/** Returns whether `context` satisfies `requiredScope`. */
 export function isScopeAllowed(
   requiredScope: CommandScope,
   context: ExecutionContext,

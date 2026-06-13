@@ -19,6 +19,10 @@ function isPrefixCommand(obj: unknown): obj is PrefixCommand {
   return true;
 }
 
+/**
+ * Loads all prefix command modules and registers each one in
+ * {@link prefixCommands} under its `name` and every entry in `aliases`.
+ */
 export async function loadPrefixCommands(): Promise<void> {
   const commands = await loadModules(
     'commands/prefix',

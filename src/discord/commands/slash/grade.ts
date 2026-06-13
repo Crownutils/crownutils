@@ -3,6 +3,7 @@ import { buildGradeContainer } from '@/discord/presentations/grade-presentation.
 import type { SlashCommand } from '@/discord/types/command.js';
 import { SlashCommandBuilder } from 'discord.js';
 
+/** `/grade`: shows the caller's permission grade. */
 export const command = {
   data: new SlashCommandBuilder()
     .setName('grade')
