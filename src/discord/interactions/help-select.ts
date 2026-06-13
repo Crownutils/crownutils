@@ -1,6 +1,7 @@
 import type { Message } from 'discord.js';
 import type { PrefixCommand, SlashCommand } from '@/discord/types/command.js';
 import { InteractiveMessage } from '@/discord/interactions/collector.js';
+import type { CommandAuthorization } from '@/core/permissions/types.js';
 import {
   HELP_SELECT_ID,
   buildHelpContainer,
@@ -11,18 +12,20 @@ const IDLE_TIME_MS = 120_000;
 /**
  * Attaches a select-menu collector to a `/help` message, limited to
  * `authorId`. Selecting a command re-renders the container to show its
- * details; the collector disables itself after `IDLE_TIME_MS` of inactivity.
+ * details, filtered to commands `userAuthorization` can access; the
+ * collector disables itself after `IDLE_TIME_MS` of inactivity.
  */
 export function attachHelpSelectCollector(
   message: Message,
   authorId: string,
   commands: SlashCommand[] | PrefixCommand[],
+  userAuthorization: CommandAuthorization,
 ): void {
   new InteractiveMessage<string | undefined>(
     message,
     undefined,
     (selected, { disabled }) =>
-      buildHelpContainer(commands, { disabled }, selected),
+      buildHelpContainer(commands, userAuthorization, { disabled }, selected),
     (interaction, selected) => {
       if (
         interaction.isStringSelectMenu() &&

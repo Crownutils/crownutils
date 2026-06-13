@@ -1,3 +1,4 @@
+import { resolveAuthorization } from '@/core/permissions/index.js';
 import { PREFIX } from '@/discord/constants.js';
 import { attachHelpSelectCollector } from '@/discord/interactions/help-select.js';
 import { lang } from '@/discord/lang/index.js';
@@ -19,7 +20,10 @@ export const command = {
 
   async execute(message, _args) {
     const commands = [...new Set(prefixCommands.values())];
-    const sent = await message.reply(buildHelpContainer(commands).build());
-    attachHelpSelectCollector(sent, message.author.id, commands);
+    const userAuthorization = resolveAuthorization(message.author.id);
+    const sent = await message.reply(
+      buildHelpContainer(commands, userAuthorization).build(),
+    );
+    attachHelpSelectCollector(sent, message.author.id, commands, userAuthorization);
   },
 } satisfies PrefixCommand;

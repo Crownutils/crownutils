@@ -11,12 +11,14 @@ import {
   resolveAuthorization,
   resolveExecutionContext,
 } from '@/core/permissions/index.js';
+import { isMaintenanceEnabled } from '@/core/maintenance/maintenance-repository.js';
 import { lang } from '@/discord/lang/index.js';
 import { PREFIX } from '@/discord/constants.js';
 
 /**
  * Dispatches prefix commands: parses `PREFIX`-prefixed messages, checks
- * permission requirements, and reports unexpected errors back to the user.
+ * maintenance mode and permission requirements, and reports unexpected
+ * errors back to the user.
  */
 export const event = {
   name: Events.MessageCreate,
@@ -36,11 +38,20 @@ export const event = {
     const command = prefixCommands.get(commandName);
     if (!command) return;
 
+    const userAuthorization = resolveAuthorization(message.author.id);
+
+    if (userAuthorization !== 'owner' && (await isMaintenanceEnabled())) {
+      await message
+        .reply(buildErrorContainer(lang.errors.maintenance).build())
+        .catch(() => {});
+      return;
+    }
+
     if (command.requirements) {
       const validation = checkCommandRequirements(
         command.requirements,
         resolveExecutionContext(message.guildId),
-        resolveAuthorization(message.author.id),
+        userAuthorization,
       );
 
       if (!validation.canBeExecuted) {

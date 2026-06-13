@@ -7,6 +7,8 @@ export const errors = {
   unexpected:
     'Une erreur inattendue est survenue. Veuillez réessayer plus tard.',
   interactionNotAllowed: 'Vous ne pouvez pas interagir avec cette interaction.',
+  maintenance:
+    'Le bot est actuellement en maintenance. Veuillez réessayer plus tard.',
 } as const;
 
 /** Formats a list of failed permission checks into a single error message. */

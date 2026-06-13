@@ -9,4 +9,5 @@ export const icons = {
   forward: '▶️',
   info: 'ℹ️',
   question: '❓',
+  wrench: '🔧',
 } as const satisfies Record<string, string>;

@@ -4,6 +4,8 @@ import { Select, Separator, Text, Title } from '../components/index.js';
 import { lang } from '../lang/index.js';
 import { md } from '../markdown.js';
 import type { PrefixCommand, SlashCommand } from '../types/command.js';
+import { isAuthorizationAllowed } from '@/core/permissions/index.js';
+import type { CommandAuthorization } from '@/core/permissions/types.js';
 
 /** Custom id of the `/help` command select menu. */
 export const HELP_SELECT_ID = 'help-select';
@@ -13,18 +15,30 @@ const MAIN_MENU = 'Menu Principal';
  * Builds the `/help` container. With no `selectedCommand` (or `MAIN_MENU`),
  * shows the welcome message; otherwise shows the matching command's
  * description, usage, and aliases (prefix commands only).
+ *
+ * Commands whose `requirements.authorization` exceeds `userAuthorization`
+ * are hidden entirely (not shown in the select menu, not selectable).
  */
 export function buildHelpContainer(
   commands: SlashCommand[] | PrefixCommand[],
+  userAuthorization: CommandAuthorization,
   options?: { disabled?: boolean },
   selectedCommand?: string,
 ): Container {
+  const allCommands: (SlashCommand | PrefixCommand)[] = commands;
+  const visibleCommands = allCommands.filter((command) =>
+    isAuthorizationAllowed(
+      command.requirements?.authorization ?? 'public',
+      userAuthorization,
+    ),
+  );
+
   const selectMenu = new Select(HELP_SELECT_ID).placeholder(
     lang.commands.help.messages.selectMenu.placeholder,
   );
 
   selectMenu.option(MAIN_MENU, MAIN_MENU);
-  for (const command of commands) {
+  for (const command of visibleCommands) {
     if ('data' in command) {
       selectMenu.option(
         command.data.name,
@@ -41,7 +55,7 @@ export function buildHelpContainer(
   }
 
   const selected = selectedCommand && selectedCommand !== MAIN_MENU
-    ? commands.find(
+    ? visibleCommands.find(
         (command) =>
           ('data' in command ? command.data.name : command.name) ===
           selectedCommand,
