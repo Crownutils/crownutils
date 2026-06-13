@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/core/persistence/prisma"
 }
 
 datasource db {
@@ -18,4 +18,10 @@ model Reminder {
   userId    String
   triggerAt DateTime
   message   String
+}
+
+// Singleton row (id always 1) holding bot-wide toggles.
+model BotState {
+  id                 Int     @id @default(1)
+  maintenanceEnabled Boolean @default(false)
 }

@@ -1,0 +1,25 @@
+import type { ClientEvents } from 'discord.js';
+import type { Event } from '@/discord/types/event.js';
+import { loadModules } from './base-loader.js';
+
+function isEvent(obj: unknown): obj is Event<keyof ClientEvents> {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  const candidate = obj as Record<string, unknown>;
+  if (typeof candidate.name !== 'string') {
+    return false;
+  }
+
+  if (typeof candidate.execute !== 'function') {
+    return false;
+  }
+
+  return true;
+}
+
+/** Loads all event modules from `src/discord/events/`. */
+export async function loadEvents(): Promise<Event<keyof ClientEvents>[]> {
+  return loadModules('events', 'event', isEvent);
+}
