@@ -23,6 +23,8 @@ export const env = {
     .filter(Boolean),
   databaseUrl: process.env.DATABASE_URL ?? 'file:./dev.db',
   githubUrl: 'https://github.com/Crownutils/crownutils',
+  projectUrl: 'https://github.com/Crownutils',
+  ownerUrl: 'https://github.com/Ntalcme',
 } as const;
 
 type RequirableEnvKey =
