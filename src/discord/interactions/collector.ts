@@ -7,8 +7,6 @@ import { buildErrorContainer } from '../errors.js';
 import { lang } from '../lang/index.js';
 import type { Container } from '../components/index.js';
 
-type CollectorIdleTimeoutMs = number;
-type CollectorTimeoutMs = number;
 type CollectorCollectHandler = (
   interaction: CollectedInteraction,
 ) => Promise<void> | void;
@@ -18,8 +16,8 @@ type CollectorEndHandler = (
 ) => void;
 
 interface CollectorOptions {
-  idle?: CollectorIdleTimeoutMs;
-  time?: CollectorTimeoutMs;
+  idle?: number;
+  time?: number;
   onCollect: CollectorCollectHandler;
   onEnd?: CollectorEndHandler;
 }
@@ -78,8 +76,8 @@ export class InteractiveMessage<S> {
     private readonly render: Render<S>,
     private readonly reduce: Reduce<S>,
     options: {
-      idle?: CollectorIdleTimeoutMs;
-      time?: CollectorTimeoutMs;
+      idle?: number;
+      time?: number;
       allowedIds: string[];
     },
   ) {
