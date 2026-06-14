@@ -1,23 +1,18 @@
 import type { SlashCommand } from '@/discord/types/command.js';
 import { slashCommands } from '@/discord/registries/slash-registry.js';
-import { loadModules } from './base-loader.js';
+import {
+  hasFunction,
+  hasString,
+  isObject,
+  loadModules,
+} from './base-loader.js';
 
 function isSlashCommand(obj: unknown): obj is SlashCommand {
-  if (typeof obj !== 'object' || obj === null) {
+  if (!isObject(obj) || !hasFunction(obj, 'execute')) {
     return false;
   }
 
-  const candidate = obj as Record<string, unknown>;
-  const data = candidate.data as Record<string, unknown> | undefined;
-  if (!data || typeof data.name !== 'string') {
-    return false;
-  }
-
-  if (typeof candidate.execute !== 'function') {
-    return false;
-  }
-
-  return true;
+  return isObject(obj.data) && hasString(obj.data, 'name');
 }
 
 /** Loads all slash command modules and registers each one in {@link slashCommands}. */

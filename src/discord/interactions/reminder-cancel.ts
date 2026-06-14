@@ -4,10 +4,16 @@ import { InteractiveMessage } from '@/discord/interactions/collector.js';
 import {
   buildReminderCancelledContainer,
   buildReminderCreatedContainer,
+  parseReminderCancelButtonId,
 } from '@/discord/presentations/reminder-presentation.js';
 import { cancelReminder } from '@/discord/reminders/reminder-bridge.js';
 
 const CANCEL_WINDOW_MS = 120_000;
+
+interface CancelState {
+  reminder: Reminder;
+  cancelled: boolean;
+}
 
 /**
  * Attaches a "cancel" button collector to a reminder confirmation message,
@@ -19,17 +25,22 @@ export function attachReminderCancelCollector(
   message: Message,
   reminder: Reminder,
 ): void {
-  new InteractiveMessage(
+  new InteractiveMessage<CancelState>(
     message,
-    reminder,
-    (r, { disabled }) =>
-      disabled
-        ? buildReminderCreatedContainer(r, { disabled })
-        : buildReminderCancelledContainer(r),
-    async (_i, r, stop) => {
-      await cancelReminder(r.id);
+    { reminder, cancelled: false },
+    ({ reminder: r, cancelled }, { disabled }) =>
+      cancelled
+        ? buildReminderCancelledContainer(r)
+        : buildReminderCreatedContainer(r, { disabled }),
+    async (interaction, state, stop) => {
+      if (
+        parseReminderCancelButtonId(interaction.customId) !== state.reminder.id
+      ) {
+        return state;
+      }
+      await cancelReminder(state.reminder.id);
       stop();
-      return r;
+      return { ...state, cancelled: true };
     },
     { time: CANCEL_WINDOW_MS, allowedIds: [reminder.userId] },
   );

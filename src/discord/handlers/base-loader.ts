@@ -6,6 +6,31 @@ import { logger } from '@/shared/logger.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /**
+ * Root of `src/discord/`, computed relative to this file's own location
+ * (`src/discord/handlers/base-loader.ts`, one level below `discord/`). If
+ * this file is ever moved to a different depth, update this path too.
+ */
+const DISCORD_DIR = join(__dirname, '..');
+
+/** Type guard helpers shared by the `is*Command`/`isEvent` predicates. */
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+/** Whether `obj[key]` is a `string`. */
+export function hasString(obj: Record<string, unknown>, key: string): boolean {
+  return typeof obj[key] === 'string';
+}
+
+/** Whether `obj[key]` is a `function`. */
+export function hasFunction(
+  obj: Record<string, unknown>,
+  key: string,
+): boolean {
+  return typeof obj[key] === 'function';
+}
+
+/**
  * Dynamically imports every module file in `directory` and collects the
  * `exportName` export from each, skipping files where it's missing or fails
  * `isValid`.
@@ -16,7 +41,7 @@ export async function loadModules<T>(
   isValid: (obj: unknown) => obj is T,
 ): Promise<T[]> {
   const items: T[] = [];
-  const dirPath = join(__dirname, '..', directory);
+  const dirPath = join(DISCORD_DIR, directory);
 
   let files: string[];
   try {

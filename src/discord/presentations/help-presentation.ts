@@ -11,6 +11,33 @@ import type { CommandAuthorization } from '@/core/permissions/types.js';
 export const HELP_SELECT_ID = 'help-select';
 const MAIN_MENU = 'Menu Principal';
 
+interface CommandDescription {
+  name: string;
+  description: string;
+  usage: string;
+  aliases?: string[];
+}
+
+/** Flattens a slash or prefix command into the fields `/help` displays. */
+function describeCommand(
+  command: SlashCommand | PrefixCommand,
+): CommandDescription {
+  if ('data' in command) {
+    return {
+      name: command.data.name,
+      description: command.data.description,
+      usage: command.help.usageSlash ?? command.help.usagePrefix ?? '',
+      aliases: undefined,
+    };
+  }
+  return {
+    name: command.name,
+    description: command.description,
+    usage: command.help.usagePrefix ?? command.help.usageSlash ?? '',
+    aliases: command.aliases,
+  };
+}
+
 /**
  * Builds the `/help` container. With no `selectedCommand` (or `MAIN_MENU`),
  * shows the welcome message; otherwise shows the matching command's
@@ -63,29 +90,21 @@ export function buildHelpContainer(
         )
       : undefined;
 
-  const title = selected
-    ? 'data' in selected
-      ? selected.data.name
-      : selected.name
+  const selectedDescription = selected ? describeCommand(selected) : undefined;
+
+  const title = selectedDescription
+    ? selectedDescription.name
     : lang.commands.help.messages.title;
 
-  const description = selected
-    ? 'data' in selected
-      ? selected.data.description
-      : selected.description
+  const description = selectedDescription
+    ? selectedDescription.description
     : lang.commands.help.messages.welcome;
 
-  const usage = selected
-    ? 'data' in selected
-      ? lang.commands.help.messages.usage(selected.help.usageSlash!)
-      : lang.commands.help.messages.usage(selected.help.usagePrefix!)
+  const usage = selectedDescription
+    ? lang.commands.help.messages.usage(selectedDescription.usage)
     : '';
 
-  const aliases = selected
-    ? 'data' in selected
-      ? undefined
-      : selected.aliases
-    : undefined;
+  const aliases = selectedDescription?.aliases;
 
   const components: V2Component[] = [new Title(title), new Text(description)];
 

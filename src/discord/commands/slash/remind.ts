@@ -4,6 +4,7 @@ import { lang } from '@/discord/lang/index.js';
 import { buildErrorContainer } from '@/discord/errors.js';
 import { buildReminderCreatedContainer } from '@/discord/presentations/reminder-presentation.js';
 import { attachReminderCancelCollector } from '@/discord/interactions/reminder-cancel.js';
+import { replyAndFetch } from '@/discord/interactions/reply.js';
 import {
   DEFAULT_REMINDER_DURATION,
   createReminderFromInput,
@@ -80,10 +81,10 @@ export const command = {
       return;
     }
 
-    await interaction.reply(
+    const reply = await replyAndFetch(
+      interaction,
       buildReminderCreatedContainer(result.reminder).build(),
     );
-    const reply = await interaction.fetchReply();
     attachReminderCancelCollector(reply, result.reminder);
   },
 } satisfies SlashCommand;
