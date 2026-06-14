@@ -36,7 +36,9 @@ export const command = {
       .add(
         new Title(lang.commands.ping.messages.title),
         new Separator(),
-        new Text(lang.commands.ping.messages.result({ totalMs, discordMs })),
+        new Text(lang.commands.ping.messages.totalLatence(totalMs)).newLine(
+          lang.commands.ping.messages.discordLatence(discordMs),
+        ),
       )
       .build();
 
