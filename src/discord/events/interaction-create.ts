@@ -10,6 +10,7 @@ import { isMaintenanceEnabled } from '@/core/maintenance/maintenance-repository.
 import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,
+  safeDiscord,
 } from '@/discord/errors.js';
 import { lang } from '@/discord/lang/index.js';
 import { logger } from '@/shared/logger.js';
@@ -68,9 +69,12 @@ export const event = {
       });
 
       if (interaction.replied || interaction.deferred) {
-        await interaction.followUp(reply).catch(() => {});
+        await safeDiscord(
+          interaction.followUp(reply),
+          'interaction-create.followUp',
+        );
       } else {
-        await interaction.reply(reply).catch(() => {});
+        await safeDiscord(interaction.reply(reply), 'interaction-create.reply');
       }
     }
   },

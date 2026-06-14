@@ -2,7 +2,7 @@ import type { Message } from 'discord.js';
 import type { Reminder } from '@/core/persistence/prisma/client.js';
 import { lang } from '@/discord/lang/index.js';
 import { InteractiveMessage } from '@/discord/interactions/collector.js';
-import { buildErrorContainer } from '@/discord/errors.js';
+import { buildErrorContainer, safeDiscord } from '@/discord/errors.js';
 import {
   buildReminderListContainer,
   parseReminderDeleteButtonId,
@@ -39,13 +39,14 @@ export function attachReminderListCollector(
 
       const deleted = await deleteUserReminder(reminderId, authorId);
       if (!deleted) {
-        await interaction
-          .reply(
+        await safeDiscord(
+          interaction.reply(
             buildErrorContainer(
               lang.commands.reminders.messages.cannotDelete,
             ).build({ ephemeral: true }),
-          )
-          .catch(() => {});
+          ),
+          'reminder-list.cannotDelete',
+        );
         return current;
       }
 

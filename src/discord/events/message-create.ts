@@ -5,6 +5,7 @@ import { logger } from '@/shared/logger.js';
 import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,
+  safeDiscord,
 } from '@/discord/errors.js';
 import {
   checkCommandRequirements,
@@ -41,9 +42,10 @@ export const event = {
     const userAuthorization = resolveAuthorization(message.author.id);
 
     if (userAuthorization !== 'owner' && (await isMaintenanceEnabled())) {
-      await message
-        .reply(buildErrorContainer(lang.errors.maintenance).build())
-        .catch(() => {});
+      await safeDiscord(
+        message.reply(buildErrorContainer(lang.errors.maintenance).build()),
+        'message-create.maintenance',
+      );
       return;
     }
 
@@ -69,9 +71,10 @@ export const event = {
     } catch (error) {
       logger.error({ error }, `Error in prefix command: ${commandName}`);
 
-      await message
-        .reply(buildErrorContainer(lang.errors.unexpected).build())
-        .catch(() => {});
+      await safeDiscord(
+        message.reply(buildErrorContainer(lang.errors.unexpected).build()),
+        'message-create.unexpected',
+      );
     }
   },
 } satisfies Event<Events.MessageCreate>;

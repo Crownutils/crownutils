@@ -3,7 +3,7 @@ import type {
   Message,
   ReadonlyCollection,
 } from 'discord.js';
-import { buildErrorContainer } from '../errors.js';
+import { buildErrorContainer, safeDiscord } from '../errors.js';
 import { lang } from '../lang/index.js';
 import type { Container } from '../components/index.js';
 
@@ -13,7 +13,7 @@ type CollectorCollectHandler = (
 type CollectorEndHandler = (
   collected: ReadonlyCollection<string, CollectedInteraction>,
   reason: string,
-) => void;
+) => Promise<void> | void;
 
 interface CollectorOptions {
   idle?: number;
@@ -35,7 +35,7 @@ class Collector {
 
     if (options.onEnd) {
       const onEnd = options.onEnd;
-      this.collector.on('end', (c, r) => onEnd(c, r));
+      this.collector.on('end', (c, r) => void onEnd(c, r));
     }
   }
 
@@ -88,13 +88,16 @@ export class InteractiveMessage<S> {
       idle: options.idle,
       time: options.time,
       onCollect: (i) => this.onCollect(i),
-      onEnd: () => {
+      onEnd: async () => {
         if (this.finished) {
           return;
         }
-        void this.message
-          .edit(this.render(this.state, { disabled: true }).build())
-          .catch(() => {});
+        await safeDiscord(
+          this.message.edit(
+            this.render(this.state, { disabled: true }).build(),
+          ),
+          'collector.onEnd',
+        );
       },
     });
   }
@@ -104,13 +107,14 @@ export class InteractiveMessage<S> {
       this.allowedIds.length > 0 &&
       !this.allowedIds.includes(interaction.user.id)
     ) {
-      await interaction
-        .reply(
+      await safeDiscord(
+        interaction.reply(
           buildErrorContainer(lang.errors.interactionNotAllowed).build({
             ephemeral: true,
           }),
-        )
-        .catch(() => {});
+        ),
+        'collector.notAllowed',
+      );
       return;
     }
 
@@ -120,9 +124,12 @@ export class InteractiveMessage<S> {
     });
 
     if (interaction.isMessageComponent()) {
-      await interaction
-        .update(this.render(this.state, { disabled: false }).build())
-        .catch(() => {});
+      await safeDiscord(
+        interaction.update(
+          this.render(this.state, { disabled: false }).build(),
+        ),
+        'collector.update',
+      );
     }
 
     if (stopped) {
