@@ -54,13 +54,14 @@ export function buildHelpContainer(
     selectMenu.disabled();
   }
 
-  const selected = selectedCommand && selectedCommand !== MAIN_MENU
-    ? visibleCommands.find(
-        (command) =>
-          ('data' in command ? command.data.name : command.name) ===
-          selectedCommand,
-      )
-    : undefined;
+  const selected =
+    selectedCommand && selectedCommand !== MAIN_MENU
+      ? visibleCommands.find(
+          (command) =>
+            ('data' in command ? command.data.name : command.name) ===
+            selectedCommand,
+        )
+      : undefined;
 
   const title = selected
     ? 'data' in selected
