@@ -32,7 +32,7 @@ export const remind = {
     triggered: {
       title: `${icons.bell} DRING !`,
     },
-    durationTooLong: 'Un rappel ne peut pas dépasser 24 jours.',
+    durationTooLong: 'Un rappel ne peut pas dépasser environ 24.8 jours.',
     limitReached: ({ max }: { max: number }): string =>
       `Vous avez atteint la limite de ${max} rappels simultanés.`,
     invalidFormat: {
