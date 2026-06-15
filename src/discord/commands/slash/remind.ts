@@ -1,15 +1,10 @@
 import { SlashCommandBuilder } from 'discord.js';
 import type { ChatInputCommandInteraction } from 'discord.js';
 import { lang } from '@/discord/lang/index.js';
-import { buildErrorContainer } from '@/discord/errors.js';
-import { buildReminderCreatedContainer } from '@/discord/presentations/reminder-presentation.js';
 import { attachReminderCancelCollector } from '@/discord/interactions/reminder-cancel.js';
 import { replyAndFetch } from '@/discord/interactions/reply.js';
-import {
-  DEFAULT_REMINDER_DURATION,
-  createReminderFromInput,
-  getMaxRemindersForUser,
-} from '@/discord/reminders/reminder-bridge.js';
+import { runRemindCommand } from '@/discord/reminders/remind-command.js';
+import { DEFAULT_REMINDER_DURATION } from '@/discord/reminders/reminder-bridge.js';
 import type { SlashCommand } from '@/discord/types/command.js';
 
 function getReminderArgs(interaction: ChatInputCommandInteraction): {
@@ -59,32 +54,21 @@ export const command = {
   async execute(interaction) {
     const { durationInput, remindMessage } = getReminderArgs(interaction);
 
-    const result = await createReminderFromInput(
-      interaction.client,
-      interaction.channelId,
-      interaction.user.id,
+    const { container, reminder } = await runRemindCommand({
+      client: interaction.client,
+      channelId: interaction.channelId,
+      userId: interaction.user.id,
       durationInput,
       remindMessage,
-    );
+      invalidFormatText: lang.commands.remind.messages.invalidFormat.slash,
+    });
 
-    if (!result.ok) {
-      const errorText = {
-        invalid_format: lang.commands.remind.messages.invalidFormat.slash,
-        duration_too_long: lang.commands.remind.messages.durationTooLong,
-        limit_reached: lang.commands.remind.messages.limitReached({
-          max: getMaxRemindersForUser(interaction.user.id),
-        }),
-      };
-      await interaction.reply(
-        buildErrorContainer(errorText[result.error]).build({ ephemeral: true }),
-      );
+    if (!reminder) {
+      await interaction.reply(container.build({ ephemeral: true }));
       return;
     }
 
-    const reply = await replyAndFetch(
-      interaction,
-      buildReminderCreatedContainer(result.reminder).build(),
-    );
-    attachReminderCancelCollector(reply, result.reminder);
+    const reply = await replyAndFetch(interaction, container.build());
+    attachReminderCancelCollector(reply, reminder);
   },
 } satisfies SlashCommand;

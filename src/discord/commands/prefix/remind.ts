@@ -1,13 +1,8 @@
 import { PREFIX } from '@/discord/constants.js';
 import { lang } from '@/discord/lang/index.js';
-import { buildErrorContainer } from '@/discord/errors.js';
-import { buildReminderCreatedContainer } from '@/discord/presentations/reminder-presentation.js';
 import { attachReminderCancelCollector } from '@/discord/interactions/reminder-cancel.js';
-import {
-  DEFAULT_REMINDER_DURATION,
-  createReminderFromInput,
-  getMaxRemindersForUser,
-} from '@/discord/reminders/reminder-bridge.js';
+import { runRemindCommand } from '@/discord/reminders/remind-command.js';
+import { DEFAULT_REMINDER_DURATION } from '@/discord/reminders/reminder-bridge.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
 function getReminderArgs(args: string[]): {
@@ -43,29 +38,18 @@ export const command = {
   async execute(message, args) {
     const { durationInput, remindMessage } = getReminderArgs(args);
 
-    const result = await createReminderFromInput(
-      message.client,
-      message.channelId,
-      message.author.id,
+    const { container, reminder } = await runRemindCommand({
+      client: message.client,
+      channelId: message.channelId,
+      userId: message.author.id,
       durationInput,
       remindMessage,
-    );
+      invalidFormatText: lang.commands.remind.messages.invalidFormat.prefix,
+    });
 
-    if (!result.ok) {
-      const errorText = {
-        invalid_format: lang.commands.remind.messages.invalidFormat.prefix,
-        duration_too_long: lang.commands.remind.messages.durationTooLong,
-        limit_reached: lang.commands.remind.messages.limitReached({
-          max: getMaxRemindersForUser(message.author.id),
-        }),
-      };
-      await message.reply(buildErrorContainer(errorText[result.error]).build());
-      return;
+    const sent = await message.reply(container.build());
+    if (reminder) {
+      attachReminderCancelCollector(sent, reminder);
     }
-
-    const sent = await message.reply(
-      buildReminderCreatedContainer(result.reminder).build(),
-    );
-    attachReminderCancelCollector(sent, result.reminder);
   },
 } satisfies PrefixCommand;

@@ -1,12 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/discord/lang/index.js';
 import type { SlashCommand } from '@/discord/types/command.js';
-import {
-  Container,
-  Text,
-  Separator,
-  Title,
-} from '@/discord/components/index.js';
+import { buildPingResultContainer } from '@/discord/presentations/ping-presentation.js';
 
 /** `/ping`: shows bot and Discord latency. */
 export const command = {
@@ -26,17 +21,8 @@ export const command = {
     const totalMs = Date.now() - before;
     const discordMs = Math.round(interaction.client.ws.ping);
 
-    const message = new Container()
-      .color('info')
-      .add(
-        new Title(lang.commands.ping.messages.title),
-        new Separator(),
-        new Text(lang.commands.ping.messages.totalLatence(totalMs)).newLine(
-          lang.commands.ping.messages.discordLatence(discordMs),
-        ),
-      )
-      .build();
-
-    await interaction.editReply(message);
+    await interaction.editReply(
+      buildPingResultContainer(totalMs, discordMs).build(),
+    );
   },
 } satisfies SlashCommand;
