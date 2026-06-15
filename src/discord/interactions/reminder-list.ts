@@ -31,7 +31,7 @@ export function attachReminderListCollector(
     reminders,
     (current, { disabled }) =>
       buildReminderListContainer(current, { disabled }),
-    async (interaction, current, stop) => {
+    async (interaction, current, { stop, handled }) => {
       const reminderId = parseReminderDeleteButtonId(interaction.customId);
       if (reminderId === null) {
         return current;
@@ -47,6 +47,7 @@ export function attachReminderListCollector(
           ),
           'reminder-list.cannotDelete',
         );
+        handled();
         return current;
       }
 
