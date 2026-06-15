@@ -22,9 +22,11 @@ export const event = {
   async execute(message) {
     if (message.author.bot) return;
 
-    if (!message.content.startsWith(PREFIX)) return;
+    const lowerMessage = message.content.toLowerCase();
 
-    const withoutPrefix = message.content.slice(PREFIX.length);
+    if (!lowerMessage.startsWith(PREFIX)) return;
+
+    const withoutPrefix = lowerMessage.slice(PREFIX.length);
     const parts = withoutPrefix.trim().split(/\s+/);
     const commandName = parts.shift()?.toLowerCase();
     const args = parts;
