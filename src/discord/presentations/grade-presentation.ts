@@ -5,7 +5,7 @@ import { icons } from '@/discord/icons.js';
 import {
   resolveAuthorization,
   AUTHORIZATION_LEVELS,
-} from '@/core/permissions/authorization.js';
+} from '@/core/permissions/index.js';
 import type { CommandAuthorization } from '@/core/permissions/types.js';
 
 const GRADE_ICONS = {

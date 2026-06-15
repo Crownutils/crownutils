@@ -7,9 +7,6 @@ import {
 } from '@/discord/components/index.js';
 import { env } from '@/core/config/index.js';
 
-const ownerGithubLink = 'https://github.com/Ntalcme';
-const projectGithubUrl = 'https://github.com/Crownutils';
-
 /** Builds the `/about` container: bot version, license, and useful links. */
 export function buildBotInfoContainer(): Container {
   return new Container().color('info').add(
@@ -33,14 +30,14 @@ export function buildBotInfoContainer(): Container {
       .newLine(
         new Text(
           lang.commands.about.messages.usefulLinks.projectGithubPage(
-            projectGithubUrl,
+            env.projectUrl,
           ),
         ).quote(),
       )
       .newLine(
         new Text(
           lang.commands.about.messages.usefulLinks.ownerGithubPage(
-            ownerGithubLink,
+            env.ownerUrl,
           ),
         ).quote(),
       ),

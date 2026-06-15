@@ -1,5 +1,6 @@
 import { resolveAuthorization } from '@/core/permissions/index.js';
 import { attachHelpSelectCollector } from '@/discord/interactions/help-select.js';
+import { replyAndFetch } from '@/discord/interactions/reply.js';
 import { lang } from '@/discord/lang/index.js';
 import { buildHelpContainer } from '@/discord/presentations/help-presentation.js';
 import { slashCommands } from '@/discord/registries/slash-registry.js';
@@ -21,10 +22,10 @@ export const command = {
   async execute(interaction) {
     const commands = [...new Set(slashCommands.values())];
     const userAuthorization = resolveAuthorization(interaction.user.id);
-    await interaction.reply(
+    const reply = await replyAndFetch(
+      interaction,
       buildHelpContainer(commands, userAuthorization).build(),
     );
-    const reply = await interaction.fetchReply();
     attachHelpSelectCollector(
       reply,
       interaction.user.id,

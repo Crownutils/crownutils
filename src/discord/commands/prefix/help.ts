@@ -24,6 +24,11 @@ export const command = {
     const sent = await message.reply(
       buildHelpContainer(commands, userAuthorization).build(),
     );
-    attachHelpSelectCollector(sent, message.author.id, commands, userAuthorization);
+    attachHelpSelectCollector(
+      sent,
+      message.author.id,
+      commands,
+      userAuthorization,
+    );
   },
 } satisfies PrefixCommand;

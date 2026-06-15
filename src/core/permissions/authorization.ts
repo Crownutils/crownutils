@@ -29,3 +29,14 @@ export function isAuthorizationAllowed(
     AUTHORIZATION_LEVELS[requiredAuthorization]
   );
 }
+
+/** Keeps only the items whose required authorization `userAuthorization` meets. */
+export function filterByAuthorization<T>(
+  items: readonly T[],
+  getRequired: (item: T) => CommandAuthorization,
+  userAuthorization: CommandAuthorization,
+): T[] {
+  return items.filter((item) =>
+    isAuthorizationAllowed(getRequired(item), userAuthorization),
+  );
+}

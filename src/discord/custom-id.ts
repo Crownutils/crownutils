@@ -1,11 +1,9 @@
-type CustomIdSeparator = string;
-
 /**
  * Builds and parses Discord component custom ids as `ctx|id` pairs, so a
  * collector can recover both the context and target id from a click.
  */
 export class CustomId<C extends string> {
-  private static readonly SEPARATOR: CustomIdSeparator = '|';
+  private static readonly SEPARATOR = '|';
 
   public readonly value: string;
 

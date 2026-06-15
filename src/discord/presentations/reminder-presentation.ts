@@ -13,7 +13,7 @@ import {
 } from '@/discord/components/index.js';
 
 const REMINDER_DELETE_CONTEXT = 'reminder-delete';
-const REMINDER_CANCEL_BUTTON_ID = 'reminder-cancel';
+const REMINDER_CANCEL_CONTEXT = 'reminder-cancel';
 
 function reminderDeleteButtonId(reminderId: string): string {
   return new CustomId(REMINDER_DELETE_CONTEXT, reminderId).value;
@@ -28,6 +28,19 @@ export function parseReminderDeleteButtonId(customId: string): string | null {
   return parsed.id;
 }
 
+function reminderCancelButtonId(reminderId: string): string {
+  return new CustomId(REMINDER_CANCEL_CONTEXT, reminderId).value;
+}
+
+/** Extracts the reminder id from a cancel button's custom id, or `null` if it doesn't match. */
+export function parseReminderCancelButtonId(customId: string): string | null {
+  const parsed = CustomId.parse(customId);
+  if (!parsed || parsed.ctx !== REMINDER_CANCEL_CONTEXT) {
+    return null;
+  }
+  return parsed.id;
+}
+
 /**
  * Builds the reminder confirmation container, with a cancel button. Pass
  * `disabled: true` once the cancel window has expired.
@@ -36,7 +49,7 @@ export function buildReminderCreatedContainer(
   reminder: Reminder,
   options?: { disabled?: boolean },
 ): Container {
-  const cancelButton = new Button(REMINDER_CANCEL_BUTTON_ID)
+  const cancelButton = new Button(reminderCancelButtonId(reminder.id))
     .color('danger')
     .label(lang.commands.remind.messages.created.cancelButton);
   if (options?.disabled) {
