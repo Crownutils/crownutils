@@ -4,7 +4,7 @@ import { Select, Separator, Text, Title } from '../components/index.js';
 import { lang } from '../lang/index.js';
 import { md } from '../markdown.js';
 import type { PrefixCommand, SlashCommand } from '../types/command.js';
-import { isAuthorizationAllowed } from '@/core/permissions/index.js';
+import { filterByAuthorization } from '@/core/permissions/index.js';
 import type { CommandAuthorization } from '@/core/permissions/types.js';
 
 /** Custom id of the `/help` command select menu. */
@@ -53,11 +53,10 @@ export function buildHelpContainer(
   selectedCommand?: string,
 ): Container {
   const allCommands: (SlashCommand | PrefixCommand)[] = commands;
-  const visibleCommands = allCommands.filter((command) =>
-    isAuthorizationAllowed(
-      command.requirements?.authorization ?? 'public',
-      userAuthorization,
-    ),
+  const visibleCommands = filterByAuthorization(
+    allCommands,
+    (command) => command.requirements?.authorization ?? 'public',
+    userAuthorization,
   );
 
   const selectMenu = new Select(HELP_SELECT_ID).placeholder(
