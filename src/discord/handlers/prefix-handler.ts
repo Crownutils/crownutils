@@ -1,22 +1,14 @@
-import { loadModules } from '@/discord/handlers/base-loader.js';
+import {
+  hasFunction,
+  hasString,
+  isObject,
+  loadModules,
+} from '@/discord/handlers/base-loader.js';
 import { prefixCommands } from '@/discord/registries/prefix-registry.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
 function isPrefixCommand(obj: unknown): obj is PrefixCommand {
-  if (typeof obj !== 'object' || obj === null) {
-    return false;
-  }
-
-  const candidate = obj as Record<string, unknown>;
-  if (typeof candidate.name !== 'string') {
-    return false;
-  }
-
-  if (typeof candidate.execute !== 'function') {
-    return false;
-  }
-
-  return true;
+  return isObject(obj) && hasString(obj, 'name') && hasFunction(obj, 'execute');
 }
 
 /**

@@ -5,13 +5,9 @@ import { logger } from '@/shared/logger.js';
 import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,
+  safeDiscord,
 } from '@/discord/errors.js';
-import {
-  checkCommandRequirements,
-  resolveAuthorization,
-  resolveExecutionContext,
-} from '@/core/permissions/index.js';
-import { isMaintenanceEnabled } from '@/core/maintenance/maintenance-repository.js';
+import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
 import { lang } from '@/discord/lang/index.js';
 import { PREFIX } from '@/discord/constants.js';
 
@@ -26,9 +22,11 @@ export const event = {
   async execute(message) {
     if (message.author.bot) return;
 
-    if (!message.content.startsWith(PREFIX)) return;
+    const lowerMessage = message.content.toLowerCase();
 
-    const withoutPrefix = message.content.slice(PREFIX.length);
+    if (!lowerMessage.startsWith(PREFIX)) return;
+
+    const withoutPrefix = lowerMessage.slice(PREFIX.length);
     const parts = withoutPrefix.trim().split(/\s+/);
     const commandName = parts.shift()?.toLowerCase();
     const args = parts;
@@ -38,40 +36,30 @@ export const event = {
     const command = prefixCommands.get(commandName);
     if (!command) return;
 
-    const userAuthorization = resolveAuthorization(message.author.id);
+    await runCommandPipeline(
+      {
+        userId: message.author.id,
+        guildId: message.guildId,
+        requirements: command.requirements,
+      },
+      {
+        execute: () => command.execute(message, args),
+        onMaintenance: () =>
+          safeDiscord(
+            message.reply(buildErrorContainer(lang.errors.maintenance).build()),
+            'message-create.maintenance',
+          ),
+        onPermissionDenied: (errors) =>
+          message.reply(buildCommandPermissionsErrorContainer(errors).build()),
+        onUnexpectedError: (error) => {
+          logger.error({ error }, `Error in prefix command: ${commandName}`);
 
-    if (userAuthorization !== 'owner' && (await isMaintenanceEnabled())) {
-      await message
-        .reply(buildErrorContainer(lang.errors.maintenance).build())
-        .catch(() => {});
-      return;
-    }
-
-    if (command.requirements) {
-      const validation = checkCommandRequirements(
-        command.requirements,
-        resolveExecutionContext(message.guildId),
-        userAuthorization,
-      );
-
-      if (!validation.canBeExecuted) {
-        const reply = buildCommandPermissionsErrorContainer(
-          validation.errors,
-        ).build();
-
-        await message.reply(reply);
-        return;
-      }
-    }
-
-    try {
-      await command.execute(message, args);
-    } catch (error) {
-      logger.error({ error }, `Error in prefix command: ${commandName}`);
-
-      await message
-        .reply(buildErrorContainer(lang.errors.unexpected).build())
-        .catch(() => {});
-    }
+          return safeDiscord(
+            message.reply(buildErrorContainer(lang.errors.unexpected).build()),
+            'message-create.unexpected',
+          );
+        },
+      },
+    );
   },
 } satisfies Event<Events.MessageCreate>;

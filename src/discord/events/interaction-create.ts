@@ -2,15 +2,11 @@ import { Events } from 'discord.js';
 import { slashCommands } from '@/discord/registries/slash-registry.js';
 import type { Event } from '@/discord/types/event.js';
 import {
-  checkCommandRequirements,
-  resolveAuthorization,
-  resolveExecutionContext,
-} from '@/core/permissions/index.js';
-import { isMaintenanceEnabled } from '@/core/maintenance/maintenance-repository.js';
-import {
   buildCommandPermissionsErrorContainer,
   buildErrorContainer,
+  safeDiscord,
 } from '@/discord/errors.js';
+import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
 import { lang } from '@/discord/lang/index.js';
 import { logger } from '@/shared/logger.js';
 
@@ -27,51 +23,44 @@ export const event = {
     const command = slashCommands.get(interaction.commandName);
     if (!command) return;
 
-    const userAuthorization = resolveAuthorization(interaction.user.id);
+    await runCommandPipeline(
+      {
+        userId: interaction.user.id,
+        guildId: interaction.guildId,
+        requirements: command.requirements,
+      },
+      {
+        execute: () => command.execute(interaction),
+        onMaintenance: () =>
+          interaction.reply(
+            buildErrorContainer(lang.errors.maintenance).build({
+              ephemeral: true,
+            }),
+          ),
+        onPermissionDenied: (errors) =>
+          interaction.reply(
+            buildCommandPermissionsErrorContainer(errors).build({
+              ephemeral: true,
+            }),
+          ),
+        onUnexpectedError: (error) => {
+          logger.error(
+            { error, command: interaction.commandName },
+            'Slash command execution failed.',
+          );
 
-    if (userAuthorization !== 'owner' && (await isMaintenanceEnabled())) {
-      const reply = buildErrorContainer(lang.errors.maintenance).build({
-        ephemeral: true,
-      });
+          const reply = buildErrorContainer(lang.errors.unexpected).build({
+            ephemeral: true,
+          });
 
-      await interaction.reply(reply);
-      return;
-    }
-
-    if (command.requirements) {
-      const validation = checkCommandRequirements(
-        command.requirements,
-        resolveExecutionContext(interaction.guildId),
-        userAuthorization,
-      );
-
-      if (!validation.canBeExecuted) {
-        const reply = buildCommandPermissionsErrorContainer(
-          validation.errors,
-        ).build({ ephemeral: true });
-
-        await interaction.reply(reply);
-        return;
-      }
-    }
-
-    try {
-      await command.execute(interaction);
-    } catch (error) {
-      logger.error(
-        { error, command: interaction.commandName },
-        'Slash command execution failed.',
-      );
-
-      const reply = buildErrorContainer(lang.errors.unexpected).build({
-        ephemeral: true,
-      });
-
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp(reply).catch(() => {});
-      } else {
-        await interaction.reply(reply).catch(() => {});
-      }
-    }
+          return interaction.replied || interaction.deferred
+            ? safeDiscord(
+                interaction.followUp(reply),
+                'interaction-create.followUp',
+              )
+            : safeDiscord(interaction.reply(reply), 'interaction-create.reply');
+        },
+      },
+    );
   },
 } satisfies Event<Events.InteractionCreate>;

@@ -1,11 +1,7 @@
 import { PREFIX } from '@/discord/constants.js';
 import { lang } from '@/discord/lang/index.js';
-import {
-  Container,
-  Text,
-  Separator,
-  Title,
-} from '@/discord/components/index.js';
+import { Container, Text } from '@/discord/components/index.js';
+import { buildPingResultContainer } from '@/discord/presentations/ping-presentation.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
 /** `c!ping` (aliases `p`, `latency`): shows bot and Discord latency. */
@@ -31,15 +27,6 @@ export const command = {
     const totalMs = sent.createdTimestamp - before;
     const discordMs = Math.round(message.client.ws.ping);
 
-    const final = new Container()
-      .color('info')
-      .add(
-        new Title(lang.commands.ping.messages.title),
-        new Separator(),
-        new Text(lang.commands.ping.messages.result({ totalMs, discordMs })),
-      )
-      .build();
-
-    await sent.edit(final);
+    await sent.edit(buildPingResultContainer(totalMs, discordMs).build());
   },
 } satisfies PrefixCommand;
