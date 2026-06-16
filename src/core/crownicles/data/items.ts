@@ -1,3 +1,4 @@
+import { computeMainItemStats } from '../calculators/items.js';
 import {
   fetchCrowniclesJson,
   listCrowniclesDir,
@@ -25,8 +26,11 @@ export interface CrowniclesItem {
   category: ItemCategory;
   name: string;
   rarity: number;
+  /** Main items only — final stats after rarity scaling. */
   attack?: number;
   defense?: number;
+  speed?: number;
+  /** Support items only (objects, potions). */
   power?: number;
   nature?: number;
 }
@@ -36,9 +40,18 @@ interface RawItemStats {
   rarity: number;
   rawAttack?: number;
   rawDefense?: number;
+  attack?: number;
+  defense?: number;
+  speed?: number;
   power?: number;
   nature?: number;
 }
+
+/** Main-item categories scale a raw stat by rarity; the rest are support items. */
+const MAIN_ITEM_SCALED_STAT = {
+  weapons: 'attack',
+  armors: 'defense',
+} as const;
 
 /** `models.json` only the item-name maps are read from, keyed by id string. */
 type ItemNames = Record<ItemCategory, Record<string, string>>;
@@ -66,16 +79,18 @@ function toItem(
   name: string,
   stats: RawItemStats,
 ): CrowniclesItem {
-  return {
-    id,
-    category,
-    name,
-    rarity: stats.rarity,
-    attack: stats.rawAttack,
-    defense: stats.rawDefense,
-    power: stats.power,
-    nature: stats.nature,
-  };
+  const base = { id, category, name, rarity: stats.rarity };
+
+  const scaledStat =
+    category in MAIN_ITEM_SCALED_STAT
+      ? MAIN_ITEM_SCALED_STAT[category as keyof typeof MAIN_ITEM_SCALED_STAT]
+      : undefined;
+
+  if (scaledStat) {
+    return { ...base, ...computeMainItemStats(stats.rarity, stats, scaledStat) };
+  }
+
+  return { ...base, power: stats.power, nature: stats.nature };
 }
 
 /** Fetches the directory listing and every stat file of `category`. */
