@@ -4,28 +4,23 @@ import { filterByAuthorization } from '@/core/permissions/index.js';
 import { InteractiveMessage } from '@/discord/interactions/collector.js';
 import { buildErrorContainer } from '@/discord/errors.js';
 import { lang } from '@/discord/lang/index.js';
-import type { HelpPage, HelpState } from './page.js';
-import { HELP_PAGES } from './pages/index.js';
+import type { HelpState } from './page.js';
+import { HELP_PAGES, findHelpPage, resolveHelpPage } from './pages/index.js';
 import { HOME_PAGE_ID } from './pages/home.js';
 
 const IDLE_TIME_MS = 120_000;
 
-function findPage(
-  pages: readonly HelpPage[],
-  id: string,
-): HelpPage | undefined {
-  return pages.find((page) => page.id === id);
-}
-
 /**
  * Mounts the Crownicles help center on `message`: a single InteractiveMessage
  * that delegates render/reduce to whichever page `state.pageId` points to,
- * filtered to pages `authorization` may see.
+ * filtered to pages `authorization` may see. Opens on `category` if it names
+ * a visible page, otherwise the home page.
  */
 export function attachCrowniclesHelp(
   message: Message,
   authorId: string,
   authorization: CommandAuthorization,
+  category?: string,
 ): void {
   const visiblePages = filterByAuthorization(
     HELP_PAGES,
@@ -33,18 +28,25 @@ export function attachCrowniclesHelp(
     authorization,
   );
 
+  const initialPageId =
+    resolveHelpPage(visiblePages, category)?.id ?? HOME_PAGE_ID;
+
   new InteractiveMessage<HelpState>(
     message,
-    { pageId: HOME_PAGE_ID },
-    (state, ctx) => {
-      const page = findPage(visiblePages, state.pageId);
+    { pageId: initialPageId },
+    (state, { disabled }) => {
+      const page = findHelpPage(visiblePages, state.pageId);
       if (!page) {
         return buildErrorContainer(lang.errors.unexpected);
       }
-      return page.render(state, ctx);
+      return page.render(state, {
+        disabled,
+        visiblePages,
+        totalPageCount: HELP_PAGES.length,
+      });
     },
     (interaction, state, reduceCtx) => {
-      const page = findPage(visiblePages, state.pageId);
+      const page = findHelpPage(visiblePages, state.pageId);
       if (!page) {
         return state;
       }
