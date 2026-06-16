@@ -91,7 +91,12 @@ function renderLeagues(state: HelpState, ctx: HelpRenderContext): Container {
         value: state.rankBonus,
       });
     }
-    container.add(...bonusRows.map((row) => new Text(messages.bonusLine(row))));
+
+    const bonusText = new Text('');
+    for (const row of bonusRows) {
+      bonusText.newLine(messages.bonusLine(row));
+    }
+    container.add(bonusText);
   }
 
   return container.add(
