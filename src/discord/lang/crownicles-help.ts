@@ -23,10 +23,12 @@ export const crowniclesHelp = {
       name: 'Bonus de ligue',
       description: 'Calcule tes récompenses de fin de saison.',
       messages: {
+        intro:
+          'Sélectionne ta ligue pour estimer tes récompenses de fin de saison.',
         selectPlaceholder: 'Choisissez votre ligue',
         calculateButton: 'Calculer mon bonus',
         selectedLeague: ({ icon, name }: { icon: string; name: string }) =>
-          `Ligue sélectionnée : ${icon} ${md.bold(name)}`,
+          `${icon} ${md.bold(name)}`,
         bonusLabels: {
           xp: 'Bonus XP',
           money: 'Bonus argent',

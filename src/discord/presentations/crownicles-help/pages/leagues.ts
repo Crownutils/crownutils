@@ -1,8 +1,8 @@
 import {
-  ActionRow,
   Button,
   Container,
   Modal,
+  Section,
   Select,
   Separator,
   Text,
@@ -50,29 +50,20 @@ function renderLeagues(state: HelpState, ctx: HelpRenderContext): Container {
   }
   if (ctx.disabled) leagueSelect.disabled();
 
-  const calcButton = new Button(LEAGUES_CALC_BUTTON_ID)
-    .label(messages.calculateButton)
-    .color('primary');
-  if (!state.selectedLeagueId || ctx.disabled) calcButton.disabled();
-
   const selectedLeague = CROWNICLES_LEAGUES.find(
     (l) => l.id === state.selectedLeagueId,
   );
 
   const container = new Container()
-    .color('info')
-    .add(new Title(`${LEAGUES_ICON} ${name}`), new Separator(), leagueSelect);
-
-  if (selectedLeague) {
-    container.add(
-      new Text(
-        messages.selectedLeague({
-          icon: selectedLeague.icon,
-          name: selectedLeague.name,
-        }),
-      ),
+    .color(selectedLeague ? selectedLeague.color : 'info')
+    .add(
+      new Title(`${LEAGUES_ICON} ${name}`),
+      new Text(messages.intro).size('subtle'),
+      new Separator(),
+      leagueSelect,
     );
 
+  if (selectedLeague) {
     const bonusRows: { icon: string; label: string; value: number }[] = [
       {
         icon: crowniclesIcons.xp,
@@ -93,18 +84,30 @@ function renderLeagues(state: HelpState, ctx: HelpRenderContext): Container {
       });
     }
 
-    const bonusText = new Text('');
+    const bonusText = new Text(
+      messages.selectedLeague({
+        icon: selectedLeague.icon,
+        name: selectedLeague.name,
+      }),
+    );
     for (const row of bonusRows) {
       bonusText.newLine(messages.bonusLine(row));
     }
-    container.add(bonusText);
+
+    const calcButton = new Button(LEAGUES_CALC_BUTTON_ID)
+      .label(messages.calculateButton)
+      .color('primary');
+    if (ctx.disabled) calcButton.disabled();
+
+    // The calculate button sits as the section's accessory, to the right of
+    // the league bonuses, rather than alone on its own row.
+    container.add(
+      new Separator(),
+      new Section().add(bonusText).button(calcButton),
+    );
   }
 
-  return container.add(
-    new ActionRow(calcButton),
-    new Separator(),
-    buildNavSelect(ctx),
-  );
+  return container.add(new Separator(), buildNavSelect(ctx));
 }
 
 /** Leagues help page: pick a league, enter rank, get XP/money/rank bonus breakdown. */
