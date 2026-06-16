@@ -21,10 +21,10 @@ export const crowniclesHelp = {
     },
     leagues: {
       name: 'Bonus de ligue',
-      description: 'Calcule tes récompenses de fin de saison.',
+      description: 'Calculez vos récompenses de fin de saison.',
       messages: {
         intro:
-          'Sélectionne ta ligue pour estimer tes récompenses de fin de saison.',
+          'Sélectionnez votre ligue pour estimer vos récompenses de fin de saison.',
         selectPlaceholder: 'Choisissez votre ligue',
         calculateButton: 'Calculer mon bonus',
         selectedLeague: ({ icon, name }: { icon: string; name: string }) =>
@@ -49,9 +49,9 @@ export const crowniclesHelp = {
           rankPlaceholder: 'Ex : 42',
         },
         invalidRank:
-          'Classement invalide. Entre un nombre entier supérieur à 0.',
+          'Classement invalide. Entrez un nombre entier supérieur à 0.',
         modalTimeout:
-          'Le formulaire a expiré. Réessaie en cliquant à nouveau sur le bouton.',
+          'Le formulaire a expiré. Réessayez en cliquant à nouveau sur le bouton.',
       },
     },
   },
