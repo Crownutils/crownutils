@@ -25,10 +25,12 @@ export const crowniclesHelp = {
       messages: {
         selectPlaceholder: 'Choisissez votre ligue',
         calculateButton: 'Calculer mon bonus',
+        selectedLeague: ({ icon, name }: { icon: string; name: string }) =>
+          `Ligue sélectionnée : ${icon} ${md.bold(name)}`,
         bonusLabels: {
           xp: 'Bonus XP',
           money: 'Bonus argent',
-          rank: 'Bonus de classement',
+          rank: 'Bonus de points',
         },
         bonusLine: ({
           icon,

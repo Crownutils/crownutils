@@ -61,17 +61,18 @@ function renderLeagues(state: HelpState, ctx: HelpRenderContext): Container {
 
   const container = new Container()
     .color('info')
-    .add(
-      new Title(
-        selectedLeague
-          ? `${selectedLeague.icon} ${selectedLeague.name}`
-          : `${LEAGUES_ICON} ${name}`,
-      ),
-      new Separator(),
-      leagueSelect,
-    );
+    .add(new Title(`${LEAGUES_ICON} ${name}`), new Separator(), leagueSelect);
 
   if (selectedLeague) {
+    container.add(
+      new Text(
+        messages.selectedLeague({
+          icon: selectedLeague.icon,
+          name: selectedLeague.name,
+        }),
+      ),
+    );
+
     const bonusRows: { icon: string; label: string; value: number }[] = [
       {
         icon: crowniclesIcons.xp,
