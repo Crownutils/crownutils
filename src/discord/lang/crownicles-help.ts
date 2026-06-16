@@ -25,27 +25,20 @@ export const crowniclesHelp = {
       messages: {
         selectPlaceholder: 'Choisissez votre ligue',
         calculateButton: 'Calculer mon bonus',
-        xpLine: ({
-          xpIcon,
-          xpBonus,
+        bonusLabels: {
+          xp: 'Bonus XP',
+          money: 'Bonus argent',
+          rank: 'Bonus de classement',
+        },
+        bonusLine: ({
+          icon,
+          label,
+          value,
         }: {
-          xpIcon: string;
-          xpBonus: number;
-        }) => `${xpIcon} Bonus XP : ${md.bold(`+${xpBonus}`)}`,
-        moneyLine: ({
-          moneyIcon,
-          moneyBonus,
-        }: {
-          moneyIcon: string;
-          moneyBonus: number;
-        }) => `${moneyIcon} Bonus argent : ${md.bold(`+${moneyBonus}`)}`,
-        rankLine: ({
-          pointsIcon,
-          rankBonus,
-        }: {
-          pointsIcon: string;
-          rankBonus: number;
-        }) => `${pointsIcon} Bonus de classement : ${md.bold(`+${rankBonus}`)}`,
+          icon: string;
+          label: string;
+          value: number;
+        }) => `${icon} ${label} : ${md.bold(`+${value}`)}`,
         modal: {
           title: 'Mon classement',
           rankLabel: 'Classement dans la ligue',

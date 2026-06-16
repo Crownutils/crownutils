@@ -1,8 +1,10 @@
 import { resolveAuthorization } from '@/core/permissions/index.js';
 import { PREFIX } from '@/discord/constants.js';
 import { lang } from '@/discord/lang/index.js';
-import { buildCrowniclesHelpContainer } from '@/discord/presentations/crownicles-help/crownicles-help-presentation.js';
-import { attachCrowniclesHelp } from '@/discord/presentations/crownicles-help/index.js';
+import {
+  attachCrowniclesHelp,
+  buildCrowniclesHelpContainer,
+} from '@/discord/presentations/crownicles-help/index.js';
 import type { PrefixCommand } from '@/discord/types/command.js';
 
 /** `c!crownicles-help [category]`: opens the Crownicles help center. */
