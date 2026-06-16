@@ -60,7 +60,11 @@ export function attachCrowniclesHelp(
       if (!page) {
         return state;
       }
-      return page.reduce(interaction, state, reduceCtx);
+      return page.reduce(interaction, state, reduceCtx, {
+        disabled: false,
+        visiblePages,
+        totalPageCount: HELP_PAGES.length,
+      });
     },
     { idle: IDLE_TIME_MS, allowedIds: [authorId] },
   );

@@ -29,7 +29,7 @@ const MODAL_ID = 'crownicles-help-leagues-modal';
 const { name, description, messages } =
   lang.commands.crowniclesHelp.pages.leagues;
 
-/** Leagues help page: pick a league, enter rank, get XP/money bonus breakdown. */
+/** Leagues help page: pick a league, enter rank, get XP/money/rank bonus breakdown. */
 export const leaguesPage = {
   id: LEAGUES_PAGE_ID,
   name,
@@ -55,24 +55,39 @@ export const leaguesPage = {
       (l) => l.id === state.selectedLeagueId,
     );
 
-    // Title reuses `name` so it always matches the nav select label.
+    const titleText = selectedLeague
+      ? `${selectedLeague.icon} ${selectedLeague.name}`
+      : `🏆 ${name}`;
+
     const container = new Container()
       .color('info')
-      .add(new Title(name), new Separator(), leagueSelect);
+      .add(new Title(titleText), new Separator(), leagueSelect);
 
     if (selectedLeague) {
       container.add(
         new Text(
-          messages.leaguePreview({
-            leagueIcon: selectedLeague.icon,
-            leagueName: selectedLeague.name,
-            xpBonus: selectedLeague.xpBonus,
-            moneyBonus: selectedLeague.moneyBonus,
+          messages.xpLine({
             xpIcon: crowniclesIcons.xp,
+            xpBonus: selectedLeague.xpBonus,
+          }),
+        ),
+        new Text(
+          messages.moneyLine({
             moneyIcon: crowniclesIcons.money,
+            moneyBonus: selectedLeague.moneyBonus,
           }),
         ),
       );
+      if (state.rankBonus !== undefined && state.rankBonus > 0) {
+        container.add(
+          new Text(
+            messages.rankLine({
+              pointsIcon: crowniclesIcons.points,
+              rankBonus: state.rankBonus,
+            }),
+          ),
+        );
+      }
     }
 
     return container.add(
@@ -82,14 +97,14 @@ export const leaguesPage = {
     );
   },
 
-  reduce: async (interaction, state, { handled }) => {
+  reduce: async (interaction, state, { handled }, renderCtx) => {
     if (
       interaction.isStringSelectMenu() &&
       interaction.customId === LEAGUES_SELECT_ID
     ) {
       const leagueId = interaction.values[0];
       return leagueId !== undefined
-        ? { ...state, selectedLeagueId: leagueId }
+        ? { ...state, selectedLeagueId: leagueId, rankBonus: undefined }
         : state;
     }
 
@@ -134,23 +149,13 @@ export const leaguesPage = {
         }
 
         const rankBonus = computeLeagueBonusScore(rank);
-        const resultText = messages.result({
-          leagueName: league.name,
-          leagueIcon: league.icon,
-          xpBonus: league.xpBonus,
-          moneyBonus: league.moneyBonus,
-          rankBonus,
-          xpIcon: crowniclesIcons.xp,
-          moneyIcon: crowniclesIcons.money,
-          pointsIcon: crowniclesIcons.points,
-        });
-
-        await submit.reply(
-          new Container()
-            .color('info')
-            .add(new Text(resultText))
-            .build({ ephemeral: true }),
-        );
+        const newState = { ...state, rankBonus };
+        // isFromMessage() is always true here since the modal opens from a button,
+        // but the check is required for TypeScript to expose .update().
+        if (submit.isFromMessage()) {
+          await submit.update(leaguesPage.render(newState, renderCtx).build());
+        }
+        return newState;
       } catch {
         await safeDiscord(
           interaction.followUp(

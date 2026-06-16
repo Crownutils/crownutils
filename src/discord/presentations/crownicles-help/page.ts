@@ -8,6 +8,8 @@ export interface HelpState {
   pageId: string;
   /** Id of the league currently selected on the leagues page. */
   selectedLeagueId?: string;
+  /** Rank bonus computed after a rank submission; undefined until the modal is submitted. */
+  rankBonus?: number;
 }
 
 /**
@@ -41,5 +43,11 @@ export interface HelpPage {
     interaction: CollectedInteraction,
     state: HelpState,
     ctx: ReduceContext,
+    /**
+     * Render context at the time of the interaction — lets a page re-render
+     * itself inline (e.g. via `submit.update()`) without going through the
+     * router's render callback.
+     */
+    renderCtx: HelpRenderContext,
   ): Promise<HelpState> | HelpState;
 }

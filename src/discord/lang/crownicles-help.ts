@@ -1,3 +1,4 @@
+import { md } from '@/discord/markdown.js';
 import type { CommandLang } from './types.js';
 
 /** Strings for the Crownicles help center. */
@@ -24,24 +25,27 @@ export const crowniclesHelp = {
       messages: {
         selectPlaceholder: 'Choisissez votre ligue',
         calculateButton: 'Calculer mon bonus',
-        leaguePreview: ({
-          leagueIcon,
-          leagueName,
-          xpBonus,
-          moneyBonus,
+        xpLine: ({
           xpIcon,
-          moneyIcon,
+          xpBonus,
         }: {
-          leagueIcon: string;
-          leagueName: string;
-          xpBonus: number;
-          moneyBonus: number;
           xpIcon: string;
+          xpBonus: number;
+        }) => `${xpIcon} Bonus XP : ${md.bold(`+${xpBonus}`)}`,
+        moneyLine: ({
+          moneyIcon,
+          moneyBonus,
+        }: {
           moneyIcon: string;
-        }) =>
-          `${leagueIcon} **${leagueName}**\n` +
-          `• ${xpIcon} Bonus XP : **+${xpBonus}**\n` +
-          `• ${moneyIcon} Bonus argent : **+${moneyBonus}**`,
+          moneyBonus: number;
+        }) => `${moneyIcon} Bonus argent : ${md.bold(`+${moneyBonus}`)}`,
+        rankLine: ({
+          pointsIcon,
+          rankBonus,
+        }: {
+          pointsIcon: string;
+          rankBonus: number;
+        }) => `${pointsIcon} Bonus de classement : ${md.bold(`+${rankBonus}`)}`,
         modal: {
           title: 'Mon classement',
           rankLabel: 'Classement dans la ligue',
@@ -51,31 +55,6 @@ export const crowniclesHelp = {
           'Classement invalide. Entre un nombre entier supérieur à 0.',
         modalTimeout:
           'Le formulaire a expiré. Réessaie en cliquant à nouveau sur le bouton.',
-        result: ({
-          leagueName,
-          leagueIcon,
-          xpBonus,
-          moneyBonus,
-          rankBonus,
-          xpIcon,
-          moneyIcon,
-          pointsIcon,
-        }: {
-          leagueName: string;
-          leagueIcon: string;
-          xpBonus: number;
-          moneyBonus: number;
-          rankBonus: number;
-          xpIcon: string;
-          moneyIcon: string;
-          pointsIcon: string;
-        }) =>
-          `${leagueIcon} **${leagueName}**\n` +
-          `• ${xpIcon} Bonus XP : **+${xpBonus}**\n` +
-          `• ${moneyIcon} Bonus argent : **+${moneyBonus}**` +
-          (rankBonus > 0
-            ? `\n• ${pointsIcon} Bonus de classement : **+${rankBonus}**`
-            : ''),
       },
     },
   },
