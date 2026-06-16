@@ -8,6 +8,9 @@ export const crowniclesHelp = {
       title: "Centre d'aide Crownicles",
       welcome:
         "Bienvenue dans le centre d'aide de Crownicles. Choisissez une rubrique dans le menu.",
+      navSelectPlaceholder: 'Choisissez une rubrique',
+      restricted:
+        'Certaines rubriques sont masquées car elles nécessitent des droits supplémentaires.',
     },
   },
 } as const satisfies CommandLang;

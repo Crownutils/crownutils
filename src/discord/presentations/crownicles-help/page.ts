@@ -8,9 +8,15 @@ export interface HelpState {
   pageId: string;
 }
 
-/** Passed to a page's `render`; `disabled` is true once the menu times out. */
+/**
+ * Passed to a page's `render`. `disabled` is true once the menu times out;
+ * `visiblePages` and `totalPageCount` let the home page build the nav select
+ * and show a notice when some pages are hidden by authorization.
+ */
 export interface HelpRenderContext {
   disabled: boolean;
+  visiblePages: readonly HelpPage[];
+  totalPageCount: number;
 }
 
 /**
@@ -21,6 +27,8 @@ export interface HelpRenderContext {
  */
 export interface HelpPage {
   id: string;
+  /** Display name used in the navigation select menu. */
+  name: string;
   requiredAuthorization: CommandAuthorization;
   render(state: HelpState, ctx: HelpRenderContext): Container;
   reduce(
