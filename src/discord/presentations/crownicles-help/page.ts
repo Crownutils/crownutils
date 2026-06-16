@@ -3,9 +3,11 @@ import type { Container } from '@/discord/components/index.js';
 import type { ReduceContext } from '@/discord/interactions/collector.js';
 import type { CollectedInteraction } from 'discord.js';
 
-/** Shared state of the help center; at minimum, which page is open. */
+/** Shared state of the help center. */
 export interface HelpState {
   pageId: string;
+  /** Id of the league currently selected on the leagues page. */
+  selectedLeagueId?: string;
 }
 
 /**
@@ -29,6 +31,10 @@ export interface HelpPage {
   id: string;
   /** Display name used in the navigation select menu. */
   name: string;
+  /** Short description shown under the name in the navigation select menu. */
+  description?: string;
+  /** Optional emoji displayed next to the name in the navigation select menu. */
+  icon?: string;
   requiredAuthorization: CommandAuthorization;
   render(state: HelpState, ctx: HelpRenderContext): Container;
   reduce(

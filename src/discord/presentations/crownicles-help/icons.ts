@@ -4,4 +4,7 @@
  */
 export const crowniclesIcons = {
   crown: '👑',
+  xp: '⭐',
+  money: '💰',
+  points: '🏅',
 } as const satisfies Record<string, string>;

@@ -1,8 +1,9 @@
 import type { HelpPage } from '../page.js';
 import { homePage, HOME_PAGE_ID } from './home.js';
+import { leaguesPage } from './leagues.js';
 
-/** All help center pages, in menu order. Register new pages here. */
-export const HELP_PAGES: readonly HelpPage[] = [homePage];
+/** All help center pages, in menu order. */
+export const HELP_PAGES: readonly HelpPage[] = [homePage, leaguesPage];
 
 /** Finds a page by id among `pages`. */
 export function findHelpPage(
