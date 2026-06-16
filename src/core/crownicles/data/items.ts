@@ -1,4 +1,5 @@
 import { computeMainItemStats } from '../calculators/items.js';
+import { loadItemIcons } from './item-icons.js';
 import {
   fetchCrowniclesJson,
   listCrowniclesDir,
@@ -25,6 +26,8 @@ export interface CrowniclesItem {
   id: number;
   category: ItemCategory;
   name: string;
+  /** Unicode emote of the item; undefined if not found in the icon source. */
+  icon?: string;
   rarity: number;
   /** Main items only — final stats after rarity scaling. */
   attack?: number;
@@ -72,14 +75,15 @@ function loadNames(): Promise<ItemNames> {
   return namesPromise;
 }
 
-/** Merges a raw stat file and a name into a `CrowniclesItem`. */
+/** Merges a raw stat file, a name and an icon into a `CrowniclesItem`. */
 function toItem(
   category: ItemCategory,
   id: number,
   name: string,
+  icon: string | undefined,
   stats: RawItemStats,
 ): CrowniclesItem {
-  const base = { id, category, name, rarity: stats.rarity };
+  const base = { id, category, name, icon, rarity: stats.rarity };
 
   const scaledStat =
     category in MAIN_ITEM_SCALED_STAT
@@ -97,8 +101,9 @@ function toItem(
 async function loadCategory(
   category: ItemCategory,
 ): Promise<CrowniclesItem[]> {
-  const [names, fileNames] = await Promise.all([
+  const [names, icons, fileNames] = await Promise.all([
     loadNames(),
+    loadItemIcons(),
     listCrowniclesDir(`Core/resources/${category}`),
   ]);
 
@@ -112,7 +117,13 @@ async function loadCategory(
   );
 
   return ids.map((id, index) =>
-    toItem(category, id, names[category][String(id)] ?? '???', stats[index]!),
+    toItem(
+      category,
+      id,
+      names[category][String(id)] ?? '???',
+      icons[category][String(id)],
+      stats[index]!,
+    ),
   );
 }
 

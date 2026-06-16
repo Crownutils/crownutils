@@ -21,6 +21,18 @@ export async function fetchCrowniclesJson<T>(path: string): Promise<T> {
 }
 
 /**
+ * Fetches a file from the public Crownicles repository as raw text, for
+ * sources that are not JSON (e.g. the `CrowniclesIcons.ts` emote table).
+ */
+export async function fetchCrowniclesText(path: string): Promise<string> {
+  const response = await fetch(`${RAW_BASE}/${path}`);
+  if (!response.ok) {
+    throw new Error(`Crownicles fetch failed (${response.status}) for ${path}`);
+  }
+  return response.text();
+}
+
+/**
  * Lists the file names in a Crownicles repo directory via the GitHub contents
  * API. Used to discover the item ids of a category without assuming a
  * contiguous range. One call per directory, meant to be cached by the caller.
