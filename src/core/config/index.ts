@@ -25,6 +25,8 @@ export const env = {
   githubUrl: 'https://github.com/Crownutils/crownutils',
   projectUrl: 'https://github.com/Crownutils',
   ownerUrl: 'https://github.com/Ntalcme',
+  inviteUrl:
+    'https://discord.com/oauth2/authorize?client_id=1485135115683368970',
 } as const;
 
 type RequirableEnvKey =
