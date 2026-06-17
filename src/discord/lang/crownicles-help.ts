@@ -1,6 +1,18 @@
 import { md } from '@/discord/markdown.js';
 import type { CommandLang } from './types.js';
 
+/**
+ * Formats a game time-advance value (stored in minutes) as a readable French
+ * duration: `45 min`, `2 h`, or `1 h 10`.
+ */
+function formatGameDuration(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (hours === 0) return `${mins} min`;
+  if (mins === 0) return `${hours} h`;
+  return `${hours} h ${mins}`;
+}
+
 /** Strings for the Crownicles help center. */
 export const crowniclesHelp = {
   commandDescription: "Centre d'aide pour le jeu Crownicles.",
@@ -99,7 +111,7 @@ export const crowniclesHelp = {
             case 4:
               return `Défense +${power}${perDay ? ' en combat' : ' au prochain combat'}`;
             case 5:
-              return `Avance le temps de ${power}${perDay ? ' chaque jour' : ''}`;
+              return `Avance le temps de ${formatGameDuration(power)}${perDay ? ' chaque jour' : ''}`;
             case 6:
               return `Argent +${power}${perDay ? ' par jour' : ''}`;
             case 7:
