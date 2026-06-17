@@ -19,6 +19,97 @@ export const crowniclesHelp = {
       name: 'Accueil',
       description: "Page principale du centre d'aide.",
     },
+    items: {
+      name: 'Équipements',
+      description: 'Parcourez les équipements du jeu et leurs statistiques.',
+      messages: {
+        intro:
+          'Choisissez une catégorie, puis une rareté, pour parcourir les équipements.',
+        selection: ({
+          category,
+          rarity,
+        }: {
+          category: string;
+          rarity?: string;
+        }) =>
+          rarity !== undefined
+            ? `Sélection : ${category} · ${rarity}`
+            : `Sélection : ${category}`,
+        categoryPlaceholder: 'Choisissez une catégorie',
+        rarityPlaceholder: 'Choisissez une rareté',
+        loading: 'Chargement des équipements…',
+        chooseRarity: 'Choisissez une rareté pour afficher les équipements.',
+        empty: 'Aucun équipement pour cette rareté.',
+        loadError:
+          'Impossible de charger les équipements. Veuillez réessayer plus tard.',
+        previous: 'Précédent',
+        next: 'Suivant',
+        categoryLabels: {
+          weapons: 'Armes',
+          armors: 'Armures',
+          objects: 'Objets',
+          potions: 'Potions',
+        },
+        rarityLabels: [
+          'Basique',
+          'Commun',
+          'Peu commun',
+          'Exotique',
+          'Rare',
+          'Spécial',
+          'Épique',
+          'Légendaire',
+          'Mythique',
+        ],
+        pageIndicator: ({
+          current,
+          total,
+        }: {
+          current: number;
+          total: number;
+        }) => `Page ${current}/${total}`,
+        itemLine: ({
+          icon,
+          name,
+          stats,
+        }: {
+          icon: string;
+          name: string;
+          stats: string;
+        }) => `${icon} ${md.bold(name)} · ${stats}`,
+        statValue: ({ icon, value }: { icon: string; value: number }) =>
+          `${icon} ${value}`,
+        natureEffect: ({
+          category,
+          nature,
+          power,
+        }: {
+          category: 'objects' | 'potions';
+          nature: number;
+          power: number;
+        }) => {
+          const perDay = category === 'objects';
+          switch (nature) {
+            case 1:
+              return `Vie +${power}${perDay ? ' par jour' : ''}`;
+            case 2:
+              return `Vitesse +${power}${perDay ? ' en combat' : ' au prochain combat'}`;
+            case 3:
+              return `Attaque +${power}${perDay ? ' en combat' : ' au prochain combat'}`;
+            case 4:
+              return `Défense +${power}${perDay ? ' en combat' : ' au prochain combat'}`;
+            case 5:
+              return `Avance le temps de ${power}${perDay ? ' chaque jour' : ''}`;
+            case 6:
+              return `Argent +${power}${perDay ? ' par jour' : ''}`;
+            case 7:
+              return `Énergie +${power}${perDay ? ' par jour' : ''}`;
+            default:
+              return 'Aucun effet';
+          }
+        },
+      },
+    },
     leagues: {
       name: 'Bonus de ligue',
       description: 'Calculez vos récompenses de fin de saison.',

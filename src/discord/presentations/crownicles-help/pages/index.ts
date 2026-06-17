@@ -1,9 +1,14 @@
 import type { HelpPage } from '../page.js';
 import { homePage, HOME_PAGE_ID } from './home.js';
 import { leaguesPage } from './leagues.js';
+import { itemsPage } from './items.js';
 
 /** All help center pages, in menu order. */
-export const HELP_PAGES: readonly HelpPage[] = [homePage, leaguesPage];
+export const HELP_PAGES: readonly HelpPage[] = [
+  homePage,
+  leaguesPage,
+  itemsPage,
+];
 
 /** Finds a page by id among `pages`. */
 export function findHelpPage(

@@ -1,4 +1,5 @@
 import type { CommandAuthorization } from '@/core/permissions/types.js';
+import type { CrowniclesItem, ItemCategory } from '@/core/crownicles/index.js';
 import type { Container } from '@/discord/components/index.js';
 import type { ReduceContext } from '@/discord/interactions/collector.js';
 import type { CollectedInteraction } from 'discord.js';
@@ -10,6 +11,16 @@ export interface HelpState {
   selectedLeagueId?: string;
   /** Rank bonus computed after a rank submission; undefined until the modal is submitted. */
   rankBonus?: number;
+  /** Category currently open on the equipment page. */
+  itemCategory?: ItemCategory;
+  /** Items loaded for `itemCategory`; undefined while loading. */
+  items?: readonly CrowniclesItem[];
+  /** True if the last item load failed, so the page can show an error. */
+  itemsError?: boolean;
+  /** Rarity currently filtered on the equipment page. */
+  itemRarity?: number;
+  /** Zero-based pagination index on the equipment page. */
+  itemPage?: number;
 }
 
 /**
