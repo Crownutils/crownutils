@@ -33,7 +33,7 @@ export const crowniclesHelp = {
           rarity?: string;
         }) =>
           rarity !== undefined
-            ? `Sélection : ${category} · ${rarity}`
+            ? `Sélection : ${category} | ${rarity}`
             : `Sélection : ${category}`,
         categoryPlaceholder: 'Choisissez une catégorie',
         rarityPlaceholder: 'Choisissez une rareté',
