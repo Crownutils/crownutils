@@ -16,6 +16,9 @@ function formatGameDuration(minutes: number): string {
 /** Strings for the Crownicles help center. */
 export const crowniclesHelp = {
   commandDescription: "Centre d'aide pour le jeu Crownicles.",
+  options: {
+    category: 'La rubrique à ouvrir directement (facultatif).',
+  },
   messages: {
     home: {
       title: "Centre d'aide Crownicles",
