@@ -20,8 +20,9 @@ export class Container {
   private readonly components: V2Component[] = [];
   private accentColor?: number;
 
-  public color(color: ColorName): this {
-    this.accentColor = COLORS[color];
+  /** Sets the accent color, either a named palette entry or a raw RGB hex. */
+  public color(color: ColorName | number): this {
+    this.accentColor = typeof color === 'number' ? color : COLORS[color];
     return this;
   }
 

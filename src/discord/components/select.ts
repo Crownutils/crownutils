@@ -16,8 +16,18 @@ export class Select implements SelectComponent {
   }
 
   /** Adds one option. `value` must be unique among this select's options. */
-  public option(label: string, value: string, description?: string): this {
-    this.builder.addOptions({ label, value, description });
+  public option(
+    label: string,
+    value: string,
+    description?: string,
+    emoji?: string,
+  ): this {
+    this.builder.addOptions({
+      label,
+      value,
+      description,
+      emoji: emoji !== undefined ? { name: emoji } : undefined,
+    });
     return this;
   }
 

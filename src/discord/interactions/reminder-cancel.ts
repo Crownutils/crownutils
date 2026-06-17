@@ -32,7 +32,7 @@ export function attachReminderCancelCollector(
       cancelled
         ? buildReminderCancelledContainer(r)
         : buildReminderCreatedContainer(r, { disabled }),
-    async (interaction, state, stop) => {
+    async (interaction, state, { stop }) => {
       if (
         parseReminderCancelButtonId(interaction.customId) !== state.reminder.id
       ) {

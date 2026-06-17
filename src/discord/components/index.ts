@@ -17,3 +17,6 @@ export type {
   ActionRowComponent,
   SelectComponent,
 } from './component.js';
+export { Modal } from './modal.js';
+export { TextInput } from './text-input.js';
+export type { TextInputStyleName } from './text-input.js';

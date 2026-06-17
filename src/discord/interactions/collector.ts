@@ -10,6 +10,7 @@ import type { Container } from '../components/index.js';
 type CollectorCollectHandler = (
   interaction: CollectedInteraction,
 ) => Promise<void> | void;
+
 type CollectorEndHandler = (
   collected: ReadonlyCollection<string, CollectedInteraction>,
   reason: string,
@@ -45,10 +46,24 @@ class Collector {
 }
 
 type Render<S> = (state: S, ctx: { disabled: boolean }) => Container;
+
+/** Callbacks `reduce` can use to control how `onCollect` finishes. */
+export interface ReduceContext {
+  /** Stops the collector; the message is re-rendered once more with `disabled: true`. */
+  stop: () => void;
+  /**
+   * Signals that `reduce` already responded to `interaction` (e.g. via
+   * `interaction.reply(...)`), so the default `interaction.update(...)`
+   * re-render — which would otherwise fail since an interaction can only be
+   * acknowledged once — is skipped.
+   */
+  handled: () => void;
+}
+
 type Reduce<S> = (
   interaction: CollectedInteraction,
   state: S,
-  stop: () => void,
+  ctx: ReduceContext,
 ) => Promise<S> | S;
 
 /**
@@ -119,11 +134,20 @@ export class InteractiveMessage<S> {
     }
 
     let stopped = false;
-    this.state = await this.reduce(interaction, this.state, () => {
-      stopped = true;
+    let handled = false;
+    this.state = await this.reduce(interaction, this.state, {
+      stop: () => {
+        stopped = true;
+      },
+      handled: () => {
+        handled = true;
+      },
     });
 
-    if (interaction.isMessageComponent()) {
+    const alreadyAnswered =
+      handled || interaction.replied || interaction.deferred;
+
+    if (interaction.isMessageComponent() && !alreadyAnswered) {
       await safeDiscord(
         interaction.update(
           this.render(this.state, { disabled: false }).build(),
