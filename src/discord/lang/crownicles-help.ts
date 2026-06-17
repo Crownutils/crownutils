@@ -145,5 +145,12 @@ export const crowniclesHelp = {
           'Le formulaire a expiré. Réessayez en cliquant à nouveau sur le bouton.',
       },
     },
+    rage: {
+      name: 'Rage',
+      description: 'Bientôt disponible.',
+      messages: {
+        comingSoon: 'Cette rubrique sera disponible prochainement.',
+      },
+    },
   },
 } as const satisfies CommandLang;
