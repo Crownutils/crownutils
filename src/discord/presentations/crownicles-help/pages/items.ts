@@ -77,7 +77,7 @@ function statSummary(item: CrowniclesItem): string {
       messages.statValue({ icon: crowniclesIcons.speed, value: item.speed }),
     );
   }
-  return parts.length > 0 ? parts.join(' · ') : '—';
+  return parts.length > 0 ? parts.join(' | ') : '—';
 }
 
 /** Adds the rarity select and, once a rarity is picked, the paginated list. */

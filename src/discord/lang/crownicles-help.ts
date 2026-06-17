@@ -76,7 +76,7 @@ export const crowniclesHelp = {
           icon: string;
           name: string;
           stats: string;
-        }) => `${icon} ${md.bold(name)} · ${stats}`,
+        }) => `${icon} ${md.bold(name)} | ${stats}`,
         statValue: ({ icon, value }: { icon: string; value: number }) =>
           `${icon} ${value}`,
         natureEffect: ({
