@@ -167,5 +167,26 @@ export const crowniclesHelp = {
         comingSoon: 'Cette rubrique sera disponible prochainement.',
       },
     },
+    events: {
+      name: 'Événements',
+      description: 'Bientôt disponible.',
+      messages: {
+        comingSoon: 'Cette rubrique sera disponible prochainement.',
+      },
+    },
+    witch: {
+      name: 'Sorcière',
+      description: 'Bientôt disponible.',
+      messages: {
+        comingSoon: 'Cette rubrique sera disponible prochainement.',
+      },
+    },
+    pets: {
+      name: 'Familiers',
+      description: 'Bientôt disponible.',
+      messages: {
+        comingSoon: 'Cette rubrique sera disponible prochainement.',
+      },
+    }
   },
 } as const satisfies CommandLang;

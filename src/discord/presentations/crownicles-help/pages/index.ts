@@ -3,6 +3,9 @@ import { homePage, HOME_PAGE_ID } from './home.js';
 import { leaguesPage } from './leagues.js';
 import { itemsPage } from './items.js';
 import { ragePage } from './rage.js';
+import { eventsPage } from './events.js';
+import { witchPage } from './witch.js';
+import { petsPage } from './pets.js';
 
 /** All help center pages, in menu order. */
 export const HELP_PAGES: readonly HelpPage[] = [
@@ -10,6 +13,9 @@ export const HELP_PAGES: readonly HelpPage[] = [
   leaguesPage,
   itemsPage,
   ragePage,
+  eventsPage,
+  witchPage,
+  petsPage
 ];
 
 /** Finds a page by id among `pages`. */

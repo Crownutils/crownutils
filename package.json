@@ -1,6 +1,6 @@
 {
   "name": "crownutils",
-  "version": "Bêta 0.5.2",
+  "version": "Bêta 0.5.2.a",
   "description": "A Discord bot",
   "main": "dist/index.js",
   "type": "module",
