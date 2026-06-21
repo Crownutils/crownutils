@@ -187,6 +187,6 @@ export const crowniclesHelp = {
       messages: {
         comingSoon: 'Cette rubrique sera disponible prochainement.',
       },
-    }
+    },
   },
 } as const satisfies CommandLang;

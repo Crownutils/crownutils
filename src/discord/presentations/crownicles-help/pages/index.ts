@@ -15,7 +15,7 @@ export const HELP_PAGES: readonly HelpPage[] = [
   ragePage,
   eventsPage,
   witchPage,
-  petsPage
+  petsPage,
 ];
 
 /** Finds a page by id among `pages`. */

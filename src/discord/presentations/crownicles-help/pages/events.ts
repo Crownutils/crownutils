@@ -12,7 +12,8 @@ export const EVENTS_PAGE_ID = 'events';
 
 const EVENTS_ICON = '🎭';
 
-const { name, description, messages } = lang.commands.crowniclesHelp.pages.events;
+const { name, description, messages } =
+  lang.commands.crowniclesHelp.pages.events;
 
 /** Events help page: placeholder until the events feature is implemented. */
 export const eventsPage = {

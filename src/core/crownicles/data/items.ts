@@ -91,16 +91,17 @@ function toItem(
       : undefined;
 
   if (scaledStat) {
-    return { ...base, ...computeMainItemStats(stats.rarity, stats, scaledStat) };
+    return {
+      ...base,
+      ...computeMainItemStats(stats.rarity, stats, scaledStat),
+    };
   }
 
   return { ...base, power: stats.power, nature: stats.nature };
 }
 
 /** Fetches the directory listing and every stat file of `category`. */
-async function loadCategory(
-  category: ItemCategory,
-): Promise<CrowniclesItem[]> {
+async function loadCategory(category: ItemCategory): Promise<CrowniclesItem[]> {
   const [names, icons, fileNames] = await Promise.all([
     loadNames(),
     loadItemIcons(),

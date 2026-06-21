@@ -13,9 +13,7 @@ const CONTENTS_API =
 export async function fetchCrowniclesJson<T>(path: string): Promise<T> {
   const response = await fetch(`${RAW_BASE}/${path}`);
   if (!response.ok) {
-    throw new Error(
-      `Crownicles fetch failed (${response.status}) for ${path}`,
-    );
+    throw new Error(`Crownicles fetch failed (${response.status}) for ${path}`);
   }
   return (await response.json()) as T;
 }
