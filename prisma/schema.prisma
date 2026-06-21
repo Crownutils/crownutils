@@ -20,3 +20,9 @@ model BotState {
   id                 Int     @id @default(1)
   maintenanceEnabled Boolean @default(false)
 }
+
+// Last time a user computed a pathfinder route, for the daily usage limit.
+model PathfinderUsage {
+  userId     String   @id
+  lastUsedAt DateTime
+}
