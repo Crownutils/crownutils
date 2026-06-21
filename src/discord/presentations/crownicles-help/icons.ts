@@ -43,3 +43,21 @@ export const CATEGORY_ICONS = {
   objects: '🎒',
   potions: '🧪',
 } as const satisfies Record<string, string>;
+
+/**
+ * Emote per location type code, for the pathfinder type select. Hard-coded
+ * because that select is shown before the map (and its icons) is fetched;
+ * mirrors the `mapTypes` table from the Crownicles icon source.
+ */
+export const LOCATION_TYPE_ICONS: Record<string, string> = {
+  vi: '🛖',
+  ci: '🏘️',
+  ro: '🛣️',
+  fo: '🌳',
+  pl: '🌺',
+  be: '🏖️',
+  ri: '🏞️',
+  la: '🚣‍♂️',
+  mo: '⛰️',
+  de: '🏜️',
+};

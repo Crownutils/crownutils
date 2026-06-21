@@ -125,6 +125,42 @@ export const crowniclesHelp = {
         },
       },
     },
+    pathfinder: {
+      name: 'Itinéraire',
+      description: 'Trouvez le chemin le plus court entre deux lieux.',
+      messages: {
+        intro: 'Trouvez le chemin le plus court entre deux lieux du continent.',
+        loading: 'Chargement de la carte…',
+        loadError:
+          'Impossible de charger la carte. Veuillez réessayer plus tard.',
+        typePlaceholder: 'Choisissez un type de lieu',
+        locationPlaceholder: 'Choisissez un lieu',
+        chooseDepartureType: 'Choisissez le type de votre lieu de départ.',
+        chooseDestinationType: 'Choisissez le type de votre destination.',
+        restart: 'Recommencer',
+        departure: ({ name }: { name: string }) => `Départ : ${md.bold(name)}`,
+        route: ({ steps }: { steps: readonly string[] }) => steps.join(' → '),
+        routeTotal: ({ minutes }: { minutes: number }) =>
+          `Durée totale : ${md.bold(formatGameDuration(minutes))}`,
+        noRoute: 'Aucun itinéraire trouvé entre ces deux lieux.',
+        dailyLimitReached:
+          "Vous avez déjà calculé un itinéraire aujourd'hui. Revenez demain pour en calculer un nouveau.",
+        // Liste des types présents sur le continent (faits, codés en dur car
+        // affichés AVANT le chargement de la carte).
+        types: [
+          { code: 'vi', label: 'Village' },
+          { code: 'ci', label: 'Ville' },
+          { code: 'ro', label: 'Route' },
+          { code: 'fo', label: 'Forêt' },
+          { code: 'pl', label: 'Plaine' },
+          { code: 'be', label: 'Plage' },
+          { code: 'ri', label: 'Rivière' },
+          { code: 'la', label: 'Lac' },
+          { code: 'mo', label: 'Montagne' },
+          { code: 'de', label: 'Désert' },
+        ],
+      },
+    },
     leagues: {
       name: 'Bonus de ligue',
       description: 'Calculez vos récompenses de fin de saison.',

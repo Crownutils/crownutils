@@ -1,5 +1,9 @@
 import type { CommandAuthorization } from '@/core/permissions/types.js';
-import type { CrowniclesItem, ItemCategory } from '@/core/crownicles/index.js';
+import type {
+  CrowniclesItem,
+  ItemCategory,
+  CrowniclesMap,
+} from '@/core/crownicles/index.js';
 import type { Container } from '@/discord/components/index.js';
 import type { ReduceContext } from '@/discord/interactions/collector.js';
 import type { CollectedInteraction } from 'discord.js';
@@ -21,6 +25,18 @@ export interface HelpState {
   itemRarity?: number;
   /** Zero-based pagination index on the equipment page. */
   itemPage?: number;
+  /** Continent map ; undefined during loading. */
+  pathMap?: CrowniclesMap;
+  /** true if the last map load failed */
+  pathMapError?: boolean;
+  /** Type selected */
+  pathType?: string;
+  /** Location start */
+  pathFromId?: number;
+  /** Destination choosed */
+  pathToId?: number;
+  /** True once the user hit the daily pathfinder limit; shows the limit notice. */
+  pathLimitReached?: boolean;
 }
 
 /**
