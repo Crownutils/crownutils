@@ -39,6 +39,12 @@ interface RawCrowniclesMapLocation {
   attribute?: string;
 }
 
+interface RawCrowniclesMapLink {
+  startMap: number;
+  endMap: number;
+  tripDuration: number;
+}
+
 type CrowniclesMapLocationNames = Record<string, { name?: string }>;
 
 const HTTP_CONCURRENCY = 10;
@@ -67,18 +73,27 @@ async function loadCrowniclesMap(): Promise<CrowniclesMap> {
   const locationIds = numericIds(locationFiles);
   const linkIds = numericIds(linkFiles);
 
-  const [rawLocations, links] = await Promise.all([
+  const [rawLocations, rawLinks] = await Promise.all([
     mapWithConcurrency(locationIds, HTTP_CONCURRENCY, (id) =>
       fetchCrowniclesJson<RawCrowniclesMapLocation>(
         `Core/resources/mapLocations/${id}.json`,
       ),
     ),
     mapWithConcurrency(linkIds, HTTP_CONCURRENCY, (id) =>
-      fetchCrowniclesJson<CrowniclesMapLink>(
+      fetchCrowniclesJson<RawCrowniclesMapLink>(
         `Core/resources/mapLinks/${id}.json`,
       ),
     ),
   ]);
+
+  // The repo stores the trip duration (in minutes) under `tripDuration`.
+  const links: CrowniclesMapLink[] = rawLinks.map(
+    ({ startMap, endMap, tripDuration }) => ({
+      startMap,
+      endMap,
+      tripDurationMin: tripDuration,
+    }),
+  );
 
   const locations: CrowniclesMapLocation[] = locationIds.map((id, index) => {
     const { type, attribute } = rawLocations[index]!;
