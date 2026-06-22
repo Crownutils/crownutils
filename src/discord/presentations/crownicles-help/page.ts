@@ -71,7 +71,7 @@ export interface HelpPage {
     state: HelpState,
     ctx: ReduceContext,
     /**
-     * Render context at the time of the interaction — lets a page re-render
+     * Render context at the time of the interaction - lets a page re-render
      * itself inline (e.g. via `submit.update()`) without going through the
      * router's render callback.
      */

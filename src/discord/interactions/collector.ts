@@ -54,8 +54,8 @@ export interface ReduceContext {
   /**
    * Signals that `reduce` already responded to `interaction` (e.g. via
    * `interaction.reply(...)`), so the default `interaction.update(...)`
-   * re-render — which would otherwise fail since an interaction can only be
-   * acknowledged once — is skipped.
+   * re-render - which would otherwise fail since an interaction can only be
+   * acknowledged once - is skipped.
    */
   handled: () => void;
 }
@@ -69,7 +69,7 @@ type Reduce<S> = (
 /**
  * Drives a Components V2 message that re-renders on each interaction.
  *
- * `reduce` updates state and `render` rebuilds the container from it —
+ * `reduce` updates state and `render` rebuilds the container from it -
  * the message is edited in place on every collected interaction until
  * `stop()` is called from within `reduce`, after which it's re-rendered
  * once more with `disabled: true`.
