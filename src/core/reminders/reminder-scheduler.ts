@@ -9,7 +9,7 @@ const timers = new Map<string, NodeJS.Timeout>();
 /**
  * Schedules `onTrigger` to run at `reminder.triggerAt`, replacing any
  * existing timer for the same reminder. Delay is capped at
- * {@link MAX_TIMEOUT_MS} — reminders further out must be re-scheduled
+ * {@link MAX_TIMEOUT_MS} - reminders further out must be re-scheduled
  * before then.
  */
 export function scheduleReminder(

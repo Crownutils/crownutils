@@ -23,7 +23,7 @@ export type ValidateReminderInputResult =
  * Returns the reminder limit for a given user based on their privilege tier.
  *
  * Note: the bot owner bypasses this limit entirely in
- * {@link validateReminderInput} — this function still returns the
+ * {@link validateReminderInput} - this function still returns the
  * privileged tier's value for them.
  */
 export function getMaxRemindersForUser(userId: string): number {

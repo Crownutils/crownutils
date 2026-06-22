@@ -20,3 +20,34 @@ model BotState {
   id                 Int     @id @default(1)
   maintenanceEnabled Boolean @default(false)
 }
+
+// Last time a user computed a pathfinder route, for the daily usage limit.
+model PathfinderUsage {
+  userId     String   @id
+  lastUsedAt DateTime
+}
+
+// A team announcement ("mail") broadcast to every user; body is rich Markdown.
+// Auto-deleted two weeks after creation.
+model Mail {
+  id        String   @id @default(cuid())
+  title     String?
+  body      String
+  authorId  String
+  createdAt DateTime @default(now())
+}
+
+// Read receipt: this user opened this mail. Unread = active mails without a
+// receipt for the user.
+model MailRead {
+  userId String
+  mailId String
+
+  @@id([userId, mailId])
+}
+
+// Per-user throttle for the in-channel unread reminder (at most once per day).
+model MailNotice {
+  userId         String   @id
+  lastNotifiedAt DateTime
+}

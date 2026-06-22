@@ -12,7 +12,8 @@ export const WITCH_PAGE_ID = 'witch';
 
 const WITCH_ICON = '🕸️';
 
-const { name, description, messages } = lang.commands.crowniclesHelp.pages.witch;
+const { name, description, messages } =
+  lang.commands.crowniclesHelp.pages.witch;
 
 /** Witch help page: placeholder until the witch feature is implemented. */
 export const witchPage = {

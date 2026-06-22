@@ -29,7 +29,7 @@ export interface CrowniclesItem {
   /** Unicode emote of the item; undefined if not found in the icon source. */
   icon?: string;
   rarity: number;
-  /** Main items only — final stats after rarity scaling. */
+  /** Main items only - final stats after rarity scaling. */
   attack?: number;
   defense?: number;
   speed?: number;
@@ -91,16 +91,17 @@ function toItem(
       : undefined;
 
   if (scaledStat) {
-    return { ...base, ...computeMainItemStats(stats.rarity, stats, scaledStat) };
+    return {
+      ...base,
+      ...computeMainItemStats(stats.rarity, stats, scaledStat),
+    };
   }
 
   return { ...base, power: stats.power, nature: stats.nature };
 }
 
 /** Fetches the directory listing and every stat file of `category`. */
-async function loadCategory(
-  category: ItemCategory,
-): Promise<CrowniclesItem[]> {
+async function loadCategory(category: ItemCategory): Promise<CrowniclesItem[]> {
   const [names, icons, fileNames] = await Promise.all([
     loadNames(),
     loadItemIcons(),

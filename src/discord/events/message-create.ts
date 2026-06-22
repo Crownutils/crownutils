@@ -9,6 +9,7 @@ import {
 } from '@/discord/errors.js';
 import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
 import { lang } from '@/discord/lang/index.js';
+import { remindUnreadMails } from '@/discord/mails/unread-reminder.js';
 import { PREFIX } from '@/discord/constants.js';
 
 /**
@@ -44,6 +45,10 @@ export const event = {
       },
       {
         execute: () => command.execute(message, args),
+        onExecuted:
+          message.guildId !== null && command.name !== 'mails'
+            ? () => remindUnreadMails(message.author.id, message.channel)
+            : undefined,
         onMaintenance: () =>
           safeDiscord(
             message.reply(buildErrorContainer(lang.errors.maintenance).build()),

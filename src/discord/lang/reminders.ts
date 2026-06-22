@@ -9,6 +9,6 @@ export const reminders = {
     empty: 'Aucun rappel en cours.',
     cannotDelete: 'Vous ne pouvez pas supprimer ce rappel.',
     item: ({ message, when }: { message: string; when: string }): string =>
-      `${md.code(message)} — ${when}`,
+      `${md.code(message)} - ${when}`,
   },
 } as const satisfies CommandLang;
