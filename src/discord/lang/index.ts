@@ -8,6 +8,7 @@ import { help } from './help.js';
 import { maintenance } from './maintenance.js';
 import { crowniclesHelp } from './crownicles-help.js';
 import { invite } from './invite.js';
+import { mail, mails } from './mail.js';
 
 const commands = {
   ping,
@@ -19,6 +20,8 @@ const commands = {
   maintenance,
   crowniclesHelp,
   invite,
+  mail,
+  mails,
 } as const;
 
 /** All user-facing strings, grouped by command, plus shared error strings. */

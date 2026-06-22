@@ -22,7 +22,7 @@ export async function isMaintenanceEnabled(): Promise<boolean> {
 
 /**
  * Enables or disables maintenance mode. While enabled, only the bot owner
- * can run commands — everyone else is blocked before the command executes.
+ * can run commands - everyone else is blocked before the command executes.
  * Persisted, so it survives bot restarts.
  */
 export async function setMaintenanceEnabled(enabled: boolean): Promise<void> {

@@ -29,7 +29,7 @@ export interface CrowniclesItem {
   /** Unicode emote of the item; undefined if not found in the icon source. */
   icon?: string;
   rarity: number;
-  /** Main items only — final stats after rarity scaling. */
+  /** Main items only - final stats after rarity scaling. */
   attack?: number;
   defense?: number;
   speed?: number;

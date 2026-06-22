@@ -23,7 +23,7 @@ export interface MainItemStats {
 
 /**
  * Scales a raw attack/defense value by rarity, matching the game's curve:
- * `round(1.15053 · m^2.3617 · (1.0569 + 0.1448/m)^raw)` where `m` is the
+ * `round(1.15053 * m^2.3617 * (1.0569 + 0.1448/m)^raw)` where `m` is the
  * rarity multiplier.
  */
 function scaleRawStat(raw: number, rarity: number): number {

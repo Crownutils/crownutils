@@ -1,14 +1,6 @@
 import { env } from '@/core/config/index.js';
 import { prisma } from '@/core/persistence/client.js';
-
-/** True if `a` and `b` fall on the same calendar day in UTC. */
-function isSameUtcDay(a: Date, b: Date): boolean {
-  return (
-    a.getUTCFullYear() === b.getUTCFullYear() &&
-    a.getUTCMonth() === b.getUTCMonth() &&
-    a.getUTCDate() === b.getUTCDate()
-  );
-}
+import { isSameUtcDay } from '@/core/time/index.js';
 
 /**
  * Records a pathfinder route computation for `userId` and reports whether it

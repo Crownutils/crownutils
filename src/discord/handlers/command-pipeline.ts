@@ -22,6 +22,8 @@ export interface CommandPipelineHandlers {
   onMaintenance: () => Promise<unknown>;
   onPermissionDenied: (errors: CommandPermissionError[]) => Promise<unknown>;
   onUnexpectedError: (error: unknown) => Promise<unknown>;
+  /** Runs after a successful `execute` (e.g. the unread-mail reminder). */
+  onExecuted?: () => Promise<unknown>;
 }
 
 /**
@@ -57,5 +59,8 @@ export async function runCommandPipeline(
     await handlers.execute();
   } catch (error) {
     await handlers.onUnexpectedError(error);
+    return;
   }
+
+  await handlers.onExecuted?.();
 }

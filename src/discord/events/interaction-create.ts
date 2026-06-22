@@ -8,6 +8,7 @@ import {
 } from '@/discord/errors.js';
 import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
 import { lang } from '@/discord/lang/index.js';
+import { remindUnreadMails } from '@/discord/mails/unread-reminder.js';
 import { logger } from '@/shared/logger.js';
 
 /**
@@ -31,6 +32,12 @@ export const event = {
       },
       {
         execute: () => command.execute(interaction),
+        onExecuted:
+          interaction.guildId !== null &&
+          interaction.commandName !== 'mail' &&
+          interaction.commandName !== 'mails'
+            ? () => remindUnreadMails(interaction.user.id, interaction.channel)
+            : undefined,
         onMaintenance: () =>
           interaction.reply(
             buildErrorContainer(lang.errors.maintenance).build({
