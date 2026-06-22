@@ -10,4 +10,6 @@ export const icons = {
   info: 'ℹ️',
   question: '❓',
   wrench: '🔧',
+  mailbox: '📬',
+  mailboxRead: '📭',
 } as const satisfies Record<string, string>;
