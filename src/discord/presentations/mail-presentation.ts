@@ -71,10 +71,13 @@ function discordRelative(date: Date): string {
   return `<t:${Math.floor(date.getTime() / 1000)}:R>`;
 }
 
-function shortDate(date: Date): string {
+/** Exact `DD/MM/YYYY HH:MM UTC` timestamp, for plain-text select descriptions. */
+function utcDateTime(date: Date): string {
   const day = String(date.getUTCDate()).padStart(2, '0');
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  return `${day}/${month}/${date.getUTCFullYear()}`;
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  return `${day}/${month}/${date.getUTCFullYear()} ${hours}:${minutes} UTC`;
 }
 
 function mailTitle(mail: Mail): string {
@@ -152,7 +155,7 @@ function renderList(
     select.option(
       mailTitle(mail),
       mail.id,
-      shortDate(mail.createdAt),
+      utcDateTime(mail.createdAt),
       state.readIds.has(mail.id) ? icons.mailboxRead : icons.mailbox,
     );
   }
