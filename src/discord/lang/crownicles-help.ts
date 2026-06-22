@@ -145,8 +145,6 @@ export const crowniclesHelp = {
         noRoute: 'Aucun itinéraire trouvé entre ces deux lieux.',
         dailyLimitReached:
           "Vous avez déjà calculé un itinéraire aujourd'hui. Revenez demain pour en calculer un nouveau.",
-        // Liste des types présents sur le continent (faits, codés en dur car
-        // affichés AVANT le chargement de la carte).
         types: [
           { code: 'vi', label: 'Village' },
           { code: 'ci', label: 'Ville' },
