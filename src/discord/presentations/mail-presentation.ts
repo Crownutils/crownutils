@@ -84,9 +84,29 @@ function mailTitle(mail: Mail): string {
   return mail.title ?? mailsLang.noTitle;
 }
 
-/** One-line body excerpt for the inbox preview, whitespace-collapsed. */
+/**
+ * Strips Markdown to plain text so a preview never renders as a heading, list,
+ * or formatted block. Handles the common syntax (headings, emphasis, code,
+ * lists, quotes, links) — good enough for a short excerpt.
+ */
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/```[\s\S]*?```/g, ' ') // fenced code blocks
+    .replace(/`([^`]+)`/g, '$1') // inline code
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '') // headings
+    .replace(/^\s*>\s?/gm, '') // block quotes
+    .replace(/^\s*[-*+]\s+/gm, '') // unordered lists
+    .replace(/^\s*\d+\.\s+/gm, '') // ordered lists
+    .replace(/^\s*[-*_]{3,}\s*$/gm, ' ') // horizontal rules
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links -> label
+    .replace(/(\*\*|__|\*|_|~~)(.+?)\1/g, '$2') // bold/italic/strikethrough
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** One-line plain-text body excerpt for the inbox preview. */
 function mailExcerpt(body: string): string {
-  const flat = body.replace(/\s+/g, ' ').trim();
+  const flat = stripMarkdown(body);
   return flat.length > PREVIEW_LENGTH
     ? `${flat.slice(0, PREVIEW_LENGTH)}…`
     : flat;
