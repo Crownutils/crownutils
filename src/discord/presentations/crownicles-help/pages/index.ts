@@ -6,16 +6,18 @@ import { ragePage } from './rage.js';
 import { eventsPage } from './events.js';
 import { witchPage } from './witch.js';
 import { petsPage } from './pets.js';
+import { pathfinderPage } from './pathfinder.js';
 
 /** All help center pages, in menu order. */
 export const HELP_PAGES: readonly HelpPage[] = [
   homePage,
   leaguesPage,
   itemsPage,
+  pathfinderPage,
   ragePage,
   eventsPage,
   witchPage,
-  petsPage
+  petsPage,
 ];
 
 /** Finds a page by id among `pages`. */
