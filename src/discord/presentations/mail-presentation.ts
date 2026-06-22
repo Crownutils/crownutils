@@ -17,7 +17,7 @@ import { InteractiveMessage } from '@/discord/interactions/collector.js';
 import { lang } from '@/discord/lang/index.js';
 import { md } from '@/discord/markdown.js';
 
-const VIEWER_IDLE_MS = 180_000;
+const VIEWER_IDLE_MS = 120_000;
 const MAILS_PER_PAGE = 5;
 const PREVIEW_LENGTH = 140;
 
