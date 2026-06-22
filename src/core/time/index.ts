@@ -31,3 +31,12 @@ export function parseDurationMs(input: string): number | null {
 
   return total;
 }
+
+/** True if `a` and `b` fall on the same calendar day in UTC. */
+export function isSameUtcDay(a: Date, b: Date): boolean {
+  return (
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
+  );
+}
