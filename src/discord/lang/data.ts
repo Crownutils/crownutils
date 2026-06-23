@@ -1,4 +1,5 @@
 import { icons } from '@/discord/icons.js';
+import { md } from '@/discord/markdown.js';
 import type { CommandLang } from './types.js';
 
 /** Strings for the `/data` command (personal-data access / export). */
@@ -39,18 +40,18 @@ export const data = {
       none: 'Jamais utilisé.',
     },
     mails: {
-      title: 'Annonces',
+      title: 'Mails',
       read: ({ count }: { count: number }): string =>
-        `${count} annonce(s) marquée(s) comme lue(s).`,
+        `${count} mail(s) marqué(s) comme lu(s).`,
       notice: ({ when }: { when: string }): string =>
-        `Dernier rappel d'annonces non lues : ${when}.`,
-      none: 'Aucune interaction avec les annonces.',
+        `Dernier rappel de mails non lus : ${when}.`,
+      none: 'Aucune interaction avec les mails.',
     },
     dataAccess: {
       title: "Demandes d'accès",
       last: ({ when }: { when: string }): string =>
         `Dernière demande d'accès ${when}.`,
     },
-    footer: 'Pour supprimer ces données, utilisez la commande /delete-data.',
+    footer: `Pour supprimer ces données, utilisez la commande ${md.code('delete-data')}.`,
   },
 } as const satisfies CommandLang;

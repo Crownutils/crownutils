@@ -1,4 +1,5 @@
 import { icons } from '@/discord/icons.js';
+import { md } from '@/discord/markdown.js';
 import type { CommandLang } from './types.js';
 
 /** Strings for the `/delete-data` command. */
@@ -12,7 +13,7 @@ export const deleteData = {
     confirmButton: 'Supprimer mes données',
     cancelButton: 'Annuler',
     cancelled: "Suppression annulée. Aucune donnée n'a été supprimée.",
-    success: `${icons.check} Toutes vos données ont été supprimées. Vous devrez accepter de nouveau les documents (commande /legal) pour réutiliser le bot.`,
+    success: `${icons.check} Toutes vos données ont été supprimées. Vous devrez accepter de nouveau les documents (commande ${md.code('legal')}) pour réutiliser le bot.`,
     nothing: "Aucune donnée n'était conservée à votre sujet.",
   },
 } as const satisfies CommandLang;
