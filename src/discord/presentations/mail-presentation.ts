@@ -16,6 +16,7 @@ import { icons } from '@/discord/icons.js';
 import { InteractiveMessage } from '@/discord/interactions/collector.js';
 import { lang } from '@/discord/lang/index.js';
 import { md } from '@/discord/markdown.js';
+import { relativeTimestamp } from '@/discord/timestamps.js';
 
 const VIEWER_IDLE_MS = 120_000;
 const MAILS_PER_PAGE = 5;
@@ -67,10 +68,6 @@ export function buildUnreadNoticeContainer(count: number): Container {
     .add(new Text(mailsLang.unreadNotice({ count })));
 }
 
-function discordRelative(date: Date): string {
-  return `<t:${Math.floor(date.getTime() / 1000)}:R>`;
-}
-
 /** Exact `DD/MM/YYYY HH:MM UTC` timestamp, for plain-text select descriptions. */
 function utcDateTime(date: Date): string {
   const day = String(date.getUTCDate()).padStart(2, '0');
@@ -116,7 +113,7 @@ function mailExcerpt(body: string): string {
 function mailPreview(mail: Mail, read: boolean): string {
   const marker = read ? icons.mailboxRead : icons.mailbox;
   return [
-    `${marker} ${md.bold(mailTitle(mail))} - ${discordRelative(mail.createdAt)}`,
+    `${marker} ${md.bold(mailTitle(mail))} - ${relativeTimestamp(mail.createdAt)}`,
     mailExcerpt(mail.body),
   ].join('\n');
 }
@@ -136,7 +133,7 @@ function renderDetail(mail: Mail, disabled: boolean): Container {
       new Text(mail.body),
       new Separator(),
       new Text(
-        mailsLang.sentAt({ when: discordRelative(mail.createdAt) }),
+        mailsLang.sentAt({ when: relativeTimestamp(mail.createdAt) }),
       ).size('subtle'),
       new ActionRow(back),
     );

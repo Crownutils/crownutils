@@ -9,6 +9,11 @@ import {
 import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
 import { lang } from '@/discord/lang/index.js';
 import { remindUnreadMails } from '@/discord/mails/unread-reminder.js';
+import {
+  attachLegalGate,
+  buildLegalGateContainer,
+} from '@/discord/presentations/legal-presentation.js';
+import { replyAndFetch } from '@/discord/interactions/reply.js';
 import { logger } from '@/shared/logger.js';
 
 /**
@@ -27,6 +32,7 @@ export const event = {
     await runCommandPipeline(
       {
         userId: interaction.user.id,
+        commandName: interaction.commandName,
         guildId: interaction.guildId,
         requirements: command.requirements,
       },
@@ -44,6 +50,16 @@ export const event = {
               ephemeral: true,
             }),
           ),
+        onLegalNotAccepted: async () => {
+          const reply = await safeDiscord(
+            replyAndFetch(
+              interaction,
+              buildLegalGateContainer().build({ ephemeral: true }),
+            ),
+            'interaction-create.legalGate',
+          );
+          if (reply) attachLegalGate(reply, interaction.user.id);
+        },
         onPermissionDenied: (errors) =>
           interaction.reply(
             buildCommandPermissionsErrorContainer(errors).build({

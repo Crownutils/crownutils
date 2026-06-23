@@ -1,6 +1,6 @@
-import { TimestampStyles, time } from 'discord.js';
 import type { Reminder } from '@/core/persistence/prisma/client.js';
 import { CustomId } from '@/discord/custom-id.js';
+import { relativeTimestamp } from '@/discord/timestamps.js';
 import { icons } from '@/discord/icons.js';
 import { lang } from '@/discord/lang/index.js';
 import {
@@ -61,7 +61,7 @@ export function buildReminderCreatedContainer(
     new Text(
       lang.commands.remind.messages.created.description({
         message: reminder.message,
-        when: time(reminder.triggerAt, TimestampStyles.RelativeTime),
+        when: relativeTimestamp(reminder.triggerAt),
       }),
     ),
     new ActionRow(cancelButton),
@@ -123,7 +123,7 @@ export function buildReminderListContainer(
           new Text(
             lang.commands.reminders.messages.item({
               message: reminder.message,
-              when: time(reminder.triggerAt, TimestampStyles.RelativeTime),
+              when: relativeTimestamp(reminder.triggerAt),
             }),
           ),
         )
