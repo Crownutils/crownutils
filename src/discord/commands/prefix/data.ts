@@ -7,6 +7,7 @@ import type { PrefixCommand } from '@/discord/types/command.js';
 export const command = {
   name: 'data',
   description: lang.commands.data.commandDescription,
+  aliases: ['d'],
   requirements: {
     scope: 'everywhere',
   },

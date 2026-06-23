@@ -10,6 +10,7 @@ import type { PrefixCommand } from '@/discord/types/command.js';
 export const command = {
   name: 'delete-data',
   description: lang.commands.deleteData.commandDescription,
+  aliases: ['dd'],
   requirements: {
     scope: 'everywhere',
   },
