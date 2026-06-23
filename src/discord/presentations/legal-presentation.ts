@@ -147,7 +147,10 @@ export function attachLegalGate(message: Message, userId: string): void {
     { accepted: false },
     (state, { disabled }) => renderGate(state, disabled),
     async (interaction, state, { stop }) => {
-      if (!interaction.isButton() || interaction.customId !== ACCEPT_BUTTON_ID) {
+      if (
+        !interaction.isButton() ||
+        interaction.customId !== ACCEPT_BUTTON_ID
+      ) {
         return state;
       }
       await acceptLegal(userId);

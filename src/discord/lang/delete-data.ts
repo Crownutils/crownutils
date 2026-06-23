@@ -8,7 +8,7 @@ export const deleteData = {
   messages: {
     title: `${icons.trash} Suppression de vos données`,
     confirmPrompt:
-      "Cette action supprime définitivement toutes vos données (rappels, accusés de lecture, acceptation des documents légaux, etc.) et est irréversible. Votre acceptation étant également supprimée, vous devrez accepter de nouveau les documents pour réutiliser le bot.",
+      'Cette action supprime définitivement toutes vos données (rappels, accusés de lecture, acceptation des documents légaux, etc.) et est irréversible. Votre acceptation étant également supprimée, vous devrez accepter de nouveau les documents pour réutiliser le bot.',
     confirmButton: 'Supprimer mes données',
     cancelButton: 'Annuler',
     cancelled: "Suppression annulée. Aucune donnée n'a été supprimée.",

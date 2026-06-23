@@ -7,15 +7,21 @@ export const data = {
     'Consulter les données personnelles que le bot conserve à votre sujet.',
   messages: {
     title: `${icons.shield} Vos données`,
-    intro: 'Voici l’ensemble des données que Crownutils conserve à votre sujet.',
+    intro:
+      'Voici l’ensemble des données que Crownutils conserve à votre sujet.',
     empty:
       "Aucune donnée personnelle n'est actuellement conservée à votre sujet.",
     cooldown: ({ when }: { when: string }): string =>
       `${icons.warning} Vous avez récemment demandé l'accès à vos données. Vous pourrez en faire une nouvelle demande ${when}.`,
     legal: {
       title: 'Acceptation des documents légaux',
-      accepted: ({ version, when }: { version: string; when: string }): string =>
-        `Acceptée (version ${version}) ${when}.`,
+      accepted: ({
+        version,
+        when,
+      }: {
+        version: string;
+        when: string;
+      }): string => `Acceptée (version ${version}) ${when}.`,
       none: 'Non acceptée.',
     },
     reminders: {

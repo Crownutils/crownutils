@@ -104,9 +104,7 @@ export interface DeletionSummary {
  * acceptance, so the gate re-locks the bot until the user accepts again. The
  * acceptance cache is invalidated accordingly.
  */
-export async function deleteUserData(
-  userId: string,
-): Promise<DeletionSummary> {
+export async function deleteUserData(userId: string): Promise<DeletionSummary> {
   const reminders = await listReminders(userId);
   for (const reminder of reminders) {
     unscheduleReminder(reminder.id);

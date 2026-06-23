@@ -60,7 +60,10 @@ export function buildDeleteConfirmContainer(): Container {
  * reports whether anything was removed; cancelling leaves the data untouched.
  * Restricted to `userId`.
  */
-export function attachDeleteDataConfirm(message: Message, userId: string): void {
+export function attachDeleteDataConfirm(
+  message: Message,
+  userId: string,
+): void {
   new InteractiveMessage<DeleteResult>(
     message,
     'pending',

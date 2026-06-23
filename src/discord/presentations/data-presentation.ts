@@ -1,5 +1,10 @@
 import type { UserDataSnapshot } from '@/core/legal/data-rights.js';
-import { Container, Separator, Text, Title } from '@/discord/components/index.js';
+import {
+  Container,
+  Separator,
+  Text,
+  Title,
+} from '@/discord/components/index.js';
 import { lang } from '@/discord/lang/index.js';
 import { relativeTimestamp } from '@/discord/timestamps.js';
 
@@ -85,7 +90,9 @@ export function buildDataContainer(snapshot: UserDataSnapshot): Container {
   if (snapshot.readMailIds.length === 0 && snapshot.mailNotice === null) {
     container.add(new Text(d.mails.none));
   } else {
-    const mails = new Text(d.mails.read({ count: snapshot.readMailIds.length }));
+    const mails = new Text(
+      d.mails.read({ count: snapshot.readMailIds.length }),
+    );
     if (snapshot.mailNotice) {
       mails.newLine(
         d.mails.notice({

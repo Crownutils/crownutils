@@ -1,4 +1,7 @@
-import { collectUserData, consumeDataAccess } from '@/core/legal/data-rights.js';
+import {
+  collectUserData,
+  consumeDataAccess,
+} from '@/core/legal/data-rights.js';
 import type { Container } from '@/discord/components/index.js';
 import {
   buildDataContainer,
