@@ -24,21 +24,38 @@ const m = lang.commands.legal.messages;
 /** Which legal document is currently displayed in the `/legal` viewer. */
 type LegalDocument = 'privacy' | 'terms';
 
-/** State of the `/legal` viewer: active tab and the user's acceptance date. */
+/**
+ * The viewer's acceptance state: already accepted (with date), still pending,
+ * or exempt (the bot owner never has to accept).
+ */
+export type LegalStatus =
+  | { kind: 'accepted'; at: Date }
+  | { kind: 'pending' }
+  | { kind: 'exempt' };
+
+/** State of the `/legal` viewer: active tab and the user's acceptance status. */
 export interface LegalViewState {
   document: LegalDocument;
-  acceptedAt: Date | null;
+  status: LegalStatus;
 }
 
-function statusLine(acceptedAt: Date | null): string {
-  return acceptedAt
-    ? m.status.accepted({ when: relativeTimestamp(acceptedAt) })
-    : m.status.notAccepted;
+function statusLine(status: LegalStatus): string {
+  switch (status.kind) {
+    case 'accepted':
+      return m.status.accepted({ when: relativeTimestamp(status.at) });
+    case 'pending':
+      return m.status.notAccepted;
+    case 'exempt':
+      return m.status.exempt;
+  }
 }
 
-/** Renders the `/legal` viewer: intro, the selected document, and controls. */
+/** Renders the `/legal` viewer: the selected document as sections, and controls. */
 function renderViewer(state: LegalViewState, disabled: boolean): Container {
   const isPrivacy = state.document === 'privacy';
+  const chapters: readonly { heading: string; body: string }[] = Object.values(
+    isPrivacy ? m.privacy : m.terms,
+  );
 
   const privacyTab = new Button(PRIVACY_BUTTON_ID)
     .label(m.privacyTab)
@@ -54,17 +71,25 @@ function renderViewer(state: LegalViewState, disabled: boolean): Container {
   const container = new Container()
     .color('info')
     .add(
-      new Title(m.title),
+      new Title(isPrivacy ? m.privacyHeading : m.termsHeading),
       new Text(m.intro).size('subtle'),
-      new Separator(),
-      new Title(isPrivacy ? m.privacyHeading : m.termsHeading, 'small'),
-      new Text(isPrivacy ? m.privacyBody : m.termsBody),
-      new Separator(),
-      new Text(statusLine(state.acceptedAt)).size('subtle'),
-      new ActionRow(privacyTab, termsTab),
     );
 
-  if (!state.acceptedAt) {
+  chapters.forEach((chapter, index) => {
+    container.add(
+      new Separator(),
+      new Title(`${index + 1}. ${chapter.heading}`, 'small'),
+      new Text(chapter.body),
+    );
+  });
+
+  container.add(
+    new Separator(),
+    new Text(statusLine(state.status)).size('subtle'),
+    new ActionRow(privacyTab, termsTab),
+  );
+
+  if (state.status.kind === 'pending') {
     const accept = new Button(ACCEPT_BUTTON_ID)
       .label(m.acceptButton)
       .color('success');
@@ -76,23 +101,23 @@ function renderViewer(state: LegalViewState, disabled: boolean): Container {
 }
 
 /** Builds the initial `/legal` viewer (privacy tab), for the first reply. */
-export function buildLegalViewerContainer(acceptedAt: Date | null): Container {
-  return renderViewer({ document: 'privacy', acceptedAt }, false);
+export function buildLegalViewerContainer(status: LegalStatus): Container {
+  return renderViewer({ document: 'privacy', status }, false);
 }
 
 /**
  * Drives the `/legal` viewer: tab buttons switch between the privacy policy and
- * the terms of service, and the accept button records the user's acceptance.
- * Restricted to `userId`.
+ * the terms of service, and the accept button (shown only while pending)
+ * records the user's acceptance. Restricted to `userId`.
  */
 export function attachLegalViewer(
   message: Message,
   userId: string,
-  acceptedAt: Date | null,
+  status: LegalStatus,
 ): void {
   new InteractiveMessage<LegalViewState>(
     message,
-    { document: 'privacy', acceptedAt },
+    { document: 'privacy', status },
     (state, { disabled }) => renderViewer(state, disabled),
     async (interaction, state) => {
       if (!interaction.isButton()) return state;
@@ -102,9 +127,12 @@ export function attachLegalViewer(
       if (interaction.customId === TERMS_BUTTON_ID) {
         return { ...state, document: 'terms' };
       }
-      if (interaction.customId === ACCEPT_BUTTON_ID && !state.acceptedAt) {
+      if (
+        interaction.customId === ACCEPT_BUTTON_ID &&
+        state.status.kind === 'pending'
+      ) {
         await acceptLegal(userId);
-        return { ...state, acceptedAt: new Date() };
+        return { ...state, status: { kind: 'accepted', at: new Date() } };
       }
       return state;
     },

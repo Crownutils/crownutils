@@ -6,12 +6,20 @@ import type { CommandLang } from './types.js';
 export const data = {
   commandDescription:
     'Consulter les données personnelles que le bot conserve à votre sujet.',
+  options: {
+    user: 'L’utilisateur dont consulter les données (réservé au propriétaire).',
+  },
   messages: {
     title: `${icons.shield} Vos données`,
+    titleOther: ({ user }: { user: string }): string =>
+      `${icons.shield} Données de ${user}`,
     intro:
       'Voici l’ensemble des données que Crownutils conserve à votre sujet.',
+    introOther:
+      'Voici l’ensemble des données conservées au sujet de cet utilisateur.',
     empty:
       "Aucune donnée personnelle n'est actuellement conservée à votre sujet.",
+    emptyOther: 'Aucune donnée n’est conservée au sujet de cet utilisateur.',
     cooldown: ({ when }: { when: string }): string =>
       `${icons.warning} Vous avez récemment demandé l'accès à vos données. Vous pourrez en faire une nouvelle demande ${when}.`,
     legal: {
@@ -24,6 +32,7 @@ export const data = {
         when: string;
       }): string => `Acceptée (version ${version}) ${when}.`,
       none: 'Non acceptée.',
+      exempt: 'Exempté (acceptation non requise).',
     },
     reminders: {
       title: 'Rappels',

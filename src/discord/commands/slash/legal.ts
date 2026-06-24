@@ -18,10 +18,8 @@ export const command = {
   },
 
   async execute(interaction) {
-    const { container, acceptedAt } = await runLegalCommand(
-      interaction.user.id,
-    );
+    const { container, status } = await runLegalCommand(interaction.user.id);
     const reply = await replyAndFetch(interaction, container.build());
-    attachLegalViewer(reply, interaction.user.id, acceptedAt);
+    attachLegalViewer(reply, interaction.user.id, status);
   },
 } satisfies SlashCommand;

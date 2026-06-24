@@ -27,13 +27,33 @@ export function buildDataCooldownContainer(nextEligibleAt: Date): Container {
     .add(new Text(d.cooldown({ when: relativeTimestamp(nextEligibleAt) })));
 }
 
+/** Options controlling whose data is shown and how. */
+export interface DataViewOptions {
+  /** Mention of the target user when an owner inspects someone else's data. */
+  mention?: string;
+  /** Whether the target is exempt from accepting the legal documents (owner). */
+  exempt?: boolean;
+}
+
 /** Renders the data-access export: every stored item grouped by category. */
-export function buildDataContainer(snapshot: UserDataSnapshot): Container {
+export function buildDataContainer(
+  snapshot: UserDataSnapshot,
+  options: DataViewOptions = {},
+): Container {
+  const { mention, exempt = false } = options;
+
   const container = new Container()
     .color('info')
-    .add(new Title(d.title), new Text(d.intro).size('subtle'), new Separator());
+    .add(
+      new Title(
+        mention === undefined ? d.title : d.titleOther({ user: mention }),
+      ),
+      new Text(mention === undefined ? d.intro : d.introOther).size('subtle'),
+      new Separator(),
+    );
 
   const hasData =
+    exempt ||
     snapshot.reminders.length > 0 ||
     snapshot.pathfinderUsage !== null ||
     snapshot.readMailIds.length > 0 ||
@@ -41,20 +61,20 @@ export function buildDataContainer(snapshot: UserDataSnapshot): Container {
     snapshot.legalAcceptance !== null;
 
   if (!hasData) {
-    return container.add(new Text(d.empty));
+    return container.add(
+      new Text(mention === undefined ? d.empty : d.emptyOther),
+    );
   }
 
-  container.add(
-    new Title(d.legal.title, 'small'),
-    new Text(
-      snapshot.legalAcceptance
-        ? d.legal.accepted({
-            version: snapshot.legalAcceptance.acceptedVersion,
-            when: relativeTimestamp(snapshot.legalAcceptance.acceptedAt),
-          })
-        : d.legal.none,
-    ),
-  );
+  const legalText = exempt
+    ? d.legal.exempt
+    : snapshot.legalAcceptance
+      ? d.legal.accepted({
+          version: snapshot.legalAcceptance.acceptedVersion,
+          when: relativeTimestamp(snapshot.legalAcceptance.acceptedAt),
+        })
+      : d.legal.none;
+  container.add(new Title(d.legal.title, 'small'), new Text(legalText));
 
   container.add(new Separator(), new Title(d.reminders.title, 'small'));
   if (snapshot.reminders.length === 0) {
@@ -115,5 +135,8 @@ export function buildDataContainer(snapshot: UserDataSnapshot): Container {
     );
   }
 
-  return container.add(new Separator(), new Text(d.footer).size('subtle'));
+  if (mention === undefined) {
+    container.add(new Separator(), new Text(d.footer).size('subtle'));
+  }
+  return container;
 }

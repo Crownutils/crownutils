@@ -16,8 +16,8 @@ export const command = {
   },
 
   async execute(message, _args) {
-    const { container, acceptedAt } = await runLegalCommand(message.author.id);
+    const { container, status } = await runLegalCommand(message.author.id);
     const sent = await message.reply(container.build());
-    attachLegalViewer(sent, message.author.id, acceptedAt);
+    attachLegalViewer(sent, message.author.id, status);
   },
 } satisfies PrefixCommand;

@@ -36,8 +36,9 @@ export interface CommandPipelineHandlers {
 /**
  * Shared dispatch sequence for prefix and slash commands: maintenance check,
  * then legal acceptance, then permission requirements, then execution with
- * error handling. Owners bypass the maintenance check; everyone must accept the
- * legal documents, except for the {@link LEGAL_GATE_EXEMPT_COMMANDS}.
+ * error handling. Owners bypass both the maintenance check and the legal gate;
+ * everyone else must accept the legal documents, except for the
+ * {@link LEGAL_GATE_EXEMPT_COMMANDS}.
  */
 export async function runCommandPipeline(
   context: CommandPipelineContext,
@@ -51,6 +52,7 @@ export async function runCommandPipeline(
   }
 
   if (
+    userAuthorization !== 'owner' &&
     !LEGAL_GATE_EXEMPT_COMMANDS.has(context.commandName) &&
     !(await hasAcceptedLegal(context.userId))
   ) {

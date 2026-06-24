@@ -7,16 +7,23 @@ import type { SlashCommand } from '@/discord/types/command.js';
 export const command = {
   data: new SlashCommandBuilder()
     .setName('data')
-    .setDescription(lang.commands.data.commandDescription),
+    .setDescription(lang.commands.data.commandDescription)
+    .addUserOption((option) =>
+      option
+        .setName('user')
+        .setDescription(lang.commands.data.options.user)
+        .setRequired(false),
+    ),
   requirements: {
     scope: 'everywhere',
   },
   help: {
-    usageSlash: '/data',
+    usageSlash: '/data [user]',
   },
 
   async execute(interaction) {
-    const container = await runDataCommand(interaction.user.id);
+    const target = interaction.options.getUser('user');
+    const container = await runDataCommand(interaction.user.id, target?.id);
     await interaction.reply(container.build());
   },
 } satisfies SlashCommand;
