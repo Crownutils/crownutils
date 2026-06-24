@@ -8,10 +8,15 @@ import type {
   CommandRequirements,
 } from '@/core/permissions/types.js';
 import { isMaintenanceEnabled } from '@/core/maintenance/maintenance-repository.js';
+import {
+  LEGAL_GATE_EXEMPT_COMMANDS,
+  hasAcceptedLegal,
+} from '@/core/legal/legal-repository.js';
 
-/** Identifies the invoking user and where the command was invoked from. */
+/** Identifies the invoking user, the command, and where it was invoked from. */
 export interface CommandPipelineContext {
   userId: string;
+  commandName: string;
   guildId: string | null;
   requirements?: CommandRequirements;
 }
@@ -20,6 +25,8 @@ export interface CommandPipelineContext {
 export interface CommandPipelineHandlers {
   execute: () => Promise<void>;
   onMaintenance: () => Promise<unknown>;
+  /** Runs when the user hasn't accepted the legal documents yet. */
+  onLegalNotAccepted: () => Promise<unknown>;
   onPermissionDenied: (errors: CommandPermissionError[]) => Promise<unknown>;
   onUnexpectedError: (error: unknown) => Promise<unknown>;
   /** Runs after a successful `execute` (e.g. the unread-mail reminder). */
@@ -28,8 +35,10 @@ export interface CommandPipelineHandlers {
 
 /**
  * Shared dispatch sequence for prefix and slash commands: maintenance check,
- * then permission requirements, then execution with error handling. Owners
- * bypass the maintenance check.
+ * then legal acceptance, then permission requirements, then execution with
+ * error handling. Owners bypass both the maintenance check and the legal gate;
+ * everyone else must accept the legal documents, except for the
+ * {@link LEGAL_GATE_EXEMPT_COMMANDS}.
  */
 export async function runCommandPipeline(
   context: CommandPipelineContext,
@@ -39,6 +48,15 @@ export async function runCommandPipeline(
 
   if (userAuthorization !== 'owner' && (await isMaintenanceEnabled())) {
     await handlers.onMaintenance();
+    return;
+  }
+
+  if (
+    userAuthorization !== 'owner' &&
+    !LEGAL_GATE_EXEMPT_COMMANDS.has(context.commandName) &&
+    !(await hasAcceptedLegal(context.userId))
+  ) {
+    await handlers.onLegalNotAccepted();
     return;
   }
 
