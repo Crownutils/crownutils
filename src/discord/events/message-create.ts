@@ -10,6 +10,10 @@ import {
 import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
 import { lang } from '@/discord/lang/index.js';
 import { remindUnreadMails } from '@/discord/mails/unread-reminder.js';
+import {
+  attachLegalGate,
+  buildLegalGateContainer,
+} from '@/discord/presentations/legal-presentation.js';
 import { PREFIX } from '@/discord/constants.js';
 
 /**
@@ -40,6 +44,7 @@ export const event = {
     await runCommandPipeline(
       {
         userId: message.author.id,
+        commandName: command.name,
         guildId: message.guildId,
         requirements: command.requirements,
       },
@@ -54,6 +59,13 @@ export const event = {
             message.reply(buildErrorContainer(lang.errors.maintenance).build()),
             'message-create.maintenance',
           ),
+        onLegalNotAccepted: async () => {
+          const sent = await safeDiscord(
+            message.reply(buildLegalGateContainer().build()),
+            'message-create.legalGate',
+          );
+          if (sent) attachLegalGate(sent, message.author.id);
+        },
         onPermissionDenied: (errors) =>
           message.reply(buildCommandPermissionsErrorContainer(errors).build()),
         onUnexpectedError: (error) => {

@@ -32,6 +32,6 @@ export const mails = {
     noTitle: 'Sans titre',
     sentAt: ({ when }: { when: string }) => `Publié ${when}`,
     unreadNotice: ({ count }: { count: number }) =>
-      `${icons.mailbox} Vous avez ${md.bold(`${count} message(s) non lu(s)`)}. Consultez-les avec ${md.code('/mails')}.`,
+      `${icons.mailbox} Vous avez ${md.bold(`${count} mail(s) non lu(s)`)}. Consultez-les avec ${md.code('mails')}.`,
   },
 } as const satisfies CommandLang;

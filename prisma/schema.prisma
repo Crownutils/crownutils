@@ -51,3 +51,19 @@ model MailNotice {
   userId         String   @id
   lastNotifiedAt DateTime
 }
+
+// Records that a user accepted the legal documents. A single acceptance is
+// enough; the row stores which version was accepted and when. Deleting it (via
+// the erasure command) re-locks the bot until the user accepts again.
+model LegalAcceptance {
+  userId          String   @id
+  acceptedVersion String
+  acceptedAt      DateTime @default(now())
+}
+
+// Anti-abuse throttle for the data-access (export) command: at most one request
+// per user every 31 days.
+model DataAccessUsage {
+  userId          String   @id
+  lastRequestedAt DateTime
+}

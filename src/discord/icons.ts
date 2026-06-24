@@ -12,4 +12,9 @@ export const icons = {
   wrench: '🔧',
   mailbox: '📬',
   mailboxRead: '📭',
+  scroll: '📜',
+  shield: '🛡️',
+  lock: '🔒',
+  check: '✅',
+  warning: '⚠️',
 } as const satisfies Record<string, string>;
