@@ -5,9 +5,9 @@ import { countReminders } from './reminder-repository.js';
 /** Duration used when a reminder is created without an explicit duration. */
 export const DEFAULT_REMINDER_DURATION = '9m45s';
 /** Maximum number of simultaneous reminders for users in `env.privilegedIds`. */
-export const MAX_REMINDER_PER_PRIVILEGED_USER = 5;
+const MAX_REMINDER_PER_PRIVILEGED_USER = 5;
 /** Maximum number of simultaneous reminders for non-privileged users. */
-export const MAX_REMINDERS_PER_USER = 3;
+const MAX_REMINDERS_PER_USER = 3;
 
 /** Reason `validateReminderInput` rejected a reminder request. */
 export type ReminderInputError =
