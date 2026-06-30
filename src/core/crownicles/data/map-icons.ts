@@ -1,4 +1,4 @@
-import { fetchCrowniclesText } from './source.js';
+import { cachedPromise, fetchCrowniclesText } from './source.js';
 
 /** Map of location type key (e.g. `vi`, `ci`, `fo`) to its Unicode emote. */
 export type MapTypeIcons = Record<string, string>;
@@ -7,8 +7,6 @@ const ICONS_SOURCE_PATH = 'Lib/src/CrowniclesIcons.ts';
 
 /** Matches `<typeKey>: "<emote>"` pairs inside the `mapTypes` block. */
 const ICON_PAIR = /(\w+):\s*"((?:[^"\\]|\\.)*)"/g;
-
-let iconsPromise: Promise<MapTypeIcons> | undefined;
 
 /**
  * Extracts the `{ typeKey: emote }` map from the `mapTypes` block of the icons
@@ -45,12 +43,8 @@ function parseMapTypeIcons(valueObject: string): MapTypeIcons {
  * failure so the next call retries. The leading type declaration is dropped by
  * splitting on the object literal's `} = {`, mirroring the item icon loader.
  */
-export function loadMapTypeIcons(): Promise<MapTypeIcons> {
-  iconsPromise ??= fetchCrowniclesText(ICONS_SOURCE_PATH)
-    .then((source) => parseMapTypeIcons(source.split('} = {')[1] ?? source))
-    .catch((error: unknown) => {
-      iconsPromise = undefined;
-      throw error;
-    });
-  return iconsPromise;
-}
+export const loadMapTypeIcons = cachedPromise<MapTypeIcons>(() =>
+  fetchCrowniclesText(ICONS_SOURCE_PATH).then((source) =>
+    parseMapTypeIcons(source.split('} = {')[1] ?? source),
+  ),
+);

@@ -1,5 +1,5 @@
 import { ITEM_CATEGORIES, type ItemCategory } from './items.js';
-import { fetchCrowniclesText } from './source.js';
+import { cachedPromise, fetchCrowniclesText } from './source.js';
 
 /** Per-category map of item id (as string) to its Unicode emote. */
 export type ItemIcons = Record<ItemCategory, Record<string, string>>;
@@ -8,8 +8,6 @@ const ICONS_SOURCE_PATH = 'Lib/src/CrowniclesIcons.ts';
 
 /** Matches `<id>: "<emote>"` pairs inside a category block. */
 const ICON_PAIR = /(\d+):\s*"((?:[^"\\]|\\.)*)"/g;
-
-let iconsPromise: Promise<ItemIcons> | undefined;
 
 /**
  * Extracts the `{ id: emote }` map of one category from the icons source.
@@ -60,12 +58,6 @@ function parseItemIcons(source: string): ItemIcons {
 }
 
 /** Loads and caches the item-icon maps once; the promise is evicted on failure. */
-export function loadItemIcons(): Promise<ItemIcons> {
-  iconsPromise ??= fetchCrowniclesText(ICONS_SOURCE_PATH)
-    .then(parseItemIcons)
-    .catch((error: unknown) => {
-      iconsPromise = undefined;
-      throw error;
-    });
-  return iconsPromise;
-}
+export const loadItemIcons = cachedPromise(() =>
+  fetchCrowniclesText(ICONS_SOURCE_PATH).then(parseItemIcons),
+);

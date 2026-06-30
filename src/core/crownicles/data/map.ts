@@ -1,5 +1,6 @@
 import { loadMapTypeIcons } from './map-icons.js';
 import {
+  cachedPromise,
   fetchCrowniclesJson,
   listCrowniclesDir,
   mapWithConcurrency,
@@ -48,7 +49,6 @@ interface RawCrowniclesMapLink {
 type CrowniclesMapLocationNames = Record<string, { name?: string }>;
 
 const HTTP_CONCURRENCY = 10;
-let mapPromise: Promise<CrowniclesMap> | undefined;
 
 /** Parses `<id>.json` file names into a sorted list of numeric ids. */
 function numericIds(fileNames: readonly string[]): number[] {
@@ -117,17 +117,10 @@ async function loadCrowniclesMap(): Promise<CrowniclesMap> {
  * and cached for the process lifetime. A failed load is not cached, so the next
  * call retries.
  */
-export function getCrowniclesMapGraph(): Promise<CrowniclesMap> {
-  mapPromise ??= loadCrowniclesMap().catch((error: unknown) => {
-    mapPromise = undefined;
-    throw error;
-  });
-
-  return mapPromise;
-}
+export const getCrowniclesMapGraph =
+  cachedPromise<CrowniclesMap>(loadCrowniclesMap);
 
 const CONTINENT_ATTRIBUTE = 'continent1';
-let continentPromise: Promise<CrowniclesMap> | undefined;
 
 /** Returns the largest connected component among `nodeIds`, found by BFS. */
 function largestComponent(
@@ -172,31 +165,24 @@ function largestComponent(
  * largest connected component so isolated stray nodes are dropped. Cached like
  * {@link getCrowniclesMapGraph}.
  */
-export function getContinentGraph(): Promise<CrowniclesMap> {
-  continentPromise ??= getCrowniclesMapGraph()
-    .then((map) => {
-      const continentIds = new Set(
-        map.locations
-          .filter((l) => l.attribute === CONTINENT_ATTRIBUTE)
-          .map((l) => l.id),
-      );
+export const getContinentGraph = cachedPromise<CrowniclesMap>(() =>
+  getCrowniclesMapGraph().then((map) => {
+    const continentIds = new Set(
+      map.locations
+        .filter((l) => l.attribute === CONTINENT_ATTRIBUTE)
+        .map((l) => l.id),
+    );
 
-      const continentLinks = map.links.filter(
-        (l) => continentIds.has(l.startMap) && continentIds.has(l.endMap),
-      );
-      const main = largestComponent(continentIds, continentLinks);
+    const continentLinks = map.links.filter(
+      (l) => continentIds.has(l.startMap) && continentIds.has(l.endMap),
+    );
+    const main = largestComponent(continentIds, continentLinks);
 
-      return {
-        locations: map.locations.filter((l) => main.has(l.id)),
-        links: continentLinks.filter(
-          (l) => main.has(l.startMap) && main.has(l.endMap),
-        ),
-      };
-    })
-    .catch((error: unknown) => {
-      continentPromise = undefined;
-      throw error;
-    });
-
-  return continentPromise;
-}
+    return {
+      locations: map.locations.filter((l) => main.has(l.id)),
+      links: continentLinks.filter(
+        (l) => main.has(l.startMap) && main.has(l.endMap),
+      ),
+    };
+  }),
+);
