@@ -9,7 +9,8 @@ import type { CommandAuthorization } from '@/core/permissions/types.js';
 
 /** Custom id of the `/help` command select menu. */
 export const HELP_SELECT_ID = 'help-select';
-const MAIN_MENU = 'Menu Principal';
+/** Stable value of the "main menu" select option (the displayed label lives in `lang`). */
+const MAIN_MENU_VALUE = 'main-menu';
 
 interface CommandDescription {
   name: string;
@@ -63,7 +64,10 @@ export function buildHelpContainer(
     lang.commands.help.messages.selectMenu.placeholder,
   );
 
-  selectMenu.option(MAIN_MENU, MAIN_MENU);
+  selectMenu.option(
+    lang.commands.help.messages.selectMenu.mainMenu,
+    MAIN_MENU_VALUE,
+  );
   for (const command of visibleCommands) {
     if ('data' in command) {
       selectMenu.option(
@@ -81,7 +85,7 @@ export function buildHelpContainer(
   }
 
   const selected =
-    selectedCommand && selectedCommand !== MAIN_MENU
+    selectedCommand && selectedCommand !== MAIN_MENU_VALUE
       ? visibleCommands.find(
           (command) =>
             ('data' in command ? command.data.name : command.name) ===
@@ -107,7 +111,7 @@ export function buildHelpContainer(
 
   const components: V2Component[] = [new Title(title), new Text(description)];
 
-  if (!selectedCommand || selectedCommand === MAIN_MENU) {
+  if (!selectedCommand || selectedCommand === MAIN_MENU_VALUE) {
     components.push(new Text(lang.commands.help.messages.myPrefix).quote());
   }
 
