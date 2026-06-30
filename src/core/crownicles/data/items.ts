@@ -1,6 +1,7 @@
 import { computeMainItemStats } from '../calculators/items.js';
 import { loadItemIcons } from './item-icons.js';
 import {
+  cachedPromise,
   fetchCrowniclesJson,
   listCrowniclesDir,
   mapWithConcurrency,
@@ -14,6 +15,7 @@ export const ITEM_CATEGORIES = [
   'potions',
 ] as const;
 
+/** One of the four Crownicles item categories. */
 export type ItemCategory = (typeof ITEM_CATEGORIES)[number];
 
 /**
@@ -61,19 +63,13 @@ type ItemNames = Record<ItemCategory, Record<string, string>>;
 
 const HTTP_CONCURRENCY = 10;
 
-let namesPromise: Promise<ItemNames> | undefined;
-const itemsPromises = new Map<ItemCategory, Promise<CrowniclesItem[]>>();
-
 /** Loads the item name maps once; the promise is cached, evicted on failure. */
-function loadNames(): Promise<ItemNames> {
-  namesPromise ??= fetchCrowniclesJson<ItemNames>('Lang/fr/models.json').catch(
-    (error: unknown) => {
-      namesPromise = undefined;
-      throw error;
-    },
-  );
-  return namesPromise;
-}
+const loadNames = cachedPromise(() =>
+  fetchCrowniclesJson<ItemNames>('Lang/fr/models.json'),
+);
+
+/** Per-category memoized loaders, so each category is fetched at most once. */
+const itemsLoaders = new Map<ItemCategory, () => Promise<CrowniclesItem[]>>();
 
 /** Merges a raw stat file, a name and an icon into a `CrowniclesItem`. */
 function toItem(
@@ -134,13 +130,10 @@ async function loadCategory(category: ItemCategory): Promise<CrowniclesItem[]> {
  * the next call retries.
  */
 export function getItems(category: ItemCategory): Promise<CrowniclesItem[]> {
-  let promise = itemsPromises.get(category);
-  if (!promise) {
-    promise = loadCategory(category).catch((error: unknown) => {
-      itemsPromises.delete(category);
-      throw error;
-    });
-    itemsPromises.set(category, promise);
+  let load = itemsLoaders.get(category);
+  if (!load) {
+    load = cachedPromise(() => loadCategory(category));
+    itemsLoaders.set(category, load);
   }
-  return promise;
+  return load();
 }

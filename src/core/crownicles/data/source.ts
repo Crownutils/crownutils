@@ -72,3 +72,17 @@ export async function mapWithConcurrency<T, R>(
   await Promise.all(workers);
   return results;
 }
+
+/**
+ * Memoizes the promise returned by `load`: the result is cached for the process
+ * lifetime and concurrent callers share the in-flight promise, but a *rejected*
+ * load is evicted so the next call retries.
+ */
+export function cachedPromise<T>(load: () => Promise<T>): () => Promise<T> {
+  let promise: Promise<T> | undefined;
+  return () =>
+    (promise ??= load().catch((error: unknown) => {
+      promise = undefined;
+      throw error;
+    }));
+}

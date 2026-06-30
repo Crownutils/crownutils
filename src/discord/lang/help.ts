@@ -9,7 +9,7 @@ export const help = {
     title: `Crownutils`,
     welcome:
       "Bienvenue sur l'aide de Crownutils, vous trouverez ici toutes les commandes disponibles.",
-    myPrefix: `Le préfixe pour mes commandes est ${md.code(PREFIX)} mais tu peux aussi utiliser les commandes slashs !`,
+    myPrefix: `Le préfixe pour mes commandes est ${md.code(PREFIX)} mais vous pouvez aussi utiliser les commandes slashs !`,
     usageTitle: 'Usage',
     usage: (help: string) => `${md.code(help)}`,
     prefixAliasesTitle: 'Alias',

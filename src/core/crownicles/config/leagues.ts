@@ -1,3 +1,4 @@
+/** One Crownicles league: identity, display, and its end-of-season bonuses. */
 export interface CrowniclesLeague {
   id: string;
   name: string;
@@ -8,6 +9,7 @@ export interface CrowniclesLeague {
   moneyBonus: number;
 }
 
+/** The Crownicles leagues, from lowest to highest (also their display order). */
 export const CROWNICLES_LEAGUES: readonly CrowniclesLeague[] = [
   {
     id: 'wood',

@@ -15,6 +15,7 @@ export type ReminderInputError =
   | 'duration_too_long'
   | 'limit_reached';
 
+/** Outcome of {@link validateReminderInput}: the fire date, or a rejection reason. */
 export type ValidateReminderInputResult =
   | { ok: true; triggerAt: Date }
   | { ok: false; error: ReminderInputError };

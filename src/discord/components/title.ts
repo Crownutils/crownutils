@@ -2,6 +2,7 @@ import type { TextDisplayBuilder } from 'discord.js';
 import type { TextComponent } from './component.js';
 import { Text } from './text.js';
 
+/** Heading level of a {@link Title}. */
 export type TitleSize = 'small' | 'medium' | 'large';
 
 /** A {@link Text} preset as a Markdown heading; defaults to `'medium'`. */
