@@ -1,7 +1,6 @@
 import type { Channel } from 'discord.js';
 import { getUnreadNotice } from '@/core/mails/mail-repository.js';
-import { hasAcceptedLegal } from '@/core/legal/legal-repository.js';
-import { resolveAuthorization } from '@/core/permissions/index.js';
+import { mustAcceptLegal } from '@/core/legal/legal-repository.js';
 import { buildUnreadNoticeContainer } from '@/discord/presentations/mail-presentation.js';
 import { logger } from '@/shared/logger.js';
 
@@ -20,10 +19,7 @@ export async function remindUnreadMails(
     if (!channel?.isSendable()) {
       return;
     }
-    if (
-      resolveAuthorization(userId) !== 'owner' &&
-      !(await hasAcceptedLegal(userId))
-    ) {
+    if (await mustAcceptLegal(userId)) {
       return;
     }
     const count = await getUnreadNotice(userId);
