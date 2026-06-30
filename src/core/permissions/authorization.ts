@@ -19,6 +19,11 @@ export function resolveAuthorization(userId: string): CommandAuthorization {
   }
 }
 
+/** Whether `userId` is the bot owner. */
+export function isOwner(userId: string): boolean {
+  return userId === env.ownerId;
+}
+
 /** Returns whether `userAuthorization` meets or exceeds `requiredAuthorization`. */
 export function isAuthorizationAllowed(
   requiredAuthorization: CommandAuthorization,

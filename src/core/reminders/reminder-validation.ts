@@ -1,4 +1,5 @@
 import { env } from '@/core/config/index.js';
+import { isOwner } from '@/core/permissions/index.js';
 import { MAX_TIMEOUT_MS, parseDurationMs } from '@/core/time/index.js';
 import { countReminders } from './reminder-repository.js';
 
@@ -50,7 +51,7 @@ export async function validateReminderInput(
     return { ok: false, error: 'duration_too_long' };
   }
 
-  if (userId !== env.ownerId) {
+  if (!isOwner(userId)) {
     const maxReminders = getMaxRemindersForUser(userId);
     const reminderCount = await countReminders(userId);
     if (reminderCount >= maxReminders) {
