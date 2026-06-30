@@ -142,6 +142,7 @@ function renderPathfinder(state: HelpState, ctx: HelpRenderContext): Container {
   return container.add(new Separator(), buildNavSelect(ctx));
 }
 
+/** Pathfinder page: pick a departure and destination, get the shortest route. */
 export const pathfinderPage = {
   id: PATHFINDER_PAGE_ID,
   name,

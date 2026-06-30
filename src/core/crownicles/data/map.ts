@@ -6,9 +6,7 @@ import {
   mapWithConcurrency,
 } from './source.js';
 
-/**
- * Locations of Crownicles
- */
+/** A location on the Crownicles map: a node of the travel graph. */
 export interface CrowniclesMapLocation {
   id: number;
   name: string;
@@ -18,18 +16,14 @@ export interface CrowniclesMapLocation {
   icon: string | undefined;
 }
 
-/**
- * Link between 2 {@link CrowniclesMapLocation}
- */
+/** A travel link between two locations, weighted by its trip duration. */
 export interface CrowniclesMapLink {
   startMap: number;
   endMap: number;
   tripDurationMin: number;
 }
 
-/**
- * Crownicles map
- */
+/** The Crownicles map as a graph: its locations and the links between them. */
 export interface CrowniclesMap {
   locations: CrowniclesMapLocation[];
   links: CrowniclesMapLink[];
@@ -146,7 +140,6 @@ function largestComponent(
     const queue = [node];
     visited.add(node);
     while (queue.length > 0) {
-      // BFS
       const current = queue.shift()!;
       for (const next of adjacency.get(current) ?? []) {
         if (!nodeIds.has(next) || visited.has(next)) continue;

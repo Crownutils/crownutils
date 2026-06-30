@@ -22,6 +22,7 @@ const VIEWER_IDLE_MS = 120_000;
 const MAILS_PER_PAGE = 5;
 const PREVIEW_LENGTH = 140;
 
+/** Custom ids of the `/mail` modal and its fields, shared with the command handler. */
 export const MAIL_MODAL_ID = 'mail-modal';
 export const MAIL_TITLE_INPUT_ID = 'mail-title';
 export const MAIL_BODY_INPUT_ID = 'mail-body';

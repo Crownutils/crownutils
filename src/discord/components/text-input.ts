@@ -1,5 +1,6 @@
 import { LabelBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
+/** Text-input style: single-line (`short`) or multi-line (`paragraph`). */
 export type TextInputStyleName = 'short' | 'paragraph';
 
 const TEXT_INPUT_STYLES = {

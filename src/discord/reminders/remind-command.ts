@@ -9,6 +9,7 @@ import {
   getMaxRemindersForUser,
 } from '@/discord/reminders/reminder-bridge.js';
 
+/** Result of {@link runRemindCommand}: the container to show, plus the reminder when created. */
 export interface RemindCommandResult {
   container: Container;
   /** Present only when the reminder was created successfully. */

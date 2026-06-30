@@ -6,9 +6,9 @@ import type { HelpPage } from '../page.js';
 /** Id of the help center home page; the menu's entry point. */
 export const HOME_PAGE_ID = 'home';
 
-/** Home page: welcome text, navigation select, and an authorization notice when some pages are hidden. */
 const { name, description } = lang.commands.crowniclesHelp.pages.home;
 
+/** Home page: welcome text, navigation select, and a notice when pages are hidden. */
 export const homePage = {
   id: HOME_PAGE_ID,
   name,

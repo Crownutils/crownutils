@@ -15,6 +15,7 @@ export const ITEM_CATEGORIES = [
   'potions',
 ] as const;
 
+/** One of the four Crownicles item categories. */
 export type ItemCategory = (typeof ITEM_CATEGORIES)[number];
 
 /**

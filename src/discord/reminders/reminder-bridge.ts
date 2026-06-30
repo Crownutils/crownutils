@@ -25,6 +25,7 @@ export {
   getMaxRemindersForUser,
 } from '@/core/reminders/reminder-validation.js';
 
+/** Outcome of {@link createReminderFromInput}: the persisted reminder, or why it was rejected. */
 export type CreateReminderResult =
   | { ok: true; reminder: Reminder }
   | { ok: false; error: ReminderInputError };

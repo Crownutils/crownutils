@@ -25,15 +25,15 @@ export interface HelpState {
   itemRarity?: number;
   /** Zero-based pagination index on the equipment page. */
   itemPage?: number;
-  /** Continent map ; undefined during loading. */
+  /** The continent graph; undefined while it is being fetched. */
   pathMap?: CrowniclesMap;
-  /** true if the last map load failed */
+  /** True if the last continent-graph load failed, so the page can show an error. */
   pathMapError?: boolean;
-  /** Type selected */
+  /** Location type selected for the current departure/destination pick. */
   pathType?: string;
-  /** Location start */
+  /** Chosen departure location id; undefined until picked. */
   pathFromId?: number;
-  /** Destination choosed */
+  /** Chosen destination location id; undefined until picked. */
   pathToId?: number;
   /** True once the user hit the daily pathfinder limit; shows the limit notice. */
   pathLimitReached?: boolean;

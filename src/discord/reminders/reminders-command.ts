@@ -3,6 +3,7 @@ import type { Container } from '@/discord/components/index.js';
 import { buildReminderListContainer } from '@/discord/presentations/reminder-presentation.js';
 import { listReminders } from '@/discord/reminders/reminder-bridge.js';
 
+/** Result of {@link runRemindersCommand}: the list container and the reminders it shows. */
 export interface RemindersCommandResult {
   container: Container;
   reminders: Reminder[];
