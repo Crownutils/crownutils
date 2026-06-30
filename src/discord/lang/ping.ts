@@ -7,7 +7,7 @@ export const ping = {
   messages: {
     title: `${icons.pingPong} Pong`,
     calculating: 'Calcul en cours...',
-    totalLatence: (latence: number) => `Latence total : ${latence}`,
-    discordLatence: (latence: number) => `Latence Discord : ${latence}`,
+    totalLatency: (latency: number) => `Latence totale : ${latency}`,
+    discordLatency: (latency: number) => `Latence Discord : ${latency}`,
   },
 } as const satisfies CommandLang;
