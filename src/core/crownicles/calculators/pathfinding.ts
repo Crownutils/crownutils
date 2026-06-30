@@ -1,9 +1,4 @@
-/** A bidirectional trip between two locations, weighted by its duration. */
-export interface MapEdge {
-  startMap: number;
-  endMap: number;
-  tripDurationMin: number;
-}
+import type { CrowniclesMapLink } from '../data/map.js';
 
 /** A route: ordered location ids from start to end, with its total duration. */
 export interface ShortestPath {
@@ -16,7 +11,7 @@ export interface ShortestPath {
  * treated as bidirectional. Returns `undefined` if `end` is unreachable.
  */
 export function findShortestPath(
-  edges: readonly MapEdge[],
+  edges: readonly CrowniclesMapLink[],
   start: number,
   end: number,
 ): ShortestPath | undefined {
