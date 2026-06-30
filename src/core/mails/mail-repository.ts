@@ -1,6 +1,6 @@
 import type { Mail } from '@/core/persistence/prisma/client.js';
 import { prisma } from '@/core/persistence/client.js';
-import { isSameUtcDay } from '@/core/time/index.js';
+import { isSameUtcDay, utcDayKey } from '@/core/time/index.js';
 
 /** Mails are auto-deleted two weeks after creation. */
 export const MAIL_TTL_MS = 14 * 24 * 60 * 60 * 1000;
@@ -20,11 +20,6 @@ let activeMailsCache: Mail[] | undefined;
  */
 const handledToday = new Map<string, string>();
 let handledCacheDay: string | undefined;
-
-/** UTC calendar-day key (`YYYY-M-D`), used to throttle the daily unread reminder. */
-function utcDayKey(date: Date): string {
-  return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
-}
 
 /** Oldest `createdAt` a mail can keep without being expired. */
 function expiryCutoff(now: Date): Date {

@@ -40,3 +40,8 @@ export function isSameUtcDay(a: Date, b: Date): boolean {
     a.getUTCDate() === b.getUTCDate()
   );
 }
+
+/** UTC calendar-day key (`YYYY-M-D`) for grouping or de-duplicating dates by day. */
+export function utcDayKey(date: Date): string {
+  return `${date.getUTCFullYear()}-${date.getUTCMonth()}-${date.getUTCDate()}`;
+}
