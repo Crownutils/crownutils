@@ -8,7 +8,7 @@ import { lang } from '@/discord/lang/index.js';
 import { buildNavSelect } from '../nav.js';
 import type { HelpPage } from '../page.js';
 
-export const RAGE_PAGE_ID = 'rage';
+const RAGE_PAGE_ID = 'rage';
 
 const RAGE_ICON = '🤬';
 

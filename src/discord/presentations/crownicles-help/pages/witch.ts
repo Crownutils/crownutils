@@ -8,7 +8,7 @@ import { lang } from '@/discord/lang/index.js';
 import { buildNavSelect } from '../nav.js';
 import type { HelpPage } from '../page.js';
 
-export const WITCH_PAGE_ID = 'witch';
+const WITCH_PAGE_ID = 'witch';
 
 const WITCH_ICON = '🕸️';
 

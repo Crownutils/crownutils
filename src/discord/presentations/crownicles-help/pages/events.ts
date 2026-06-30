@@ -8,7 +8,7 @@ import { lang } from '@/discord/lang/index.js';
 import { buildNavSelect } from '../nav.js';
 import type { HelpPage } from '../page.js';
 
-export const EVENTS_PAGE_ID = 'events';
+const EVENTS_PAGE_ID = 'events';
 
 const EVENTS_ICON = '🎭';
 

@@ -24,7 +24,7 @@ import {
 import { buildNavSelect } from '../nav.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 
-export const ITEMS_PAGE_ID = 'items';
+const ITEMS_PAGE_ID = 'items';
 
 const ITEMS_ICON = '🎒';
 const CATEGORY_SELECT_ID = 'crownicles-help-items-category';

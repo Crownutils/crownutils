@@ -19,7 +19,7 @@ import { LOCATION_TYPE_ICONS } from '../icons.js';
 import { buildNavSelect } from '../nav.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 
-export const PATHFINDER_PAGE_ID = 'pathfinder';
+const PATHFINDER_PAGE_ID = 'pathfinder';
 
 const PATHFINDER_ICON = '🧭';
 const TYPE_SELECT_ID = 'crownicles-help-path-type';
