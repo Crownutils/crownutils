@@ -1,9 +1,11 @@
 import { loadMapTypeIcons } from './map-icons.js';
 import {
+  HTTP_CONCURRENCY,
   cachedPromise,
   fetchCrowniclesJson,
   listCrowniclesDir,
   mapWithConcurrency,
+  numericIds,
 } from './source.js';
 
 /** A location on the Crownicles map: a node of the travel graph. */
@@ -41,16 +43,6 @@ interface RawCrowniclesMapLink {
 }
 
 type CrowniclesMapLocationNames = Record<string, { name?: string }>;
-
-const HTTP_CONCURRENCY = 10;
-
-/** Parses `<id>.json` file names into a sorted list of numeric ids. */
-function numericIds(fileNames: readonly string[]): number[] {
-  return fileNames
-    .map((file) => parseInt(file, 10))
-    .filter((id) => Number.isInteger(id))
-    .sort((a, b) => a - b);
-}
 
 /** Assembles the full map: location names, type icons, and links. */
 async function loadCrowniclesMap(): Promise<CrowniclesMap> {
