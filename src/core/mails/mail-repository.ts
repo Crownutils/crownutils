@@ -1,16 +1,16 @@
 import type { Mail } from '@/core/persistence/prisma/client.js';
 import { prisma } from '@/core/persistence/client.js';
 import { isSameUtcDay, utcDayKey } from '@/core/time/index.js';
+import { memoCell } from '@/core/cache.js';
 
 /** Mails are auto-deleted two weeks after creation. */
 export const MAIL_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
 /**
- * Cache of non-expired mails, newest first. Invalidated (set to `undefined`)
- * on creation and purge, then reloaded lazily. Holds full rows so `/mails` can
- * render without a query.
+ * Cache of non-expired mails, newest first. Invalidated on creation and purge,
+ * then reloaded lazily. Holds full rows so `/mails` renders without a query.
  */
-let activeMailsCache: Mail[] | undefined;
+const activeMails = memoCell<Mail[]>();
 
 /**
  * Per-user UTC day already evaluated for the unread reminder, so repeated
@@ -28,15 +28,15 @@ function expiryCutoff(now: Date): Date {
 
 /** Loads (once) and returns the non-expired mails, newest first. */
 async function ensureActiveMails(now: Date): Promise<Mail[]> {
-  if (activeMailsCache === undefined) {
-    activeMailsCache = await prisma.mail.findMany({
+  const mails = await activeMails.get(() =>
+    prisma.mail.findMany({
       where: { createdAt: { gte: expiryCutoff(now) } },
       orderBy: { createdAt: 'desc' },
-    });
-  }
+    }),
+  );
   // Filter again in case rows expired since the cache was loaded (between purges).
   const cutoff = expiryCutoff(now);
-  return activeMailsCache.filter((mail) => mail.createdAt >= cutoff);
+  return mails.filter((mail) => mail.createdAt >= cutoff);
 }
 
 /** Returns the non-expired mails, newest first, for the `/mails` inbox. */
@@ -79,7 +79,7 @@ export async function createMail(
   });
   await markMailRead(authorId, mail.id);
 
-  activeMailsCache = undefined;
+  activeMails.clear();
   handledToday.clear();
   return mail;
 }
@@ -145,6 +145,6 @@ export async function purgeExpiredMails(): Promise<number> {
   await prisma.mailRead.deleteMany({ where: { mailId: { in: ids } } });
   await prisma.mail.deleteMany({ where: { id: { in: ids } } });
 
-  activeMailsCache = undefined;
+  activeMails.clear();
   return ids.length;
 }

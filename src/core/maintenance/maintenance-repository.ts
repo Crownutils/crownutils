@@ -1,23 +1,19 @@
 import { prisma } from '@/core/persistence/client.js';
+import { memoCell } from '@/core/cache.js';
 
 const BOT_STATE_ID = 1;
 
-/**
- * In-memory cache of the maintenance flag, populated on first read and kept
- * in sync by {@link setMaintenanceEnabled}. Avoids a DB round-trip on every
- * command.
- */
-let cachedMaintenanceEnabled: boolean | undefined;
+/** In-memory cache of the maintenance flag, kept in sync by {@link setMaintenanceEnabled}. */
+const maintenanceEnabled = memoCell<boolean>();
 
 /** Returns whether maintenance mode is currently active. */
 export async function isMaintenanceEnabled(): Promise<boolean> {
-  if (cachedMaintenanceEnabled === undefined) {
+  return maintenanceEnabled.get(async () => {
     const state = await prisma.botState.findUnique({
       where: { id: BOT_STATE_ID },
     });
-    cachedMaintenanceEnabled = state?.maintenanceEnabled ?? false;
-  }
-  return cachedMaintenanceEnabled;
+    return state?.maintenanceEnabled ?? false;
+  });
 }
 
 /**
@@ -31,5 +27,5 @@ export async function setMaintenanceEnabled(enabled: boolean): Promise<void> {
     update: { maintenanceEnabled: enabled },
     create: { id: BOT_STATE_ID, maintenanceEnabled: enabled },
   });
-  cachedMaintenanceEnabled = enabled;
+  maintenanceEnabled.set(enabled);
 }
