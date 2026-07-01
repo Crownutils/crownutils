@@ -1,3 +1,4 @@
+import { buildAdjacency } from '../calculators/graph.js';
 import { loadMapTypeIcons } from './map-icons.js';
 import {
   HTTP_CONCURRENCY,
@@ -112,16 +113,7 @@ function largestComponent(
   nodeIds: ReadonlySet<number>,
   edges: readonly CrowniclesMapLink[],
 ): Set<number> {
-  const adjacency = new Map<number, number[]>();
-  const connect = (from: number, to: number): void => {
-    const neighbours = adjacency.get(from) ?? [];
-    neighbours.push(to);
-    adjacency.set(from, neighbours);
-  };
-  for (const edge of edges) {
-    connect(edge.startMap, edge.endMap);
-    connect(edge.endMap, edge.startMap);
-  }
+  const adjacency = buildAdjacency(edges);
 
   const visited = new Set<number>();
   let largest = new Set<number>();
@@ -132,7 +124,7 @@ function largestComponent(
     visited.add(node);
     while (queue.length > 0) {
       const current = queue.shift()!;
-      for (const next of adjacency.get(current) ?? []) {
+      for (const { to: next } of adjacency.get(current) ?? []) {
         if (!nodeIds.has(next) || visited.has(next)) continue;
         visited.add(next);
         component.add(next);
