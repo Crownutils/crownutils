@@ -1,7 +1,10 @@
 import type { Message } from 'discord.js';
 import type { Reminder } from '@/core/persistence/prisma/client.js';
 import { lang } from '@/discord/lang/index.js';
-import { InteractiveMessage } from '@/discord/interactions/collector.js';
+import {
+  COLLECTOR_IDLE_MS,
+  InteractiveMessage,
+} from '@/discord/interactions/collector.js';
 import { buildErrorContainer, safeDiscord } from '@/discord/errors.js';
 import {
   buildReminderListContainer,
@@ -12,14 +15,12 @@ import {
   listReminders,
 } from '@/discord/reminders/reminder-bridge.js';
 
-const LIST_WINDOW_MS = 120_000;
-
 /**
  * Attaches delete-button collectors to a reminder list message, limited to
  * `authorId`. Deleting a reminder re-renders the list with it removed; if it
  * was already gone (or belongs to someone else), replies with an ephemeral
  * error instead. Stops automatically once the list becomes empty, or after
- * `LIST_WINDOW_MS` of inactivity.
+ * `COLLECTOR_IDLE_MS` of inactivity.
  */
 export function attachReminderListCollector(
   message: Message,
@@ -57,6 +58,6 @@ export function attachReminderListCollector(
       }
       return remaining;
     },
-    { idle: LIST_WINDOW_MS, allowedIds: [authorId] },
+    { idle: COLLECTOR_IDLE_MS, allowedIds: [authorId] },
   );
 }

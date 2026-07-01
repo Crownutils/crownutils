@@ -1,13 +1,14 @@
 import { env } from '@/core/config/index.js';
+import { isOwner } from '@/core/permissions/index.js';
 import { MAX_TIMEOUT_MS, parseDurationMs } from '@/core/time/index.js';
 import { countReminders } from './reminder-repository.js';
 
 /** Duration used when a reminder is created without an explicit duration. */
 export const DEFAULT_REMINDER_DURATION = '9m45s';
 /** Maximum number of simultaneous reminders for users in `env.privilegedIds`. */
-export const MAX_REMINDER_PER_PRIVILEGED_USER = 5;
+const MAX_REMINDER_PER_PRIVILEGED_USER = 5;
 /** Maximum number of simultaneous reminders for non-privileged users. */
-export const MAX_REMINDERS_PER_USER = 3;
+const MAX_REMINDERS_PER_USER = 3;
 
 /** Reason `validateReminderInput` rejected a reminder request. */
 export type ReminderInputError =
@@ -50,7 +51,7 @@ export async function validateReminderInput(
     return { ok: false, error: 'duration_too_long' };
   }
 
-  if (userId !== env.ownerId) {
+  if (!isOwner(userId)) {
     const maxReminders = getMaxRemindersForUser(userId);
     const reminderCount = await countReminders(userId);
     if (reminderCount >= maxReminders) {

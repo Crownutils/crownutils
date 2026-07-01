@@ -19,7 +19,7 @@ import { crowniclesIcons } from '../icons.js';
 import { buildNavSelect } from '../nav.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 
-export const LEAGUES_PAGE_ID = 'leagues';
+const LEAGUES_PAGE_ID = 'leagues';
 
 const LEAGUES_ICON = '🏆';
 const LEAGUES_SELECT_ID = 'crownicles-help-leagues-select';

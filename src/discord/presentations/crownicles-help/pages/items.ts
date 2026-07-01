@@ -13,7 +13,7 @@ import {
   type CrowniclesItem,
   type ItemCategory,
 } from '@/core/crownicles/index.js';
-import { safeDiscord } from '@/discord/errors.js';
+import { loadIntoPage } from '../load.js';
 import { lang } from '@/discord/lang/index.js';
 import {
   CATEGORY_ICONS,
@@ -24,7 +24,7 @@ import {
 import { buildNavSelect } from '../nav.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 
-export const ITEMS_PAGE_ID = 'items';
+const ITEMS_PAGE_ID = 'items';
 
 const ITEMS_ICON = '🎒';
 const CATEGORY_SELECT_ID = 'crownicles-help-items-category';
@@ -227,9 +227,6 @@ export const itemsPage = {
       if (value === undefined) return state;
       const category = value as ItemCategory;
 
-      // Loading a category hits the network (~2.4s on first access), so
-      // acknowledge the interaction immediately with a "loading" view, then
-      // edit the message once the items are in.
       const loadingState: HelpState = {
         ...state,
         itemCategory: category,
@@ -238,25 +235,17 @@ export const itemsPage = {
         itemRarity: undefined,
         itemPage: 0,
       };
-      await interaction.update(renderItems(loadingState, renderCtx).build());
-      handled();
 
-      try {
-        const items = await getItems(category);
-        const loaded: HelpState = { ...loadingState, items };
-        await safeDiscord(
-          interaction.message.edit(renderItems(loaded, renderCtx).build()),
-          'items.load',
-        );
-        return loaded;
-      } catch {
-        const errored: HelpState = { ...loadingState, itemsError: true };
-        await safeDiscord(
-          interaction.message.edit(renderItems(errored, renderCtx).build()),
-          'items.loadError',
-        );
-        return errored;
-      }
+      return loadIntoPage({
+        interaction,
+        handled,
+        render: (s) => renderItems(s, renderCtx),
+        loadingState,
+        load: () => getItems(category),
+        onLoaded: (items) => ({ ...loadingState, items }),
+        onError: () => ({ ...loadingState, itemsError: true }),
+        logContext: 'items',
+      });
     }
 
     if (

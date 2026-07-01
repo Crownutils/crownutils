@@ -13,12 +13,15 @@ import {
   Title,
 } from '@/discord/components/index.js';
 import { icons } from '@/discord/icons.js';
-import { InteractiveMessage } from '@/discord/interactions/collector.js';
+import {
+  COLLECTOR_IDLE_MS,
+  InteractiveMessage,
+} from '@/discord/interactions/collector.js';
 import { lang } from '@/discord/lang/index.js';
 import { md } from '@/discord/markdown.js';
+import { truncate } from '@/discord/truncate.js';
 import { relativeTimestamp } from '@/discord/timestamps.js';
 
-const VIEWER_IDLE_MS = 120_000;
 const MAILS_PER_PAGE = 5;
 const PREVIEW_LENGTH = 140;
 
@@ -104,10 +107,7 @@ function stripMarkdown(text: string): string {
 
 /** One-line plain-text body excerpt for the inbox preview. */
 function mailExcerpt(body: string): string {
-  const flat = stripMarkdown(body);
-  return flat.length > PREVIEW_LENGTH
-    ? `${flat.slice(0, PREVIEW_LENGTH)}…`
-    : flat;
+  return truncate(stripMarkdown(body), PREVIEW_LENGTH);
 }
 
 /** Inbox preview block for one mail: read marker, title, date, excerpt. */
@@ -254,6 +254,6 @@ export function attachMailsViewer(
       }
       return state;
     },
-    { idle: VIEWER_IDLE_MS, allowedIds: [userId] },
+    { idle: COLLECTOR_IDLE_MS, allowedIds: [userId] },
   );
 }

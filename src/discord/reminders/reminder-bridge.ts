@@ -20,8 +20,6 @@ import { buildReminderTriggeredContainer } from '@/discord/presentations/reminde
 export { listReminders } from '@/core/reminders/reminder-repository.js';
 export {
   DEFAULT_REMINDER_DURATION,
-  MAX_REMINDER_PER_PRIVILEGED_USER,
-  MAX_REMINDERS_PER_USER,
   getMaxRemindersForUser,
 } from '@/core/reminders/reminder-validation.js';
 

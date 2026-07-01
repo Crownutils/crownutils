@@ -1,5 +1,16 @@
 import type { Reminder } from '@/core/persistence/prisma/client.js';
 import { prisma } from '@/core/persistence/client.js';
+import { logger } from '@/shared/logger.js';
+
+/** True for Prisma's "record to delete does not exist" error (code `P2025`). */
+function isRecordNotFound(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 'P2025'
+  );
+}
 
 /** Persists a new reminder. */
 export function createReminder(
@@ -31,12 +42,18 @@ export function findReminder(id: string): Promise<Reminder | null> {
   return prisma.reminder.findUnique({ where: { id } });
 }
 
-/** Deletes a reminder by id. Returns `false` if it didn't exist. */
+/**
+ * Deletes a reminder by id. Returns `false` if it didn't exist; logs (and still
+ * returns `false` for) any other failure rather than swallowing it silently.
+ */
 export async function deleteReminder(id: string): Promise<boolean> {
   try {
     await prisma.reminder.delete({ where: { id } });
     return true;
-  } catch {
+  } catch (error) {
+    if (!isRecordNotFound(error)) {
+      logger.error({ error, reminderId: id }, 'Failed to delete reminder.');
+    }
     return false;
   }
 }

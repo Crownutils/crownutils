@@ -5,7 +5,7 @@ import type {
   PathfinderUsage,
   Reminder,
 } from '@/core/persistence/prisma/client.js';
-import { env } from '@/core/config/index.js';
+import { isOwner } from '@/core/permissions/index.js';
 import { prisma } from '@/core/persistence/client.js';
 import { listReminders } from '@/core/reminders/reminder-repository.js';
 import { unscheduleReminder } from '@/core/reminders/reminder-scheduler.js';
@@ -27,7 +27,7 @@ export type DataAccessResult =
 export async function consumeDataAccess(
   userId: string,
 ): Promise<DataAccessResult> {
-  if (userId === env.ownerId) {
+  if (isOwner(userId)) {
     return { allowed: true };
   }
 

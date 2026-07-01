@@ -1,5 +1,6 @@
 import type { LegalAcceptance } from '@/core/persistence/prisma/client.js';
 import { prisma } from '@/core/persistence/client.js';
+import { isOwner } from '@/core/permissions/index.js';
 
 /**
  * Current version of the legal documents. Acceptance is one-time, but the
@@ -42,6 +43,11 @@ export async function hasAcceptedLegal(userId: string): Promise<boolean> {
     return true;
   }
   return false;
+}
+
+/** Whether `userId` still needs to accept the legal documents (the owner is exempt). */
+export async function mustAcceptLegal(userId: string): Promise<boolean> {
+  return !isOwner(userId) && !(await hasAcceptedLegal(userId));
 }
 
 /** Records `userId`'s acceptance of the current {@link LEGAL_VERSION}; idempotent. */

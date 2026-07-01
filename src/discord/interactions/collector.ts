@@ -7,6 +7,9 @@ import { buildErrorContainer, safeDiscord } from '../errors.js';
 import { lang } from '../lang/index.js';
 import type { Container } from '../components/index.js';
 
+/** Default inactivity/lifetime window (ms) for interactive-message collectors. */
+export const COLLECTOR_IDLE_MS = 120_000;
+
 type CollectorCollectHandler = (
   interaction: CollectedInteraction,
 ) => Promise<void> | void;

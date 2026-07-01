@@ -16,8 +16,8 @@ export function buildPingResultContainer(
     .add(
       new Title(lang.commands.ping.messages.title),
       new Separator(),
-      new Text(lang.commands.ping.messages.totalLatence(totalMs)).newLine(
-        lang.commands.ping.messages.discordLatence(discordMs),
+      new Text(lang.commands.ping.messages.totalLatency(totalMs)).newLine(
+        lang.commands.ping.messages.discordLatency(discordMs),
       ),
     );
 }

@@ -1,9 +1,5 @@
-/** A bidirectional trip between two locations, weighted by its duration. */
-export interface MapEdge {
-  startMap: number;
-  endMap: number;
-  tripDurationMin: number;
-}
+import type { CrowniclesMapLink } from '../data/map.js';
+import { buildAdjacency } from './graph.js';
 
 /** A route: ordered location ids from start to end, with its total duration. */
 export interface ShortestPath {
@@ -16,20 +12,11 @@ export interface ShortestPath {
  * treated as bidirectional. Returns `undefined` if `end` is unreachable.
  */
 export function findShortestPath(
-  edges: readonly MapEdge[],
+  edges: readonly CrowniclesMapLink[],
   start: number,
   end: number,
 ): ShortestPath | undefined {
-  const adjacency = new Map<number, { to: number; weight: number }[]>();
-  const link = (from: number, to: number, weight: number): void => {
-    const neighbours = adjacency.get(from) ?? [];
-    neighbours.push({ to, weight });
-    adjacency.set(from, neighbours);
-  };
-  for (const edge of edges) {
-    link(edge.startMap, edge.endMap, edge.tripDurationMin);
-    link(edge.endMap, edge.startMap, edge.tripDurationMin);
-  }
+  const adjacency = buildAdjacency(edges);
 
   const distance = new Map<number, number>([[start, 0]]);
   const previous = new Map<number, number>();

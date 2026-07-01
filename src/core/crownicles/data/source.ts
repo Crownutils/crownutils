@@ -3,6 +3,17 @@ const RAW_BASE =
 const CONTENTS_API =
   'https://api.github.com/repos/Crownicles/Crownicles/contents';
 
+/** Max concurrent fetches when loading a whole category/directory (~100 files). */
+export const HTTP_CONCURRENCY = 10;
+
+/** Parses `<id>.json` file names into a sorted list of numeric ids. */
+export function numericIds(fileNames: readonly string[]): number[] {
+  return fileNames
+    .map((file) => parseInt(file, 10))
+    .filter((id) => Number.isInteger(id))
+    .sort((a, b) => a - b);
+}
+
 /**
  * Fetches and parses a JSON file from the public Crownicles repository.
  * `path` is repo-relative, e.g. `Core/resources/weapons/0.json`.

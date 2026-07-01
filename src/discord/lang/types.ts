@@ -1,4 +1,4 @@
-type MessageValue = string | ((...args: any[]) => string) | MessageObject;
+type MessageValue = string | ((...args: never[]) => string) | MessageObject;
 
 interface MessageObject {
   [key: string]: MessageValue;

@@ -8,12 +8,12 @@ import {
   Text,
   Title,
 } from '@/discord/components/index.js';
-import { InteractiveMessage } from '@/discord/interactions/collector.js';
+import {
+  COLLECTOR_IDLE_MS,
+  InteractiveMessage,
+} from '@/discord/interactions/collector.js';
 import { lang } from '@/discord/lang/index.js';
 import { relativeTimestamp } from '@/discord/timestamps.js';
-
-const VIEWER_IDLE_MS = 120_000;
-const GATE_IDLE_MS = 120_000;
 
 const PRIVACY_BUTTON_ID = 'legal-privacy';
 const TERMS_BUTTON_ID = 'legal-terms';
@@ -136,7 +136,7 @@ export function attachLegalViewer(
       }
       return state;
     },
-    { idle: VIEWER_IDLE_MS, allowedIds: [userId] },
+    { idle: COLLECTOR_IDLE_MS, allowedIds: [userId] },
   );
 }
 
@@ -185,6 +185,6 @@ export function attachLegalGate(message: Message, userId: string): void {
       stop();
       return { ...state, accepted: true };
     },
-    { idle: GATE_IDLE_MS, allowedIds: [userId] },
+    { idle: COLLECTOR_IDLE_MS, allowedIds: [userId] },
   );
 }

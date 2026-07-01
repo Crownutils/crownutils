@@ -10,7 +10,7 @@ import type {
 import { isMaintenanceEnabled } from '@/core/maintenance/maintenance-repository.js';
 import {
   LEGAL_GATE_EXEMPT_COMMANDS,
-  hasAcceptedLegal,
+  mustAcceptLegal,
 } from '@/core/legal/legal-repository.js';
 
 /** Identifies the invoking user, the command, and where it was invoked from. */
@@ -52,9 +52,8 @@ export async function runCommandPipeline(
   }
 
   if (
-    userAuthorization !== 'owner' &&
     !LEGAL_GATE_EXEMPT_COMMANDS.has(context.commandName) &&
-    !(await hasAcceptedLegal(context.userId))
+    (await mustAcceptLegal(context.userId))
   ) {
     await handlers.onLegalNotAccepted();
     return;

@@ -7,6 +7,7 @@ import {
 } from '@/discord/components/index.js';
 import { lang } from '@/discord/lang/index.js';
 import { relativeTimestamp } from '@/discord/timestamps.js';
+import { truncate } from '@/discord/truncate.js';
 
 const MESSAGE_PREVIEW_LENGTH = 120;
 
@@ -14,10 +15,7 @@ const d = lang.commands.data.messages;
 
 /** One-line, length-capped preview of a reminder message. */
 function preview(message: string): string {
-  const flat = message.replace(/\s+/g, ' ').trim();
-  return flat.length > MESSAGE_PREVIEW_LENGTH
-    ? `${flat.slice(0, MESSAGE_PREVIEW_LENGTH)}…`
-    : flat;
+  return truncate(message.replace(/\s+/g, ' ').trim(), MESSAGE_PREVIEW_LENGTH);
 }
 
 /** Refusal shown when the user requested their data within the cooldown window. */

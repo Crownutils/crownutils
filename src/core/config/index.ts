@@ -1,10 +1,14 @@
 import { readFileSync } from 'node:fs';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 
 const packageJson = JSON.parse(
   readFileSync(new URL('../../../package.json', import.meta.url), 'utf8'),
 ) as { version: string; license: string };
+
+const buildInviteUrl = (clientId: string) =>
+  `https://discord.com/oauth2/authorize?client_id=${clientId}`;
 
 /** Runtime configuration sourced from environment variables and `package.json`. */
 export const env = {
@@ -13,7 +17,7 @@ export const env = {
   botVersion: packageJson.version,
   license: packageJson.license,
   discordToken: process.env.DISCORD_TOKEN,
-  discordClientId: process.env.DISCORD_CLIENT_ID,
+  discordClientId: DISCORD_CLIENT_ID,
   testGuildId: process.env.TEST_GUILD_ID,
   mainGuildId: process.env.MAIN_GUILD_ID,
   ownerId: process.env.OWNER_ID,
@@ -25,8 +29,7 @@ export const env = {
   githubUrl: 'https://github.com/Crownutils/crownutils',
   projectUrl: 'https://github.com/Crownutils',
   ownerUrl: 'https://github.com/Ntalcme',
-  inviteUrl:
-    'https://discord.com/oauth2/authorize?client_id=1485135115683368970',
+  inviteUrl: buildInviteUrl(DISCORD_CLIENT_ID ?? ''),
 } as const;
 
 type RequirableEnvKey =

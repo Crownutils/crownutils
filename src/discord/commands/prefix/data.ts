@@ -17,7 +17,10 @@ export const command = {
 
   async execute(message, args) {
     const requestedTargetId = args[0]?.replace(/\D/g, '') || undefined;
-    const container = await runDataCommand(message.author.id, requestedTargetId);
+    const container = await runDataCommand(
+      message.author.id,
+      requestedTargetId,
+    );
     await message.reply(container.build());
   },
 } satisfies PrefixCommand;

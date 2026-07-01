@@ -15,6 +15,7 @@ export const help = {
     prefixAliasesTitle: 'Alias',
     selectMenu: {
       placeholder: 'Sélectionnez une commande',
+      mainMenu: 'Menu Principal',
     },
   },
 } as const satisfies CommandLang;

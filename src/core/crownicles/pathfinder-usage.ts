@@ -1,4 +1,4 @@
-import { env } from '@/core/config/index.js';
+import { isOwner } from '@/core/permissions/index.js';
 import { prisma } from '@/core/persistence/client.js';
 import { isSameUtcDay } from '@/core/time/index.js';
 
@@ -9,7 +9,7 @@ import { isSameUtcDay } from '@/core/time/index.js';
  * the daily limit has already been reached.
  */
 export async function consumePathfinderUse(userId: string): Promise<boolean> {
-  if (userId === env.ownerId) {
+  if (isOwner(userId)) {
     return true;
   }
 

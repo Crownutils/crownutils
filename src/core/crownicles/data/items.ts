@@ -1,10 +1,12 @@
 import { computeMainItemStats } from '../calculators/items.js';
 import { loadItemIcons } from './item-icons.js';
 import {
+  HTTP_CONCURRENCY,
   cachedPromise,
   fetchCrowniclesJson,
   listCrowniclesDir,
   mapWithConcurrency,
+  numericIds,
 } from './source.js';
 
 /** The four item categories Crownicles exposes under `Core/resources`. */
@@ -61,8 +63,6 @@ const MAIN_ITEM_SCALED_STAT = {
 /** `models.json` only the item-name maps are read from, keyed by id string. */
 type ItemNames = Record<ItemCategory, Record<string, string>>;
 
-const HTTP_CONCURRENCY = 10;
-
 /** Loads the item name maps once; the promise is cached, evicted on failure. */
 const loadNames = cachedPromise(() =>
   fetchCrowniclesJson<ItemNames>('Lang/fr/models.json'),
@@ -104,10 +104,7 @@ async function loadCategory(category: ItemCategory): Promise<CrowniclesItem[]> {
     listCrowniclesDir(`Core/resources/${category}`),
   ]);
 
-  const ids = fileNames
-    .map((file) => parseInt(file, 10))
-    .filter((id) => Number.isInteger(id))
-    .sort((a, b) => a - b);
+  const ids = numericIds(fileNames);
 
   const stats = await mapWithConcurrency(ids, HTTP_CONCURRENCY, (id) =>
     fetchCrowniclesJson<RawItemStats>(`Core/resources/${category}/${id}.json`),

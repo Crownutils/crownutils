@@ -45,10 +45,13 @@ export const event = {
             ? () => remindUnreadMails(interaction.user.id, interaction.channel)
             : undefined,
         onMaintenance: () =>
-          interaction.reply(
-            buildErrorContainer(lang.errors.maintenance).build({
-              ephemeral: true,
-            }),
+          safeDiscord(
+            interaction.reply(
+              buildErrorContainer(lang.errors.maintenance).build({
+                ephemeral: true,
+              }),
+            ),
+            'interaction-create.onMaintenance',
           ),
         onLegalNotAccepted: async () => {
           const reply = await safeDiscord(
@@ -61,11 +64,15 @@ export const event = {
           if (reply) attachLegalGate(reply, interaction.user.id);
         },
         onPermissionDenied: (errors) =>
-          interaction.reply(
-            buildCommandPermissionsErrorContainer(errors).build({
-              ephemeral: true,
-            }),
+          safeDiscord(
+            interaction.reply(
+              buildCommandPermissionsErrorContainer(errors).build({
+                ephemeral: true,
+              }),
+            ),
+            'interaction-create.onPermissionDenied',
           ),
+
         onUnexpectedError: (error) => {
           logger.error(
             { error, command: interaction.commandName },
