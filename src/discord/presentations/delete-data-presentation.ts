@@ -7,10 +7,11 @@ import {
   Text,
   Title,
 } from '@/discord/components/index.js';
-import { InteractiveMessage } from '@/discord/interactions/collector.js';
+import {
+  COLLECTOR_IDLE_MS,
+  InteractiveMessage,
+} from '@/discord/interactions/collector.js';
 import { lang } from '@/discord/lang/index.js';
-
-const CONFIRM_WINDOW_MS = 120_000;
 
 const CONFIRM_BUTTON_ID = 'delete-data-confirm';
 const CANCEL_BUTTON_ID = 'delete-data-cancel';
@@ -81,6 +82,6 @@ export function attachDeleteDataConfirm(
       }
       return result;
     },
-    { time: CONFIRM_WINDOW_MS, allowedIds: [userId] },
+    { time: COLLECTOR_IDLE_MS, allowedIds: [userId] },
   );
 }

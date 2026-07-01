@@ -1,14 +1,15 @@
 import type { Message } from 'discord.js';
 import type { Reminder } from '@/core/persistence/prisma/client.js';
-import { InteractiveMessage } from '@/discord/interactions/collector.js';
+import {
+  COLLECTOR_IDLE_MS,
+  InteractiveMessage,
+} from '@/discord/interactions/collector.js';
 import {
   buildReminderCancelledContainer,
   buildReminderCreatedContainer,
   parseReminderCancelButtonId,
 } from '@/discord/presentations/reminder-presentation.js';
 import { cancelReminder } from '@/discord/reminders/reminder-bridge.js';
-
-const CANCEL_WINDOW_MS = 120_000;
 
 interface CancelState {
   reminder: Reminder;
@@ -42,6 +43,6 @@ export function attachReminderCancelCollector(
       stop();
       return { ...state, cancelled: true };
     },
-    { time: CANCEL_WINDOW_MS, allowedIds: [reminder.userId] },
+    { time: COLLECTOR_IDLE_MS, allowedIds: [reminder.userId] },
   );
 }

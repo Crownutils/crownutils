@@ -1,7 +1,10 @@
 import type { Message } from 'discord.js';
 import type { CommandAuthorization } from '@/core/permissions/types.js';
 import { filterByAuthorization } from '@/core/permissions/index.js';
-import { InteractiveMessage } from '@/discord/interactions/collector.js';
+import {
+  COLLECTOR_IDLE_MS,
+  InteractiveMessage,
+} from '@/discord/interactions/collector.js';
 import type { Container } from '@/discord/components/index.js';
 import { buildErrorContainer } from '@/discord/errors.js';
 import { lang } from '@/discord/lang/index.js';
@@ -9,8 +12,6 @@ import type { HelpPage, HelpRenderContext, HelpState } from './page.js';
 import { NAV_SELECT_ID } from './nav.js';
 import { HELP_PAGES, findHelpPage, resolveHelpPage } from './pages/index.js';
 import { HOME_PAGE_ID } from './pages/home.js';
-
-const IDLE_TIME_MS = 120_000;
 
 /** Pages `authorization` is allowed to see, in menu order. */
 function visiblePagesFor(
@@ -103,6 +104,6 @@ export function attachCrowniclesHelp(
         renderContext(visiblePages, false),
       );
     },
-    { idle: IDLE_TIME_MS, allowedIds: [authorId] },
+    { idle: COLLECTOR_IDLE_MS, allowedIds: [authorId] },
   );
 }
