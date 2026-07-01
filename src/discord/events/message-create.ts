@@ -7,7 +7,7 @@ import {
   buildErrorContainer,
   safeDiscord,
 } from '@/discord/errors.js';
-import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
+import { runCommandPipeline } from '@/discord/command-pipeline.js';
 import { lang } from '@/discord/lang/index.js';
 import { remindUnreadMails } from '@/discord/mails/unread-reminder.js';
 import {
