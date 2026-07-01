@@ -103,8 +103,7 @@ async function loadCrowniclesMap(): Promise<CrowniclesMap> {
  * and cached for the process lifetime. A failed load is not cached, so the next
  * call retries.
  */
-export const getCrowniclesMapGraph =
-  cachedPromise<CrowniclesMap>(loadCrowniclesMap);
+const getCrowniclesMapGraph = cachedPromise<CrowniclesMap>(loadCrowniclesMap);
 
 const CONTINENT_ATTRIBUTE = 'continent1';
 

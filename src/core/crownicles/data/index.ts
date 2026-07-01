@@ -10,10 +10,4 @@ export {
   type ItemCategory,
 } from './items.js';
 
-export {
-  getCrowniclesMapGraph,
-  getContinentGraph,
-  type CrowniclesMap,
-  type CrowniclesMapLocation,
-  type CrowniclesMapLink,
-} from './map.js';
+export { getContinentGraph, type CrowniclesMap } from './map.js';
