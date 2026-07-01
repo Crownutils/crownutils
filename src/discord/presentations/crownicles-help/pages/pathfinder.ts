@@ -13,7 +13,7 @@ import {
   getContinentGraph,
   type CrowniclesMap,
 } from '@/core/crownicles/index.js';
-import { safeDiscord } from '@/discord/errors.js';
+import { loadIntoPage } from '../load.js';
 import { lang } from '@/discord/lang/index.js';
 import { LOCATION_TYPE_ICONS } from '../icons.js';
 import { buildNavSelect } from '../nav.js';
@@ -166,28 +166,16 @@ export const pathfinderPage = {
         pathMap: undefined,
         pathMapError: false,
       };
-      await interaction.update(
-        renderPathfinder(loadingState, renderCtx).build(),
-      );
-      handled();
-      try {
-        const map = await getContinentGraph();
-        const loaded: HelpState = { ...loadingState, pathMap: map };
-        await safeDiscord(
-          interaction.message.edit(renderPathfinder(loaded, renderCtx).build()),
-          'pathfinder.load',
-        );
-        return loaded;
-      } catch {
-        const errored: HelpState = { ...loadingState, pathMapError: true };
-        await safeDiscord(
-          interaction.message.edit(
-            renderPathfinder(errored, renderCtx).build(),
-          ),
-          'pathfinder.loadError',
-        );
-        return errored;
-      }
+      return loadIntoPage({
+        interaction,
+        handled,
+        render: (s) => renderPathfinder(s, renderCtx),
+        loadingState,
+        load: getContinentGraph,
+        onLoaded: (map) => ({ ...loadingState, pathMap: map }),
+        onError: () => ({ ...loadingState, pathMapError: true }),
+        logContext: 'pathfinder',
+      });
     }
 
     if (
