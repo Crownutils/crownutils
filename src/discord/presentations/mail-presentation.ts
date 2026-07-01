@@ -19,6 +19,7 @@ import {
 } from '@/discord/interactions/collector.js';
 import { lang } from '@/discord/lang/index.js';
 import { md } from '@/discord/markdown.js';
+import { truncate } from '@/discord/truncate.js';
 import { relativeTimestamp } from '@/discord/timestamps.js';
 
 const MAILS_PER_PAGE = 5;
@@ -106,10 +107,7 @@ function stripMarkdown(text: string): string {
 
 /** One-line plain-text body excerpt for the inbox preview. */
 function mailExcerpt(body: string): string {
-  const flat = stripMarkdown(body);
-  return flat.length > PREVIEW_LENGTH
-    ? `${flat.slice(0, PREVIEW_LENGTH)}…`
-    : flat;
+  return truncate(stripMarkdown(body), PREVIEW_LENGTH);
 }
 
 /** Inbox preview block for one mail: read marker, title, date, excerpt. */
