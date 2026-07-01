@@ -1,5 +1,6 @@
 import { TextDisplayBuilder } from 'discord.js';
 import type { TextComponent } from './component.js';
+import { md } from '../markdown.js';
 
 /** `subtle` renders as a small, dimmed line; the others map to Markdown headings. */
 export type TextSize = 'normal' | 'subtle' | 'small' | 'medium' | 'large';
@@ -94,22 +95,19 @@ export class Text implements TextComponent {
 
     let content = lines.join('\n');
     if (this.isQuote) {
-      content = content
-        .split('\n')
-        .map((line) => `> ${line}`)
-        .join('\n');
+      content = md.quote(content);
     }
     return new TextDisplayBuilder().setContent(content);
   }
 
   private renderLine(): string {
     let text = this.content;
-    if (this.isCode) text = `\`${text}\``;
-    if (this.isBold) text = `**${text}**`;
-    if (this.isItalic) text = `*${text}*`;
-    if (this.isUnderline) text = `__${text}__`;
-    if (this.isStrikethrough) text = `~~${text}~~`;
-    if (this.linkUrl !== undefined) text = `[${text}](${this.linkUrl})`;
+    if (this.isCode) text = md.code(text);
+    if (this.isBold) text = md.bold(text);
+    if (this.isItalic) text = md.italic(text);
+    if (this.isUnderline) text = md.underline(text);
+    if (this.isStrikethrough) text = md.strikethrough(text);
+    if (this.linkUrl !== undefined) text = md.link(text, this.linkUrl);
 
     const prefix = SIZE_PREFIX[this.textSize];
     return prefix ? `${prefix} ${text}` : text;
