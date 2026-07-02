@@ -13,6 +13,7 @@
     "noImplicitOverride": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": true,
     "sourceMap": true,
     "paths": {
       "@/*": ["./src/*"]
