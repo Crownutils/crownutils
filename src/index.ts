@@ -1,3 +1,6 @@
-import { logger } from '@/shared/logger.js';
+import { config } from '@/core/config/index.js';
+import { CrownutilsClient } from '@/discord/client/index.js';
 
-logger.info('Crownutils starting…');
+const client = new CrownutilsClient();
+await client.init();
+await client.login(config.discordToken);

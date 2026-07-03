@@ -52,6 +52,23 @@ export default tseslint.config(
     },
   },
 
+  // Config is the single place allowed to read process.env; everywhere else
+  // must go through @/core/config so env is loaded and validated exactly once.
+  {
+    files: ['src/**/*.ts'],
+    ignores: ['src/core/config/**'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'process',
+          property: 'env',
+          message: 'Read config via @/core/config, not process.env directly.',
+        },
+      ],
+    },
+  },
+
   {
     files: ['**/*.{js,mjs,cjs}'],
     extends: [tseslint.configs.disableTypeChecked],
