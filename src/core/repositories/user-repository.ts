@@ -15,3 +15,15 @@ export async function getUserLanguage(
   const user = await findOrCreateUser(userId);
   return user.language;
 }
+
+/** Persist a user's preferred language, creating the row if it does not exist. */
+export async function setUserLanguage(
+  userId: string,
+  language: SupportedLocale,
+): Promise<void> {
+  await prisma.user.upsert({
+    where: { userId },
+    update: { language },
+    create: { userId, language },
+  });
+}
