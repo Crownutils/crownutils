@@ -19,5 +19,6 @@ enum Language {
 
 model User {
   userId String @id
+  pseudoId String @unique @default(uuid())
   language Language @default(en)
 }
