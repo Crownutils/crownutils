@@ -4,6 +4,7 @@ import {
   loadPrefixCommands,
   loadSlashCommands,
 } from '../handlers/index.js';
+import { createRegistries } from '../registries/index.js';
 import { toError } from '../errors.js';
 import { logger } from '@/shared/index.js';
 
@@ -29,6 +30,7 @@ export class CrownutilsClient {
 
   public constructor() {
     this.client = buildDiscordClient();
+    this.client.registries = createRegistries();
   }
 
   public async init(): Promise<void> {
