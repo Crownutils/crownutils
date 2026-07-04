@@ -9,6 +9,7 @@ export const commonLang = {
   unexpectedError:
     'An unexpected error has occurred. The incident has been logged.',
   gateDenied: 'You do not have access to this command at the moment.',
+  interactionNotAllowed: 'You cannot interact with this message.',
   scopeDenied: (scope: CommandScope): string => {
     switch (scope) {
       case 'guild':
