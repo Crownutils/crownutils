@@ -6,7 +6,7 @@ export const ping = {
   messages: {
     calculating: 'Calcul en cours...',
     title: `${icons.ping} Pong`,
-    totalLatency: (latencyMs: number) => `Latence total : ${latencyMs}ms`,
+    totalLatency: (latencyMs: number) => `Latence totale : ${latencyMs}ms`,
     discordLatency: (latencyMs: number) => `Latence Discord : ${latencyMs}ms`,
   },
 } satisfies CommandNode;
