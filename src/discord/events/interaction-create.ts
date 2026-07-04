@@ -3,11 +3,11 @@ import type { EventModule } from '../registries/index.js';
 import { logger } from '@/shared/index.js';
 import { runCommandPipeline } from '../command-pipeline.js';
 import { config } from '@/core/config/index.js';
-import type { UserLang } from '../lang/index.js';
 import { lang } from '../lang/index.js';
 import { toError } from '../errors.js';
 import { safeReplyToInteraction } from '../interactions/index.js';
 import { isMaintenanceEnabled } from '@/core/repositories/index.js';
+import { resolveUserLocale } from '../locale.js';
 
 const event = {
   name: Events.InteractionCreate,
@@ -27,8 +27,8 @@ const event = {
     }
 
     const inGuild = interaction.inGuild();
-    const userLang: UserLang = 'fr'; // TODO Gets user language from database
-    const t = lang[userLang].common;
+    const userLanguage = await resolveUserLocale(interaction.user.id);
+    const t = lang[userLanguage].common;
 
     await runCommandPipeline(
       {
