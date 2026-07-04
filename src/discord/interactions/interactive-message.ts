@@ -3,6 +3,7 @@ import type {
   ContainerBuilder,
   Message,
   MessageComponentInteraction,
+  RepliableInteraction,
   SendableChannels,
 } from 'discord.js';
 import type { Container } from '@/discord/components/index.js';
@@ -85,30 +86,13 @@ async function refuse(interaction: MessageComponentInteraction): Promise<void> {
   );
 }
 
-/**
- * Send `render(initialState)` to `channel`, then keep it in sync: each allowed
- * interaction runs `reduce` and re-renders via `update`, until `stop()` or the
- * idle timeout, after which a single disabled render is applied. Every Discord
- * call is best-effort, so a transient failure never crashes the process.
- *
- * @returns the mounted message, or `undefined` if the initial send failed.
- */
-export async function mountInteractiveMessage<State>(
-  channel: SendableChannels,
+/** Attach the collector loop that keeps `message` in sync until stop or timeout. */
+function drive<State>(
+  message: Message,
   controller: InteractiveMessage<State>,
-): Promise<Message | undefined> {
-  let state = controller.initialState;
-
-  const message = await safeDiscord<Message>(
-    // Collapse the `SendableChannels` union's `send` overloads to one Promise.
-    (async () =>
-      channel.send({
-        flags: MessageFlags.IsComponentsV2,
-        components: componentsOf(controller, state, false),
-      }))(),
-    { action: 'interactiveSend' },
-  );
-  if (!message) return undefined;
+  initialState: State,
+): void {
+  let state = initialState;
 
   const collector = message.createMessageComponentCollector({
     idle: controller.idleMs ?? INTERACTIVE_MESSAGE_IDLE_MS,
@@ -160,6 +144,60 @@ export async function mountInteractiveMessage<State>(
       { action: 'interactiveTimeout' },
     );
   });
+}
 
+/**
+ * Post `render(initialState)` in `channel` and keep it in sync: each allowed
+ * interaction runs `reduce` and re-renders, until `stop()` or the idle timeout,
+ * after which one disabled render is applied. Every Discord call is best-effort.
+ *
+ * @returns the mounted message, or `undefined` if the initial send failed.
+ */
+export async function mountInteractiveMessage<State>(
+  channel: SendableChannels,
+  controller: InteractiveMessage<State>,
+): Promise<Message | undefined> {
+  const state = controller.initialState;
+
+  const message = await safeDiscord<Message>(
+    // Collapse the `SendableChannels` union's `send` overloads to one Promise.
+    (async () =>
+      channel.send({
+        flags: MessageFlags.IsComponentsV2,
+        components: componentsOf(controller, state, false),
+      }))(),
+    { action: 'interactiveSend' },
+  );
+  if (!message) return undefined;
+
+  drive(message, controller, state);
+  return message;
+}
+
+/**
+ * Like {@link mountInteractiveMessage}, but reply to `interaction` instead of
+ * posting in a channel. The reply is public (not ephemeral) so the timeout
+ * re-render can still edit it.
+ *
+ * @returns the reply message, or `undefined` if the reply failed.
+ */
+export async function mountInteractiveReply<State>(
+  interaction: RepliableInteraction,
+  controller: InteractiveMessage<State>,
+): Promise<Message | undefined> {
+  const state = controller.initialState;
+
+  const response = await safeDiscord(
+    interaction.reply({
+      flags: MessageFlags.IsComponentsV2,
+      components: componentsOf(controller, state, false),
+      withResponse: true,
+    }),
+    { action: 'interactiveReply' },
+  );
+  const message = response?.resource?.message ?? undefined;
+  if (!message) return undefined;
+
+  drive(message, controller, state);
   return message;
 }
