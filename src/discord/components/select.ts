@@ -1,4 +1,8 @@
-import { StringSelectMenuBuilder } from 'discord.js';
+import {
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+} from 'discord.js';
+import type { ComponentEmojiResolvable } from 'discord.js';
 import type { RowChild } from './component.js';
 
 /** One option of a {@link SelectMenu}. */
@@ -7,6 +11,8 @@ export interface SelectOption {
   readonly value: string;
   readonly description?: string;
   readonly default?: boolean;
+  /** Leading emoji (unicode or custom) shown before the label. */
+  readonly emoji?: ComponentEmojiResolvable;
 }
 
 /** Fluent wrapper over a string select menu. */
@@ -24,14 +30,17 @@ export class SelectMenu implements RowChild {
 
   public options(options: readonly SelectOption[]): this {
     this.builder.setOptions(
-      options.map((option) => ({
-        label: option.label,
-        value: option.value,
-        ...(option.description !== undefined && {
-          description: option.description,
-        }),
-        ...(option.default !== undefined && { default: option.default }),
-      })),
+      options.map((option) => {
+        const builder = new StringSelectMenuOptionBuilder()
+          .setLabel(option.label)
+          .setValue(option.value);
+        if (option.description !== undefined) {
+          builder.setDescription(option.description);
+        }
+        if (option.default !== undefined) builder.setDefault(option.default);
+        if (option.emoji !== undefined) builder.setEmoji(option.emoji);
+        return builder;
+      }),
     );
 
     return this;
