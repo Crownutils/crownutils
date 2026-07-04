@@ -69,6 +69,23 @@ export default tseslint.config(
     },
   },
 
+  // Default exports are reserved for dynamically-loaded modules (commands,
+  // events); everywhere else must use named exports.
+  {
+    files: ['src/**/*.ts'],
+    ignores: ['src/discord/commands/**', 'src/discord/events/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ExportDefaultDeclaration',
+          message:
+            'Use named exports; default is reserved for commands/ and events/ (dynamic loading).',
+        },
+      ],
+    },
+  },
+
   {
     files: ['**/*.{js,mjs,cjs}'],
     extends: [tseslint.configs.disableTypeChecked],
