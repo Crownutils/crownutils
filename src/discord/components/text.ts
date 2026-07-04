@@ -90,6 +90,11 @@ export class Text implements ContainerChild {
     section.addTextDisplayComponents(this.toBuilder());
   }
 
+  public title(): this {
+    this.textSize = 'medium';
+    return this;
+  }
+
   private toBuilder(): TextDisplayBuilder {
     return new TextDisplayBuilder().setContent(this.render());
   }
