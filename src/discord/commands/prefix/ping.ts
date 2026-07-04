@@ -1,0 +1,37 @@
+import { createContainer, Text } from '@/discord/components/index.js';
+import { sendResponseToMessage } from '@/discord/interactions/respond.js';
+import { lang } from '@/discord/lang/index.js';
+import { resolveUserLocale } from '@/discord/locale.js';
+import type { PrefixCommand } from '@/discord/registries/index.js';
+import { runPingCommand } from '@/discord/usecases/ping.js';
+import { MessageFlags } from 'discord.js';
+
+export const command = {
+  name: 'ping',
+  aliases: ['p', 'latency'],
+  requirements: { scope: 'guild', authorization: 'everyone' },
+
+  async execute(message, _args) {
+    const userLanguage = await resolveUserLocale(message.author.id);
+    const before = Date.now();
+    const interim = createContainer('brand').add(
+      new Text(lang[userLanguage].commandPing.messages.calculating),
+    );
+    const sent = await sendResponseToMessage(message, { container: interim });
+
+    const totalLatencyMs = sent.createdTimestamp - before;
+    const discordLatencyMs = Math.round(message.client.ws.ping);
+
+    const response = runPingCommand(
+      { totalLatencyMs, discordLatencyMs },
+      userLanguage,
+    );
+
+    await sent.edit({
+      flags: [MessageFlags.IsComponentsV2] as const,
+      components: [response.container.build()],
+    });
+  },
+} satisfies PrefixCommand;
+
+export default command;
