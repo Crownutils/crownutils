@@ -11,3 +11,13 @@ model BotState {
   id Int @id @default(1)
   maintenanceEnabled Boolean @default(false)
 }
+
+enum Language {
+  fr
+  en
+}
+
+model User {
+  userId String @id
+  language Language @default(en)
+}
