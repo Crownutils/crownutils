@@ -1,0 +1,13 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model BotState {
+  id Int @id @default(1)
+  maintenanceEnabled Boolean @default(false)
+}
