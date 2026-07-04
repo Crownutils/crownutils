@@ -9,3 +9,9 @@ export type LangLeaf = string | ((...args: never[]) => string);
 export interface LangNode {
   readonly [key: string]: LangLeaf | LangNode;
 }
+
+export interface CommandNode {
+  description: string;
+  messages: LangLeaf | LangNode;
+  readonly [key: string]: LangLeaf | LangNode;
+}
