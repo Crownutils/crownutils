@@ -7,6 +7,7 @@ import type { UserLang } from '../lang/index.js';
 import { lang } from '../lang/index.js';
 import { toError } from '../errors.js';
 import { safeReplyToInteraction } from '../interactions/index.js';
+import { isMaintenanceEnabled } from '@/core/repositories/index.js';
 
 const event = {
   name: Events.InteractionCreate,
@@ -38,7 +39,7 @@ const event = {
         userId: interaction.user.id,
         ownerId: config.ownerDiscordId,
         privilegedIds: config.privilegedDiscordIds,
-        maintenance: false, // TODO maintenance
+        maintenance: await isMaintenanceEnabled(),
       },
       {
         execute: () => command.execute(interaction),

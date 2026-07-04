@@ -8,6 +8,7 @@ import { lang } from '../lang/index.js';
 import { toError } from '../errors.js';
 import { COMMAND_PREFIX } from '../constants.js';
 import { safeReplyToMessage } from '../interactions/index.js';
+import { isMaintenanceEnabled } from '@/core/repositories/index.js';
 
 const event = {
   name: Events.MessageCreate,
@@ -38,7 +39,7 @@ const event = {
         userId: message.author.id,
         ownerId: config.ownerDiscordId,
         privilegedIds: config.privilegedDiscordIds,
-        maintenance: false, // TODO maintenance
+        maintenance: await isMaintenanceEnabled(),
       },
       {
         execute: () => command.execute(message, args),
