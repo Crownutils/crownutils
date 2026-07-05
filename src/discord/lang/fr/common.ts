@@ -1,5 +1,6 @@
 import type { CommandScope } from '@/core/permissions/index.js';
 import type { LangNode } from '../types.js';
+import { md } from '@/discord/markdown.js';
 
 /** Cross-cutting user-facing strings */
 export const commonLang = {
@@ -10,6 +11,7 @@ export const commonLang = {
     "Une erreur inattendue est survenue. L'incident a été consigné.",
   gateDenied: "Vous n'avez pas accès à cette commande pour le moment.",
   interactionNotAllowed: 'Vous ne pouvez pas interagir avec ce message.',
+  legalNotAccepted: `Merci de vous enregistrer (${md.code('register')}) dans le bot avant toute utilisation.`,
   scopeDenied: (scope: CommandScope): string => {
     switch (scope) {
       case 'guild':

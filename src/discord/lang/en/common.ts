@@ -1,5 +1,6 @@
 import type { CommandScope } from '@/core/permissions/index.js';
 import type { LangNode } from '../types.js';
+import { md } from '@/discord/markdown.js';
 
 /** Cross-cutting user-facing strings */
 export const commonLang = {
@@ -10,6 +11,7 @@ export const commonLang = {
     'An unexpected error has occurred. The incident has been logged.',
   gateDenied: 'You do not have access to this command at the moment.',
   interactionNotAllowed: 'You cannot interact with this message.',
+  legalNotAccepted: `Please register (${md.code('register')}) with the bot before using it.`,
   scopeDenied: (scope: CommandScope): string => {
     switch (scope) {
       case 'guild':

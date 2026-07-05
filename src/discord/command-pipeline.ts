@@ -3,10 +3,15 @@ import type {
   CommandScope,
 } from '@/core/permissions/index.js';
 import { checkCommandRequirements, isOwner } from '@/core/permissions/index.js';
+import {
+  hasAcceptedLegal,
+  LEGAL_GATE_EXEMPT_COMMANDS,
+} from '@/core/repositories/index.js';
 import type { Awaitable } from 'discord.js';
 
 /** Everything the pipeline needs to decide whether a command may run. */
 export interface CommandPipelineContext {
+  readonly commandName: string;
   readonly requirements: CommandRequirements;
   readonly inGuild: boolean;
   readonly inMainGuild: boolean;
@@ -27,6 +32,7 @@ export interface CommandPipelineHandlers {
   onScopeDenied: (scope: CommandScope) => Awaitable<void>;
   onPermissionDenied: () => Awaitable<void>;
   onUnexpectedError: (error: unknown) => Awaitable<void>;
+  onLegalNotAccepted: () => Awaitable<unknown>;
   onSuccess?: () => Awaitable<void>;
   /** Optional extra gate (e.g. a feature flag); resolve `false` to block. */
   gate?: () => Awaitable<boolean>;
@@ -42,8 +48,18 @@ export async function runCommandPipeline(
   context: CommandPipelineContext,
   handlers: CommandPipelineHandlers,
 ): Promise<void> {
-  if (context.maintenance && !isOwner(context.userId, context.ownerId)) {
+  const isUserOwner = isOwner(context.userId, context.ownerId);
+
+  if (context.maintenance && !isUserOwner) {
     await handlers.onMaintenance();
+    return;
+  }
+
+  if (
+    !(await hasAcceptedLegal(context.userId)) &&
+    !LEGAL_GATE_EXEMPT_COMMANDS.has(context.commandName)
+  ) {
+    await handlers.onLegalNotAccepted();
     return;
   }
 

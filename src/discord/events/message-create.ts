@@ -33,6 +33,7 @@ const event = {
 
     await runCommandPipeline(
       {
+        commandName: command.name,
         requirements: command.requirements,
         inGuild,
         inMainGuild: inGuild && message.guildId === config.mainGuildDiscordId,
@@ -55,6 +56,8 @@ const event = {
           );
           await safeReplyToMessage(message, t.unexpectedError);
         },
+        onLegalNotAccepted: async () =>
+          safeReplyToMessage(message, t.legalNotAccepted),
         ...(command.gate && {
           gate: () => command.gate!(message, args),
           onGateDenied: command.onGateDenied

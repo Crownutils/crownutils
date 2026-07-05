@@ -32,6 +32,7 @@ const event = {
 
     await runCommandPipeline(
       {
+        commandName: interaction.commandName,
         requirements: command.requirements,
         inGuild,
         inMainGuild:
@@ -55,6 +56,8 @@ const event = {
           );
           await safeReplyToInteraction(interaction, t.unexpectedError);
         },
+        onLegalNotAccepted: async () =>
+          safeReplyToInteraction(interaction, t.legalNotAccepted),
         ...(command.gate && {
           gate: () => command.gate!(interaction),
           onGateDenied: command.onGateDenied
