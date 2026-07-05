@@ -22,3 +22,9 @@ model User {
   pseudoId String @unique @default(uuid())
   language Language @default(en)
 }
+
+model LegalAcceptance {
+  userId String @id
+  acceptedVersion String
+  acceptedAt DateTime @default(now())
+}
