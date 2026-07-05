@@ -12,6 +12,7 @@ export interface LangNode {
 
 export interface CommandNode {
   description: string;
-  messages: LangLeaf | LangNode;
+  /** Command-specific strings; omit for commands whose content lives in a shared node. */
+  messages?: LangLeaf | LangNode;
   readonly [key: string]: LangLeaf | LangNode;
 }
