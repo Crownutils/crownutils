@@ -6,4 +6,6 @@ export const icons = {
   error: '❌',
   warning: '⚠️',
   maintenance: '🛠️',
+  scroll: '📜',
+  shield: '🛡️',
 } as const;
