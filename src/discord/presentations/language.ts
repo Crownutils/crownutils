@@ -44,7 +44,6 @@ export function buildLanguageContainer(
             label: LANGUAGE_LABELS[locale],
             value: locale,
             emoji: LANGUAGE_FLAGS[locale],
-            default: locale === language,
           })),
         )
         .disabled(disabled),
