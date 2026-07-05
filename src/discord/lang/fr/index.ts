@@ -4,6 +4,7 @@ import { ping } from './ping.js';
 import { language } from './language.js';
 import { register } from './register.js';
 import { legal, legalCommand } from './legal.js';
+import { about } from './about.js';
 
 /** The French language pack: a typed tree of strings and formatters. */
 export const fr = {
@@ -13,4 +14,5 @@ export const fr = {
   commandRegister: register,
   commandLegal: legalCommand,
   legal,
+  commandAbout: about,
 } as const satisfies LangNode;

@@ -8,4 +8,5 @@ export const icons = {
   maintenance: '🛠️',
   scroll: '📜',
   shield: '🛡️',
+  info: 'ℹ️',
 } as const;
