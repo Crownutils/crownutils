@@ -15,7 +15,8 @@ const event = {
   name: Events.MessageCreate,
   async execute(message) {
     if (message.author.bot) return;
-    if (!message.content.startsWith(COMMAND_PREFIX)) return;
+    const prefix = message.content.slice(0, COMMAND_PREFIX.length);
+    if (prefix.toLowerCase() !== COMMAND_PREFIX) return;
 
     const withoutPrefix = message.content.slice(COMMAND_PREFIX.length).trim();
     if (withoutPrefix.length === 0) return;
