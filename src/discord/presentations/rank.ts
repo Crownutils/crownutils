@@ -2,17 +2,17 @@ import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '../components/index.js';
 import { createContainer, Separator, Text } from '../components/index.js';
 import { lang } from '../lang/index.js';
-import type { Rank } from '@/core/permissions/index.js';
+import type { NotBannedRank, Rank } from '@/core/permissions/index.js';
 
 const RANK_ICON = {
   normal: '👤',
   privileged: '🎟️',
   owner: '👑',
-} satisfies Record<Exclude<Rank, 'banned'>, string>;
+} satisfies Record<NotBannedRank, string>;
 
 export function buildRankContainer(
   language: SupportedLocale,
-  userRank: Exclude<Rank, 'banned'>,
+  userRank: NotBannedRank,
   userRankLevel: number,
 ): Container {
   const messages = lang[language].commandRank.messages;

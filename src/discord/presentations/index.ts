@@ -3,3 +3,4 @@ export * from './language.js';
 export * from './register.js';
 export * from './about.js';
 export * from './rank.js';
+export * from './set-rank.js';

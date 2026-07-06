@@ -1,11 +1,11 @@
 import type { SupportedLocale } from '@/core/types.js';
 import type { CommandResponse } from '../interactions/index.js';
-import type { Rank } from '@/core/permissions/rank.js';
+import type { NotBannedRank, Rank } from '@/core/permissions/rank.js';
 import { buildRankContainer } from '../presentations/index.js';
 
 export function runRankCommand(
   language: SupportedLocale,
-  userRank: Exclude<Rank, 'banned'>,
+  userRank: NotBannedRank,
   userRankLevel: number,
 ): CommandResponse {
   return {
