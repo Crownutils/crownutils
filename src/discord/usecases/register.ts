@@ -1,12 +1,13 @@
 import type { SupportedLocale } from '@/core/types.js';
 import { isSupportedLocale } from '@/core/types.js';
-import { registerUser } from '@/core/repositories/index.js';
+import { canUserRegister, registerUser } from '@/core/repositories/index.js';
 import type { Container } from '../components/index.js';
 import type { InteractiveMessage } from '../interactions/index.js';
 import {
   buildLanguageContainer,
   buildLegalContainer,
   buildRegisterCancelledContainer,
+  buildRegisterCannotRegisterContainer,
   buildRegisterDoneContainer,
   LEGAL_ACCEPT_ID,
   LEGAL_DECLINE_ID,
@@ -14,7 +15,6 @@ import {
   LEGAL_VIEW_PRIVACY_ID,
 } from '../presentations/index.js';
 import { isOwner } from '@/core/permissions/user.js';
-import { config } from '@/core/config/index.js';
 
 /** Which legal document the viewer is currently showing. */
 export type LegalDocument = 'cgu' | 'privacy';
@@ -22,6 +22,7 @@ export type LegalDocument = 'cgu' | 'privacy';
 /** Steps of the registration flow: pick a language, read the legal docs, then a terminal screen. */
 export type RegisterState =
   | { step: 'language' }
+  | { step: 'cannotRegister'; language: SupportedLocale }
   | { step: 'legal'; language: SupportedLocale; document: LegalDocument }
   | { step: 'accepted'; language: SupportedLocale }
   | { step: 'declined' };
@@ -49,6 +50,8 @@ export function createRegisterController(
           return buildRegisterDoneContainer(state.language);
         case 'declined':
           return buildRegisterCancelledContainer(initialLanguage);
+        case 'cannotRegister':
+          return buildRegisterCannotRegisterContainer(state.language);
       }
     },
 
@@ -57,9 +60,13 @@ export function createRegisterController(
         const [selected] = interaction.values;
         if (selected === undefined || !isSupportedLocale(selected))
           return state;
-        if (isOwner(interaction.user.id, config.ownerDiscordId)) {
+        if (isOwner(interaction.user.id)) {
           await registerUser(userId, selected);
           return { step: 'accepted', language: selected };
+        }
+
+        if (!(await canUserRegister(interaction.user.id))) {
+          return { step: 'cannotRegister', language: selected };
         }
         return { step: 'legal', language: selected, document: 'cgu' };
       }

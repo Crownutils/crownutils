@@ -1,3 +1,6 @@
+import type { Container } from '../components/index.js';
+import { createContainer, Text } from '../components/index.js';
+
 /**
  * Normalise an unknown thrown value into an `Error`, so logging always receives
  * a real error object (with a stack) instead of a bare string or object.
@@ -7,4 +10,8 @@
 export function toError(value: unknown): Error {
   if (value instanceof Error) return value;
   return new Error(typeof value === 'string' ? value : String(value));
+}
+
+export function buildErrorContainer(message: string): Container {
+  return createContainer('cancel').add(new Text(message));
 }

@@ -1,13 +1,14 @@
 import { Events } from 'discord.js';
 import type { EventModule } from '../registries/index.js';
 import { logger } from '@/shared/index.js';
-import { runCommandPipeline } from '../command-pipeline.js';
+import { runCommandPipeline } from '../pipeline/command-pipeline.js';
 import { config } from '@/core/config/index.js';
 import { lang } from '../lang/index.js';
-import { toError } from '../errors.js';
-import { safeReplyToInteraction } from '../interactions/index.js';
+import { buildErrorContainer, toError } from '../utils/errors.js';
+import { sendResponseToInteraction } from '../interactions/index.js';
 import { isMaintenanceEnabled } from '@/core/repositories/index.js';
-import { resolveUserLocale } from '../locale.js';
+import { resolveUserLocale } from '../context/locale.js';
+import { resolveUserRank } from '../context/rank.js';
 
 const event = {
   name: Events.InteractionCreate,
@@ -38,31 +39,55 @@ const event = {
         inMainGuild:
           inGuild && interaction.guildId === config.mainGuildDiscordId,
         userId: interaction.user.id,
-        ownerId: config.ownerDiscordId,
-        privilegedIds: config.privilegedDiscordIds,
+        rank: await resolveUserRank(interaction.user.id),
         maintenance: await isMaintenanceEnabled(),
       },
       {
         execute: () => command.execute(interaction),
-        onMaintenance: () => safeReplyToInteraction(interaction, t.maintenance),
+        onBanned: () =>
+          sendResponseToInteraction(interaction, {
+            container: buildErrorContainer(t.banned),
+            ephemeral: true,
+          }),
+        onMaintenance: () =>
+          sendResponseToInteraction(interaction, {
+            container: buildErrorContainer(t.maintenance),
+            ephemeral: true,
+          }),
         onScopeDenied: (scope) =>
-          safeReplyToInteraction(interaction, t.scopeDenied(scope)),
+          sendResponseToInteraction(interaction, {
+            container: buildErrorContainer(t.scopeDenied(scope)),
+            ephemeral: true,
+          }),
         onPermissionDenied: () =>
-          safeReplyToInteraction(interaction, t.permissionDenied),
+          sendResponseToInteraction(interaction, {
+            container: buildErrorContainer(t.permissionDenied),
+            ephemeral: true,
+          }),
         onUnexpectedError: async (error) => {
           logger.error(
             { err: toError(error), command: interaction.commandName },
             'Slash command failed',
           );
-          await safeReplyToInteraction(interaction, t.unexpectedError);
+          await sendResponseToInteraction(interaction, {
+            container: buildErrorContainer(t.unexpectedError),
+            ephemeral: true,
+          });
         },
         onLegalNotAccepted: async () =>
-          safeReplyToInteraction(interaction, t.legalNotAccepted),
+          await sendResponseToInteraction(interaction, {
+            container: buildErrorContainer(t.legalNotAccepted),
+            ephemeral: true,
+          }),
         ...(command.gate && {
           gate: () => command.gate!(interaction),
           onGateDenied: command.onGateDenied
             ? () => command.onGateDenied!(interaction)
-            : () => safeReplyToInteraction(interaction, t.gateDenied),
+            : () =>
+                sendResponseToInteraction(interaction, {
+                  container: buildErrorContainer(t.gateDenied),
+                  ephemeral: true,
+                }),
         }),
       },
     );

@@ -1,8 +1,9 @@
 import type {
   CommandRequirements,
   CommandScope,
+  Rank,
 } from '@/core/permissions/index.js';
-import { checkCommandRequirements, isOwner } from '@/core/permissions/index.js';
+import { checkCommandRequirements } from '@/core/permissions/index.js';
 import {
   hasAcceptedLegal,
   LEGAL_GATE_EXEMPT_COMMANDS,
@@ -16,8 +17,7 @@ export interface CommandPipelineContext {
   readonly inGuild: boolean;
   readonly inMainGuild: boolean;
   readonly userId: string;
-  readonly ownerId: string;
-  readonly privilegedIds: readonly string[];
+  readonly rank: Rank;
   readonly maintenance: boolean;
 }
 
@@ -28,6 +28,7 @@ export interface CommandPipelineContext {
  */
 export interface CommandPipelineHandlers {
   execute: () => Awaitable<void>;
+  onBanned: () => Awaitable<void>;
   onMaintenance: () => Awaitable<void>;
   onScopeDenied: (scope: CommandScope) => Awaitable<void>;
   onPermissionDenied: () => Awaitable<void>;
@@ -41,16 +42,19 @@ export interface CommandPipelineHandlers {
 
 /**
  * Single, declarative dispatch shared by both command fronts:
- * maintenance → optional gate → requirements → execution → post-success.
+ * banned → maintenance → legal → optional gate → requirements → execution.
  * This is the only place access rules live, so slash and prefix never drift.
  */
 export async function runCommandPipeline(
   context: CommandPipelineContext,
   handlers: CommandPipelineHandlers,
 ): Promise<void> {
-  const isUserOwner = isOwner(context.userId, context.ownerId);
+  if (context.rank === 'banned') {
+    await handlers.onBanned();
+    return;
+  }
 
-  if (context.maintenance && !isUserOwner) {
+  if (context.maintenance && context.rank !== 'owner') {
     await handlers.onMaintenance();
     return;
   }
@@ -71,9 +75,7 @@ export async function runCommandPipeline(
   const check = checkCommandRequirements(context.requirements, {
     inGuild: context.inGuild,
     inMainGuild: context.inGuild && context.inMainGuild,
-    userId: context.userId,
-    ownerId: context.ownerId,
-    privilegedIds: context.privilegedIds,
+    rank: context.rank,
   });
   if (!check.ok) {
     if (check.error === 'scope') {

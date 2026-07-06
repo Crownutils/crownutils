@@ -1,11 +1,11 @@
 import { mountInteractiveMessage } from '@/discord/interactions/index.js';
 import { createLegalController } from '@/discord/usecases/index.js';
-import { resolveUserLocale } from '@/discord/locale.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 
 export const command = {
   name: 'legal',
-  requirements: { scope: 'guild', authorization: 'everyone' },
+  requirements: { scope: 'guild', authorization: 'normal' },
 
   async execute(message) {
     const channel = message.channel;

@@ -1,11 +1,12 @@
 import type { CommandScope } from '@/core/permissions/index.js';
 import type { LangNode } from '../types.js';
-import { md } from '@/discord/markdown.js';
+import { md } from '@/discord/theme/markdown.js';
 
 /** Cross-cutting user-facing strings */
 export const commonLang = {
   maintenance:
     'The bot is currently undergoing maintenance. Please try again in a few moments.',
+  banned: 'You are banned from using this bot.',
   permissionDenied: 'You do not have permission to use this command.',
   unexpectedError:
     'An unexpected error has occurred. The incident has been logged.',

@@ -7,7 +7,7 @@ import {
 import { createRegisterController } from '@/discord/usecases/index.js';
 import { buildRegisterAlreadyContainer } from '@/discord/presentations/index.js';
 import { getLegalAcceptance } from '@/core/repositories/index.js';
-import { resolveUserLocale } from '@/discord/locale.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
 import type {
   SlashCommand,
   SlashCommandData,
@@ -24,7 +24,7 @@ function createRegisterCommandData(): SlashCommandData {
 
 const command = {
   data: createRegisterCommandData(),
-  requirements: { scope: 'anywhere', authorization: 'everyone' },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
     const userId = interaction.user.id;
     const language = await resolveUserLocale(userId);

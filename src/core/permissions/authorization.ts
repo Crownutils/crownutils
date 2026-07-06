@@ -1,25 +1,21 @@
-import { isOwner, isPrivileged } from './user.js';
+import type { Rank } from './rank.js';
+import { hasRank } from './rank.js';
 
-/** Who is allowed to run a command. */
-export type Authorization = 'everyone' | 'privileged' | 'owner';
+/**
+ * The minimum rank a command requires. `banned` is excluded: banned users are
+ * blocked from every command, so it is never a level a command can require.
+ */
+export type Authorization = Exclude<Rank, 'banned'>;
 
 export interface AuthorizationContext {
-  readonly userId: string;
-  readonly ownerId: string;
-  readonly privilegedIds: readonly string[];
+  /** The invoking user's effective rank. */
+  readonly rank: Rank;
 }
 
-/** Whether the invoking user satisfies the command's authorization level. */
+/** Whether the invoking user's rank satisfies the command's required rank. */
 export function isAuthorized(
   authorization: Authorization,
   context: AuthorizationContext,
 ): boolean {
-  switch (authorization) {
-    case 'everyone':
-      return true;
-    case 'privileged':
-      return isPrivileged(context.userId, context.privilegedIds);
-    case 'owner':
-      return isOwner(context.userId, context.ownerId);
-  }
+  return hasRank(context.rank, authorization);
 }

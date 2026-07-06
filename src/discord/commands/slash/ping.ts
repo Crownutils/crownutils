@@ -6,7 +6,7 @@ import type {
   SlashCommandData,
 } from '@/discord/registries/index.js';
 import { runPingCommand } from '@/discord/usecases/index.js';
-import { resolveUserLocale } from '@/discord/locale.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
 
 function createPingCommandData(): SlashCommandData {
   return new SlashCommandBuilder()
@@ -19,7 +19,7 @@ function createPingCommandData(): SlashCommandData {
 
 const command = {
   data: createPingCommandData(),
-  requirements: { scope: 'guild', authorization: 'everyone' },
+  requirements: { scope: 'guild', authorization: 'normal' },
   async execute(interaction) {
     const before = Date.now();
     await interaction.deferReply();

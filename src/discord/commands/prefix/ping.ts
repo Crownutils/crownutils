@@ -1,7 +1,7 @@
 import { createContainer, Text } from '@/discord/components/index.js';
 import { sendResponseToMessage } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import { resolveUserLocale } from '@/discord/locale.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 import { runPingCommand } from '@/discord/usecases/index.js';
 import { MessageFlags } from 'discord.js';
@@ -9,7 +9,7 @@ import { MessageFlags } from 'discord.js';
 export const command = {
   name: 'ping',
   aliases: ['p', 'latency'],
-  requirements: { scope: 'guild', authorization: 'everyone' },
+  requirements: { scope: 'guild', authorization: 'normal' },
 
   async execute(message, _args) {
     const userLanguage = await resolveUserLocale(message.author.id);

@@ -1,14 +1,15 @@
 import { Events } from 'discord.js';
 import type { EventModule } from '../registries/index.js';
 import { logger } from '@/shared/index.js';
-import { runCommandPipeline } from '../command-pipeline.js';
+import { runCommandPipeline } from '../pipeline/command-pipeline.js';
 import { config } from '@/core/config/index.js';
 import { lang } from '../lang/index.js';
-import { toError } from '../errors.js';
-import { COMMAND_PREFIX } from '../constants.js';
-import { safeReplyToMessage } from '../interactions/index.js';
+import { buildErrorContainer, toError } from '../utils/errors.js';
+import { COMMAND_PREFIX } from '../utils/constants.js';
+import { sendResponseToMessage } from '../interactions/index.js';
 import { isMaintenanceEnabled } from '@/core/repositories/index.js';
-import { resolveUserLocale } from '../locale.js';
+import { resolveUserLocale } from '../context/locale.js';
+import { resolveUserRank } from '../context/rank.js';
 
 const event = {
   name: Events.MessageCreate,
@@ -31,6 +32,15 @@ const event = {
     const userLanguage = await resolveUserLocale(message.author.id);
     const t = lang[userLanguage].common;
 
+    /** `sendResponseToMessage` resolves to the sent Message; wrap it so every
+     * denial handler returns `Promise<void>` and is actually awaited (no `void`).
+    **/
+    const reply = async (text: string): Promise<void> => {
+      await sendResponseToMessage(message, {
+        container: buildErrorContainer(text),
+      });
+    };
+
     await runCommandPipeline(
       {
         commandName: command.name,
@@ -38,31 +48,28 @@ const event = {
         inGuild,
         inMainGuild: inGuild && message.guildId === config.mainGuildDiscordId,
         userId: message.author.id,
-        ownerId: config.ownerDiscordId,
-        privilegedIds: config.privilegedDiscordIds,
+        rank: await resolveUserRank(message.author.id),
         maintenance: await isMaintenanceEnabled(),
       },
       {
         execute: () => command.execute(message, args),
-        onMaintenance: () => safeReplyToMessage(message, t.maintenance),
-        onScopeDenied: (scope) =>
-          safeReplyToMessage(message, t.scopeDenied(scope)),
-        onPermissionDenied: () =>
-          safeReplyToMessage(message, t.permissionDenied),
+        onBanned: () => reply(t.banned),
+        onMaintenance: () => reply(t.maintenance),
+        onScopeDenied: (scope) => reply(t.scopeDenied(scope)),
+        onPermissionDenied: () => reply(t.permissionDenied),
         onUnexpectedError: async (error) => {
           logger.error(
             { err: toError(error), command: name },
-            'Slash command failed',
+            'Prefix command failed',
           );
-          await safeReplyToMessage(message, t.unexpectedError);
+          await reply(t.unexpectedError);
         },
-        onLegalNotAccepted: async () =>
-          safeReplyToMessage(message, t.legalNotAccepted),
+        onLegalNotAccepted: () => reply(t.legalNotAccepted),
         ...(command.gate && {
           gate: () => command.gate!(message, args),
           onGateDenied: command.onGateDenied
             ? () => command.onGateDenied!(message, args)
-            : () => safeReplyToMessage(message, t.gateDenied),
+            : () => reply(t.gateDenied),
         }),
       },
     );

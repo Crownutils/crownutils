@@ -2,7 +2,7 @@ import { Locale, SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/discord/lang/index.js';
 import { mountInteractiveReply } from '@/discord/interactions/index.js';
 import { createLanguageController } from '@/discord/usecases/index.js';
-import { resolveUserLocale } from '@/discord/locale.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
 import type {
   SlashCommand,
   SlashCommandData,
@@ -19,7 +19,7 @@ function createLanguageCommandData(): SlashCommandData {
 
 const command = {
   data: createLanguageCommandData(),
-  requirements: { scope: 'anywhere', authorization: 'everyone' },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
     const current = await resolveUserLocale(interaction.user.id);
     await mountInteractiveReply(

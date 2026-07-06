@@ -44,11 +44,6 @@ export const config = {
   ),
   ownerDiscordId: required('ownerDiscordId', process.env.OWNER_DISCORD_ID),
 
-  privilegedDiscordIds: (process.env.PRIVILEGED_DISCORD_IDS ?? '')
-    .split(',')
-    .map((id) => id.trim())
-    .filter(Boolean),
-
   githubUrl: 'https://github.com/Crownutils/crownutils',
   projectUrl: 'https://github.com/Crownutils',
   ownerUrl: 'https://github.com/Ntalcme',
@@ -56,4 +51,6 @@ export const config = {
   inviteUrl: applicationId
     ? `https://discord.com/oauth2/authorize?client_id=${applicationId}`
     : undefined,
+
+  saltKey: required('saltKey', process.env.SALT_KEY),
 } as const;
