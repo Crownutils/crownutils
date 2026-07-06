@@ -9,7 +9,7 @@ import { buildSetRankContainer } from '../presentations/index.js';
 /**
  * Change `targetId`'s rank, rejecting changes to yourself, to the owner, or to a
  * rank the user already has. Assigning `banned` goes through {@link banUser} so
- * the ban is fully recorded. Every response is ephemeral.
+ * the ban is fully recorded.
  */
 export async function runSetRankCommand(
   targetId: string,
@@ -49,6 +49,5 @@ export async function runSetRankCommand(
 
   return {
     container: buildSetRankContainer(targetMention, rank, language),
-    ephemeral: true,
   };
 }
