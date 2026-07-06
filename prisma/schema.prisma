@@ -17,14 +17,25 @@ enum Language {
   en
 }
 
+enum Rank {
+  banned
+  normal
+  privileged
+  owner
+}
+
 model User {
   userId String @id
-  pseudoId String @unique @default(uuid())
   language Language @default(en)
+  rank Rank @default(normal)
 }
 
 model LegalAcceptance {
   userId String @id
   acceptedVersion String
   acceptedAt DateTime @default(now())
+}
+
+model Banned {
+  pseudoId String @id @unique
 }
