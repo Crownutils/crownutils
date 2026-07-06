@@ -1,4 +1,4 @@
-import { icons } from '@/discord/icons.js';
+import { icons } from '@/discord/theme/icons.js';
 import type { CommandNode } from '../types.js';
 
 export const ping = {

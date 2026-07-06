@@ -3,7 +3,7 @@ import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord.js';
 import { config } from '@/core/config/index.js';
 import { loadSlashCommands } from '@/discord/handlers/index.js';
 import type { SlashCommand } from '@/discord/registries/index.js';
-import { toError } from '@/discord/errors.js';
+import { toError } from '@/discord/utils/errors.js';
 import { logger } from '@/shared/index.js';
 
 const rest = new REST().setToken(config.discordToken);

@@ -1,7 +1,7 @@
 import { TextDisplayBuilder } from 'discord.js';
 import type { ContainerBuilder, SectionBuilder } from 'discord.js';
 import type { ContainerChild } from './component.js';
-import { md } from '../markdown.js';
+import { md } from '../theme/markdown.js';
 
 /** `subtle` renders as a small, dimmed line; the others map to Markdown headings. */
 export type TextSize = 'normal' | 'subtle' | 'small' | 'medium' | 'large';

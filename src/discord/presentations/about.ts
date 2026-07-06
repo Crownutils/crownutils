@@ -1,11 +1,6 @@
 import type { SupportedLocale } from '@/core/types.js';
-import type {
-  Container} from '../components/index.js';
-import {
-  createContainer,
-  Separator,
-  Text,
-} from '../components/index.js';
+import type { Container } from '../components/index.js';
+import { createContainer, Separator, Text } from '../components/index.js';
 import { lang } from '../lang/index.js';
 import { config } from '@/core/config/index.js';
 

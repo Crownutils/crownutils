@@ -1,6 +1,6 @@
-import { icons } from '@/discord/icons.js';
+import { icons } from '@/discord/theme/icons.js';
 import type { CommandNode, LangNode } from '../types.js';
-import { md } from '@/discord/markdown.js';
+import { md } from '@/discord/theme/markdown.js';
 
 /**
  * Privacy-policy chapters, in display order. Each is a plain heading and body;

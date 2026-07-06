@@ -1,4 +1,4 @@
-import { icons } from '@/discord/icons.js';
+import { icons } from '@/discord/theme/icons.js';
 import type { CommandNode } from '../types.js';
 
 export const register = {
@@ -15,5 +15,7 @@ export const register = {
     alreadyTitle: `${icons.success} Already registered`,
     alreadyBody: (version: string, date: string) =>
       `You already accepted the documents (version ${version}) on ${date}.`,
+    cannotRegister:
+      'You are permanently banned from the bot, you can not register again.',
   },
 } satisfies CommandNode;

@@ -1,7 +1,7 @@
 import { MessageFlags } from 'discord.js';
 import type { Message, RepliableInteraction } from 'discord.js';
 import { logger } from '@/shared/index.js';
-import { toError } from '@/discord/errors.js';
+import { toError } from '@/discord/utils/errors.js';
 
 export type SafeDiscordContext = Record<string, unknown>;
 

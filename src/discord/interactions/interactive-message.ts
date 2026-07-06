@@ -7,9 +7,9 @@ import type {
   SendableChannels,
 } from 'discord.js';
 import type { Container } from '@/discord/components/index.js';
-import { INTERACTIVE_MESSAGE_IDLE_MS } from '@/discord/constants.js';
+import { INTERACTIVE_MESSAGE_IDLE_MS } from '@/discord/utils/constants.js';
 import { lang } from '@/discord/lang/index.js';
-import { resolveUserLocale } from '@/discord/locale.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
 import { safeDiscord } from './safe-discord.js';
 
 /** Collector end reason marking a deliberate `stop()`, told apart from a timeout. */

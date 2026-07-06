@@ -127,3 +127,10 @@ export function buildRegisterAlreadyContainer(
     new Text(messages.alreadyBody(version, when)),
   );
 }
+
+export function buildRegisterCannotRegisterContainer(
+  language: SupportedLocale,
+) {
+  const messages = lang[language].commandRegister.messages;
+  return createContainer('cancel').add(new Text(messages.cannotRegister));
+}

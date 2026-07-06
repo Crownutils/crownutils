@@ -5,7 +5,7 @@ import {
   loadSlashCommands,
 } from '../handlers/index.js';
 import { createRegistries } from '../registries/index.js';
-import { toError } from '../errors.js';
+import { toError } from '../utils/errors.js';
 import { logger } from '@/shared/index.js';
 
 function buildDiscordClient(): Client {

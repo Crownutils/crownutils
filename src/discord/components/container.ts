@@ -1,7 +1,7 @@
 import { ContainerBuilder } from 'discord.js';
 import type { ContainerChild } from './component.js';
-import type { EmbedColor } from '../colors.js';
-import { colors } from '../colors.js';
+import type { EmbedColor } from '../theme/colors.js';
+import { colors } from '../theme/colors.js';
 
 /** Fluent wrapper over a Components V2 container (the message body). */
 export class Container {

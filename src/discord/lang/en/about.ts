@@ -1,5 +1,5 @@
-import { icons } from '@/discord/icons.js';
-import { md } from '@/discord/markdown.js';
+import { icons } from '@/discord/theme/icons.js';
+import { md } from '@/discord/theme/markdown.js';
 import type { CommandNode } from '../types.js';
 
 export const about = {
