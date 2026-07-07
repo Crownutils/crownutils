@@ -6,6 +6,14 @@ export type Rank = (typeof RANK)[number];
 
 export type NotBannedRank = Exclude<Rank, 'banned'>;
 
+/** Narrows `rank` to {@link NotBannedRank}; throws if it is `banned` (the pipeline never lets that reach a command). */
+export function assertNotBanned(rank: Rank): NotBannedRank {
+  if (rank === 'banned') {
+    throw new Error('Unexpected banned user reached a command.');
+  }
+  return rank;
+}
+
 /** Numeric access level of a rank (its index in {@link RANK}); higher grants more. */
 export function rankLevel(rank: Rank): number {
   return RANK.indexOf(rank);

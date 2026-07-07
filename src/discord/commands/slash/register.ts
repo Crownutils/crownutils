@@ -4,9 +4,11 @@ import {
   mountInteractiveReply,
   sendResponseToInteraction,
 } from '@/discord/interactions/index.js';
-import { createRegisterController } from '@/discord/usecases/index.js';
-import { buildRegisterAlreadyContainer } from '@/discord/presentations/index.js';
-import { getLegalAcceptance } from '@/core/repositories/index.js';
+import {
+  canRegister,
+  createRegisterController,
+  runRegisterGateDenied,
+} from '@/discord/usecases/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type {
   SlashCommand,
@@ -25,21 +27,17 @@ function createRegisterCommandData(): SlashCommandData {
 const command = {
   data: createRegisterCommandData(),
   requirements: { scope: 'anywhere', authorization: 'normal' },
+  gate: (interaction) => canRegister(interaction.user.id),
+  async onGateDenied(interaction) {
+    const language = await resolveUserLocale(interaction.user.id);
+    await sendResponseToInteraction(
+      interaction,
+      await runRegisterGateDenied(interaction.user.id, language),
+    );
+  },
   async execute(interaction) {
     const userId = interaction.user.id;
     const language = await resolveUserLocale(userId);
-
-    const acceptance = await getLegalAcceptance(userId);
-    if (acceptance) {
-      await sendResponseToInteraction(interaction, {
-        container: buildRegisterAlreadyContainer(
-          language,
-          acceptance.acceptedVersion,
-          acceptance.acceptedAt,
-        ),
-      });
-      return;
-    }
 
     await mountInteractiveReply(
       interaction,

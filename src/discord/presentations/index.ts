@@ -4,3 +4,4 @@ export * from './register.js';
 export * from './about.js';
 export * from './rank.js';
 export * from './set-rank.js';
+export * from './data.js';

@@ -13,19 +13,19 @@ const privacy = {
   },
   dataCollected: {
     heading: 'Data collected',
-    body: 'We only keep: your Discord id and those of the relevant channels, the content of the reminders you create, mail read receipts, the dates of certain actions (route calculation, access request) and your acceptance of these documents. We do not read your messages and collect no sensitive data.',
+    body: 'We only keep: your Discord id, your chosen language, your access rank, your acceptance of these documents and, if you are banned, a cryptographic hash of your Discord id. We do not read your messages and collect no sensitive data.',
   },
   purposes: {
     heading: 'Purposes',
-    body: 'This data is used solely to run the bot features (reminders, mails, anti-abuse limits) and to respect your choices.',
+    body: 'This data is used solely to run the bot in the language and with the access rights that match you, and to respect your choices. The hash tied to a ban is used only to prevent creating a new account to circumvent the sanction.',
   },
   legalBasis: {
     heading: 'Legal basis',
-    body: 'Processing is based on your consent (your acceptance) and on the performance of the service you request.',
+    body: 'Processing is based on your consent (your acceptance) and on the performance of the service you request. Retaining the ban hash is based on our legitimate interest in preventing abuse.',
   },
   retention: {
     heading: 'Retention period',
-    body: 'Reminders are kept until they are sent or cancelled; mails are deleted automatically after 14 days; other data is kept until you delete it or its purpose no longer applies.',
+    body: 'This data is kept until you delete it or its purpose no longer applies. The hash tied to a ban is kept indefinitely, including after an erasure request, to preserve the effectiveness of the sanction.',
   },
   sharing: {
     heading: 'Data sharing',
@@ -33,7 +33,7 @@ const privacy = {
   },
   rights: {
     heading: 'Your rights',
-    body: `Under the GDPR, you have a right of access (${md.code('data')} command, limited to one request every 31 days) and a right to erasure (${md.code('delete-data')} command). Erasure also removes your acceptance: you will have to accept the documents again to use the bot. You may lodge a complaint with the CNIL, the French data protection authority.`,
+    body: `Under the GDPR, you have a right of access (${md.code('data')} command, limited to one request every 31 days, which notably states whether a ban hash exists for you) and a right to erasure (${md.code('delete-data')} command). Erasure also removes your acceptance: you will have to accept the documents again to use the bot. This does not cover the ban hash mentioned above, which does not identify you directly and is kept to prevent circumventing the sanction, including after the ban itself is lifted. You may lodge a complaint with the CNIL, the French data protection authority.`,
   },
   security: {
     heading: 'Security',

@@ -1,11 +1,20 @@
 import type { SupportedLocale } from '@/core/types.js';
 import { isSupportedLocale } from '@/core/types.js';
-import { canUserRegister, registerUser } from '@/core/repositories/index.js';
+import {
+  canUserRegister,
+  getLegalAcceptance,
+  hasAcceptedLegal,
+  registerUser,
+} from '@/core/repositories/index.js';
 import type { Container } from '../components/index.js';
-import type { InteractiveMessage } from '../interactions/index.js';
+import type {
+  CommandResponse,
+  InteractiveMessage,
+} from '../interactions/index.js';
 import {
   buildLanguageContainer,
   buildLegalContainer,
+  buildRegisterAlreadyContainer,
   buildRegisterCancelledContainer,
   buildRegisterCannotRegisterContainer,
   buildRegisterDoneContainer,
@@ -15,6 +24,31 @@ import {
   LEGAL_VIEW_PRIVACY_ID,
 } from '../presentations/index.js';
 import { isOwner } from '@/core/permissions/user.js';
+
+/**
+ * Whether `userId` may go through the registration flow, i.e. hasn't accepted
+ * yet. Uses {@link hasAcceptedLegal}'s cache, so returning users hit no DB
+ * round-trip; {@link runRegisterGateDenied} fetches the full record only when
+ * the gate actually denies.
+ */
+export async function canRegister(userId: string): Promise<boolean> {
+  return !(await hasAcceptedLegal(userId));
+}
+
+/** Response shown when `userId` runs `register` again after already accepting. */
+export async function runRegisterGateDenied(
+  userId: string,
+  language: SupportedLocale,
+): Promise<CommandResponse> {
+  const acceptance = await getLegalAcceptance(userId);
+  return {
+    container: buildRegisterAlreadyContainer(
+      language,
+      acceptance!.acceptedVersion,
+      acceptance!.acceptedAt,
+    ),
+  };
+}
 
 /** Which legal document the viewer is currently showing. */
 export type LegalDocument = 'cgu' | 'privacy';

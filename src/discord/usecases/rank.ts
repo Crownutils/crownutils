@@ -1,13 +1,15 @@
 import type { SupportedLocale } from '@/core/types.js';
 import type { CommandResponse } from '../interactions/index.js';
-import type { NotBannedRank, Rank } from '@/core/permissions/rank.js';
+import { assertNotBanned, rankLevel } from '@/core/permissions/rank.js';
+import { getUserRank } from '@/core/repositories/index.js';
 import { buildRankContainer } from '../presentations/index.js';
 
-export function runRankCommand(
+export async function runRankCommand(
+  userId: string,
   language: SupportedLocale,
-  userRank: NotBannedRank,
-  userRankLevel: number,
-): CommandResponse {
+): Promise<CommandResponse> {
+  const userRank = assertNotBanned(await getUserRank(userId));
+  const userRankLevel = rankLevel(userRank);
   return {
     container: buildRankContainer(language, userRank, userRankLevel),
   };

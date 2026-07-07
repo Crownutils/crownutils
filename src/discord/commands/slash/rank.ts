@@ -6,8 +6,6 @@ import type {
   SlashCommandData,
 } from '@/discord/registries/index.js';
 import { Locale, SlashCommandBuilder } from 'discord.js';
-import { getUserRank } from '@/core/repositories/user-repository.js';
-import { rankLevel } from '@/core/permissions/rank.js';
 import { runRankCommand } from '@/discord/usecases/index.js';
 
 function createCommandRankData(): SlashCommandData {
@@ -23,19 +21,10 @@ const command = {
   data: createCommandRankData(),
   requirements: { scope: 'guild', authorization: 'normal' },
   async execute(interaction) {
-    const userRank = await getUserRank(interaction.user.id);
-    if (userRank === 'banned') {
-      throw new Error('Unexpected banned user reached a command.');
-    }
-
-    const userRankLevel = rankLevel(userRank);
+    const language = await resolveUserLocale(interaction.user.id);
     await sendResponseToInteraction(
       interaction,
-      runRankCommand(
-        await resolveUserLocale(interaction.user.id),
-        userRank,
-        userRankLevel,
-      ),
+      await runRankCommand(interaction.user.id, language),
     );
   },
 } satisfies SlashCommand;

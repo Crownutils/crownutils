@@ -13,19 +13,19 @@ const privacy = {
   },
   dataCollected: {
     heading: 'Données collectées',
-    body: "Nous conservons uniquement : votre identifiant Discord et celui des salons concernés, le contenu des rappels que vous créez, les accusés de lecture des mails, les dates de certaines actions (calcul d'itinéraire, demande d'accès) et votre acceptation des présents documents. Nous ne lisons pas vos messages et ne collectons aucune donnée sensible.",
+    body: "Nous conservons uniquement : votre identifiant Discord, la langue choisie, votre rang d'accès, votre acceptation des présents documents et, si vous êtes banni, une empreinte cryptographique (hash) de votre identifiant Discord. Nous ne lisons pas vos messages et ne collectons aucune donnée sensible.",
   },
   purposes: {
     heading: 'Finalités',
-    body: 'Ces données servent exclusivement à faire fonctionner les fonctionnalités du bot (rappels, mails, limites anti-abus) et à respecter vos choix.',
+    body: "Ces données servent exclusivement à faire fonctionner le bot dans la langue et avec les droits d'accès qui vous correspondent, et à respecter vos choix. L'empreinte liée à un bannissement sert uniquement à empêcher la création d'un nouveau compte pour contourner la sanction.",
   },
   legalBasis: {
     heading: 'Base légale',
-    body: "Le traitement repose sur votre consentement (votre acceptation) et sur l'exécution du service que vous demandez.",
+    body: "Le traitement repose sur votre consentement (votre acceptation) et sur l'exécution du service que vous demandez. La conservation de l'empreinte de bannissement repose sur notre intérêt légitime à prévenir les abus.",
   },
   retention: {
     heading: 'Durée de conservation',
-    body: "Les rappels sont conservés jusqu'à leur envoi ou leur annulation ; les mails sont supprimés automatiquement après 14 jours ; les autres données sont conservées jusqu'à leur suppression par vos soins ou la disparition de leur finalité.",
+    body: "Ces données sont conservées jusqu'à leur suppression par vos soins ou la disparition de leur finalité. L'empreinte liée à un bannissement est conservée indéfiniment, y compris après une demande d'effacement, afin de préserver l'efficacité de la sanction.",
   },
   sharing: {
     heading: 'Partage des données',
@@ -33,7 +33,7 @@ const privacy = {
   },
   rights: {
     heading: 'Vos droits',
-    body: `Conformément au RGPD, vous disposez d'un droit d'accès (commande ${md.code('data')}, limitée à une demande tous les 31 jours) et d'un droit à l'effacement (commande ${md.code('delete-data')}). L'effacement supprime également votre acceptation : vous devrez accepter de nouveau les documents pour réutiliser le bot. Vous pouvez introduire une réclamation auprès de la CNIL.`,
+    body: `Conformément au RGPD, vous disposez d'un droit d'accès (commande ${md.code('data')}, limitée à une demande tous les 31 jours, qui précise notamment si une empreinte de bannissement existe pour vous) et d'un droit à l'effacement (commande ${md.code('delete-data')}). L'effacement supprime également votre acceptation : vous devrez accepter de nouveau les documents pour réutiliser le bot. Cette suppression ne porte toutefois pas sur l'empreinte de bannissement mentionnée ci-dessus, qui ne permet pas de vous identifier directement et reste conservée pour empêcher un contournement de la sanction, y compris si le bannissement est ensuite levé. Vous pouvez introduire une réclamation auprès de la CNIL.`,
   },
   security: {
     heading: 'Sécurité',

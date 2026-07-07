@@ -7,6 +7,7 @@ import { legal, legalCommand } from './legal.js';
 import { about } from './about.js';
 import { rank } from './rank.js';
 import { setRank } from './setrank.js';
+import { data } from './data.js';
 
 /** The French language pack: a typed tree of strings and formatters. */
 export const fr = {
@@ -19,4 +20,5 @@ export const fr = {
   commandAbout: about,
   commandRank: rank,
   commandSetRank: setRank,
+  commandData: data,
 } as const satisfies LangNode;

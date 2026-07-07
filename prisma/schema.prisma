@@ -37,5 +37,10 @@ model LegalAcceptance {
 }
 
 model Banned {
-  pseudoId String @id @unique
+  hash String @id @unique
+}
+
+model GdprRequest {
+  hash String @id
+  requestedAt DateTime @default(now())
 }

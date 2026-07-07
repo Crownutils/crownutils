@@ -1,27 +1,21 @@
-import { config } from '../config/index.js';
 import { prisma } from '../persistence/client.js';
+import { hashUserId } from '../security/hash-user-id.js';
 import { setUserRank } from './user-repository.js';
-import { createHash } from 'node:crypto';
-
-function createHashForUser(userId: string): string {
-  return createHash('sha256')
-    .update(userId + config.saltKey)
-    .digest('hex');
-}
 
 export async function persitBan(userId: string) {
   await setUserRank(userId, 'banned');
-  const hash = createHashForUser(userId);
+  const hash = hashUserId(userId);
 
-  await prisma.banned.create({ data: { pseudoId: hash } });
+  await prisma.banned.create({ data: { hash } });
+}
+
+/** Whether `userId` has a ban hash on record, regardless of their current rank. */
+export async function hasBanHash(userId: string): Promise<boolean> {
+  const hash = hashUserId(userId);
+  const banned = await prisma.banned.findUnique({ where: { hash } });
+  return banned !== null;
 }
 
 export async function canUserRegister(userId: string): Promise<boolean> {
-  const userHash = createHashForUser(userId);
-
-  const banned = await prisma.banned.findUnique({
-    where: { pseudoId: userHash },
-  });
-
-  return banned ? false : true;
+  return !(await hasBanHash(userId));
 }

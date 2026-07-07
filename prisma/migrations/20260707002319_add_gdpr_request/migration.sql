@@ -1,0 +1,5 @@
+-- CreateTable
+CREATE TABLE "GdprRequest" (
+    "userId" TEXT NOT NULL PRIMARY KEY,
+    "requestedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

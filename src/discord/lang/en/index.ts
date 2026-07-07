@@ -7,6 +7,7 @@ import { legal, legalCommand } from './legal.js';
 import { about } from './about.js';
 import { rank } from './rank.js';
 import { setRank } from './setrank.js';
+import { data } from './data.js';
 
 /** The English language pack: a typed tree of strings and formatters. */
 export const en = {
@@ -19,4 +20,5 @@ export const en = {
   commandAbout: about,
   commandRank: rank,
   commandSetRank: setRank,
+  commandData: data,
 } as const satisfies LangNode;
