@@ -1,5 +1,3 @@
-import { MessageFlags } from 'discord.js';
-import type { Message, RepliableInteraction } from 'discord.js';
 import { logger } from '@/shared/index.js';
 import { toError } from '@/discord/utils/errors.js';
 
@@ -20,25 +18,4 @@ export async function safeDiscord<T>(
     logger.warn({ err: toError(error), ...context }, 'Discord call failed');
     return undefined;
   }
-}
-
-/** Best-effort ephemeral text reply to an interaction (never throws). */
-export async function safeReplyToInteraction(
-  interaction: RepliableInteraction,
-  content: string,
-): Promise<void> {
-  const payload = { content, flags: MessageFlags.Ephemeral } as const;
-  if (interaction.replied || interaction.deferred) {
-    await safeDiscord(interaction.followUp(payload), { action: 'followUp' });
-    return;
-  }
-  await safeDiscord(interaction.reply(payload), { action: 'reply' });
-}
-
-/** Best-effort text reply to a message (never throws). */
-export async function safeReplyToMessage(
-  message: Message,
-  content: string,
-): Promise<void> {
-  await safeDiscord(message.reply({ content }), { action: 'messageReply' });
 }

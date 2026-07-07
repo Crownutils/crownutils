@@ -2,17 +2,13 @@ import { Locale, SlashCommandBuilder } from 'discord.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import { sendResponseToInteraction } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import {
-  canRunDataCommand,
-  runDataCommand,
-  runDataCommandGateDenied,
-} from '@/discord/usecases/index.js';
+import { runDataCommand } from '@/discord/usecases/index.js';
 import type {
   SlashCommand,
   SlashCommandData,
 } from '@/discord/registries/index.js';
 
-function createCommandDataData(): SlashCommandData {
+function createDataCommandData(): SlashCommandData {
   return new SlashCommandBuilder()
     .setName('data')
     .setDescription(lang.en.commandData.description)
@@ -22,16 +18,8 @@ function createCommandDataData(): SlashCommandData {
 }
 
 const command = {
-  data: createCommandDataData(),
-  requirements: { scope: 'anywhere', authorization: 'normal' },
-  gate: (interaction) => canRunDataCommand(interaction.user.id),
-  async onGateDenied(interaction) {
-    const language = await resolveUserLocale(interaction.user.id);
-    await sendResponseToInteraction(
-      interaction,
-      await runDataCommandGateDenied(interaction.user.id, language),
-    );
-  },
+  data: createDataCommandData(),
+  requirements: { scope: 'dm', authorization: 'normal' },
   async execute(interaction) {
     const language = await resolveUserLocale(interaction.user.id);
     await sendResponseToInteraction(

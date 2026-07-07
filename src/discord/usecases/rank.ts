@@ -4,6 +4,7 @@ import { assertNotBanned, rankLevel } from '@/core/permissions/rank.js';
 import { getUserRank } from '@/core/repositories/index.js';
 import { buildRankContainer } from '../presentations/index.js';
 
+/** Builds the `rank` command's response: the caller's own rank and its numeric level. */
 export async function runRankCommand(
   userId: string,
   language: SupportedLocale,

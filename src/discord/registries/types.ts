@@ -22,8 +22,6 @@ export interface SlashCommand {
   readonly data: SlashCommandData;
   readonly requirements: CommandRequirements;
   execute(interaction: ChatInputCommandInteraction): Awaitable<void>;
-  gate?(interaction: ChatInputCommandInteraction): Awaitable<boolean>;
-  onGateDenied?(interaction: ChatInputCommandInteraction): Awaitable<void>;
 }
 
 /** A legacy prefix (message-based) command module. */
@@ -32,8 +30,6 @@ export interface PrefixCommand {
   readonly aliases?: readonly string[];
   readonly requirements: CommandRequirements;
   execute(message: Message, args: readonly string[]): Awaitable<void>;
-  gate?(message: Message, args: readonly string[]): Awaitable<boolean>;
-  onGateDenied?(message: Message, args: readonly string[]): Awaitable<void>;
 }
 
 /** A gateway event module bound to the client by the loader. */

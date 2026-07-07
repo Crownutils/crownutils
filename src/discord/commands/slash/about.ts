@@ -5,10 +5,10 @@ import type {
   SlashCommand,
   SlashCommandData,
 } from '@/discord/registries/index.js';
-import { runAboutCommand } from '@/discord/usecases/about.js';
+import { runAboutCommand } from '@/discord/usecases/index.js';
 import { Locale, SlashCommandBuilder } from 'discord.js';
 
-function createCommandAboutData(): SlashCommandData {
+function createAboutCommandData(): SlashCommandData {
   return new SlashCommandBuilder()
     .setName('about')
     .setDescription(lang.en.commandAbout.description)
@@ -18,8 +18,8 @@ function createCommandAboutData(): SlashCommandData {
 }
 
 const command = {
-  data: createCommandAboutData(),
-  requirements: { scope: 'guild', authorization: 'normal' },
+  data: createAboutCommandData(),
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
     await sendResponseToInteraction(
       interaction,

@@ -1,12 +1,12 @@
 import { sendResponseToMessage } from '@/discord/interactions/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
-import { runAboutCommand } from '@/discord/usecases/about.js';
+import { runAboutCommand } from '@/discord/usecases/index.js';
 
-export const command = {
+const command = {
   name: 'about',
   aliases: ['botinfo'],
-  requirements: { scope: 'guild', authorization: 'normal' },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
 
   async execute(message, _args) {
     const userLanguage = await resolveUserLocale(message.author.id);

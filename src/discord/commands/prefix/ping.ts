@@ -6,10 +6,10 @@ import type { PrefixCommand } from '@/discord/registries/index.js';
 import { runPingCommand } from '@/discord/usecases/index.js';
 import { MessageFlags } from 'discord.js';
 
-export const command = {
+const command = {
   name: 'ping',
   aliases: ['p', 'latency'],
-  requirements: { scope: 'guild', authorization: 'normal' },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
 
   async execute(message, _args) {
     const userLanguage = await resolveUserLocale(message.author.id);

@@ -9,12 +9,11 @@ export const LEGAL_VERSION = '1.0';
 
 /**
  * Commands that must stay usable without having accepted the legal documents:
- * the legal viewer itself, the purely informational commands, and the GDPR
- * rights commands (a user must always be able to access or erase their data).
+ * the registration flow itself and the GDPR access command (a user must always
+ * be able to see their data).
  */
 export const LEGAL_GATE_EXEMPT_COMMANDS: ReadonlySet<string> = new Set([
   'data',
-  'delete-data',
   'register',
 ]);
 

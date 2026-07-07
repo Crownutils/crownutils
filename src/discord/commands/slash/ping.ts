@@ -19,7 +19,7 @@ function createPingCommandData(): SlashCommandData {
 
 const command = {
   data: createPingCommandData(),
-  requirements: { scope: 'guild', authorization: 'normal' },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
     const before = Date.now();
     await interaction.deferReply();

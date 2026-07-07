@@ -8,7 +8,7 @@ import type {
 import { Locale, SlashCommandBuilder } from 'discord.js';
 import { runRankCommand } from '@/discord/usecases/index.js';
 
-function createCommandRankData(): SlashCommandData {
+function createRankCommandData(): SlashCommandData {
   return new SlashCommandBuilder()
     .setName('rank')
     .setDescription(lang.en.commandRank.description)
@@ -18,8 +18,8 @@ function createCommandRankData(): SlashCommandData {
 }
 
 const command = {
-  data: createCommandRankData(),
-  requirements: { scope: 'guild', authorization: 'normal' },
+  data: createRankCommandData(),
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
     const language = await resolveUserLocale(interaction.user.id);
     await sendResponseToInteraction(

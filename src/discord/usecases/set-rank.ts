@@ -1,6 +1,10 @@
 import type { SupportedLocale } from '@/core/types.js';
 import { isOwner, type AssignableRank } from '@/core/permissions/index.js';
-import { banUser, getUserRank, setUserRank } from '@/core/repositories/index.js';
+import {
+  getUserRank,
+  persistBan,
+  setUserRank,
+} from '@/core/repositories/index.js';
 import type { CommandResponse } from '../interactions/index.js';
 import { lang } from '../lang/index.js';
 import { buildErrorContainer } from '../utils/errors.js';
@@ -8,8 +12,8 @@ import { buildSetRankContainer } from '../presentations/index.js';
 
 /**
  * Change `targetId`'s rank, rejecting changes to yourself, to the owner, or to a
- * rank the user already has. Assigning `banned` goes through {@link banUser} so
- * the ban is fully recorded.
+ * rank the user already has. Assigning `banned` goes through {@link persistBan}
+ * so the ban is fully recorded.
  */
 export async function runSetRankCommand(
   targetId: string,
@@ -42,7 +46,7 @@ export async function runSetRankCommand(
   }
 
   if (rank === 'banned') {
-    await banUser(targetId);
+    await persistBan(targetId);
   } else {
     await setUserRank(targetId, rank);
   }

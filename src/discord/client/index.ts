@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, Partials } from 'discord.js';
 import {
   loadEvents,
   loadPrefixCommands,
@@ -12,9 +12,13 @@ function buildDiscordClient(): Client {
   return new Client({
     intents: [
       GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.DirectMessages,
       GatewayIntentBits.Guilds,
       GatewayIntentBits.MessageContent,
     ],
+    /** DM channels aren't cached, so the message event only fires for them when
+     * the channel can be delivered as a partial. */
+    partials: [Partials.Channel],
     presence: {
       status: 'online',
     },

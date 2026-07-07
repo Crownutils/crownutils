@@ -26,26 +26,27 @@ import {
 import { isOwner } from '@/core/permissions/user.js';
 
 /**
- * Whether `userId` may go through the registration flow, i.e. hasn't accepted
- * yet. Uses {@link hasAcceptedLegal}'s cache, so returning users hit no DB
- * round-trip; {@link runRegisterGateDenied} fetches the full record only when
- * the gate actually denies.
+ * The "already registered" response when `userId` has previously accepted, or
+ * `null` to let the registration flow proceed. Cheap common case first: the
+ * cached {@link hasAcceptedLegal} spares returning users a DB round-trip, and
+ * the full record is fetched only to build the notice. If the record vanished
+ * between the two reads (e.g. a data erasure), we fall through to registering
+ * again rather than throwing.
  */
-export async function canRegister(userId: string): Promise<boolean> {
-  return !(await hasAcceptedLegal(userId));
-}
-
-/** Response shown when `userId` runs `register` again after already accepting. */
-export async function runRegisterGateDenied(
+export async function runRegisterAlreadyResponse(
   userId: string,
   language: SupportedLocale,
-): Promise<CommandResponse> {
+): Promise<CommandResponse | null> {
+  if (!(await hasAcceptedLegal(userId))) return null;
+
   const acceptance = await getLegalAcceptance(userId);
+  if (!acceptance) return null;
+
   return {
     container: buildRegisterAlreadyContainer(
       language,
-      acceptance!.acceptedVersion,
-      acceptance!.acceptedAt,
+      acceptance.acceptedVersion,
+      acceptance.acceptedAt,
     ),
   };
 }

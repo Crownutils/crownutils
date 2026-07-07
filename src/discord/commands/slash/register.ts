@@ -5,9 +5,8 @@ import {
   sendResponseToInteraction,
 } from '@/discord/interactions/index.js';
 import {
-  canRegister,
   createRegisterController,
-  runRegisterGateDenied,
+  runRegisterAlreadyResponse,
 } from '@/discord/usecases/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type {
@@ -27,17 +26,18 @@ function createRegisterCommandData(): SlashCommandData {
 const command = {
   data: createRegisterCommandData(),
   requirements: { scope: 'anywhere', authorization: 'normal' },
-  gate: (interaction) => canRegister(interaction.user.id),
-  async onGateDenied(interaction) {
-    const language = await resolveUserLocale(interaction.user.id);
-    await sendResponseToInteraction(
-      interaction,
-      await runRegisterGateDenied(interaction.user.id, language),
-    );
-  },
   async execute(interaction) {
     const userId = interaction.user.id;
     const language = await resolveUserLocale(userId);
+
+    const alreadyRegistered = await runRegisterAlreadyResponse(
+      userId,
+      language,
+    );
+    if (alreadyRegistered) {
+      await sendResponseToInteraction(interaction, alreadyRegistered);
+      return;
+    }
 
     await mountInteractiveReply(
       interaction,

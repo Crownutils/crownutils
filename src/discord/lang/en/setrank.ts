@@ -5,7 +5,8 @@ export const setRank = {
   messages: {
     userOption: 'The user whose rank to change.',
     rankOption: 'The rank to assign.',
-    success: (user: string, rank: string) => `${user} now has the rank ${rank}.`,
+    success: (user: string, rank: string) =>
+      `${user} now has the rank ${rank}.`,
     alreadyThatRank: (user: string, rank: string) =>
       `${user} already has the rank ${rank}.`,
     cannotChangeSelf: 'You cannot change your own rank.',

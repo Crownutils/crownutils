@@ -35,58 +35,52 @@ export interface CommandPipelineHandlers {
   onUnexpectedError: (error: unknown) => Awaitable<void>;
   onLegalNotAccepted: () => Awaitable<unknown>;
   onSuccess?: () => Awaitable<void>;
-  /** Optional extra gate (e.g. a feature flag); resolve `false` to block. */
-  gate?: () => Awaitable<boolean>;
-  onGateDenied?: () => Awaitable<void>;
 }
 
 /**
  * Single, declarative dispatch shared by both command fronts:
- * banned → maintenance → legal → optional gate → requirements → execution.
+ * banned → maintenance → legal → requirements → execution.
  * This is the only place access rules live, so slash and prefix never drift.
+ * The whole run is wrapped so a failing *denial* reply (not just `execute`)
+ * still surfaces through `onUnexpectedError` instead of being lost.
  */
 export async function runCommandPipeline(
   context: CommandPipelineContext,
   handlers: CommandPipelineHandlers,
 ): Promise<void> {
-  if (context.rank === 'banned') {
-    await handlers.onBanned();
-    return;
-  }
-
-  if (context.maintenance && context.rank !== 'owner') {
-    await handlers.onMaintenance();
-    return;
-  }
-
-  if (
-    !(await hasAcceptedLegal(context.userId)) &&
-    !LEGAL_GATE_EXEMPT_COMMANDS.has(context.commandName)
-  ) {
-    await handlers.onLegalNotAccepted();
-    return;
-  }
-
-  if (handlers.gate && !(await handlers.gate())) {
-    await handlers.onGateDenied?.();
-    return;
-  }
-
-  const check = checkCommandRequirements(context.requirements, {
-    inGuild: context.inGuild,
-    inMainGuild: context.inGuild && context.inMainGuild,
-    rank: context.rank,
-  });
-  if (!check.ok) {
-    if (check.error === 'scope') {
-      await handlers.onScopeDenied(context.requirements.scope);
-    } else {
-      await handlers.onPermissionDenied();
-    }
-    return;
-  }
-
   try {
+    if (context.rank === 'banned') {
+      await handlers.onBanned();
+      return;
+    }
+
+    if (context.maintenance && context.rank !== 'owner') {
+      await handlers.onMaintenance();
+      return;
+    }
+
+    if (
+      !(await hasAcceptedLegal(context.userId)) &&
+      !LEGAL_GATE_EXEMPT_COMMANDS.has(context.commandName)
+    ) {
+      await handlers.onLegalNotAccepted();
+      return;
+    }
+
+    const check = checkCommandRequirements(context.requirements, {
+      inGuild: context.inGuild,
+      inMainGuild: context.inGuild && context.inMainGuild,
+      rank: context.rank,
+    });
+    if (!check.ok) {
+      if (check.error === 'scope') {
+        await handlers.onScopeDenied(context.requirements.scope);
+      } else {
+        await handlers.onPermissionDenied();
+      }
+      return;
+    }
+
     await handlers.execute();
     await handlers.onSuccess?.();
   } catch (error) {

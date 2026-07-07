@@ -3,7 +3,10 @@ import { lang } from '@/discord/lang/index.js';
 import { sendResponseToInteraction } from '@/discord/interactions/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import { runSetRankCommand } from '@/discord/usecases/index.js';
-import { ASSIGNABLE_RANKS, isAssignableRank } from '@/core/permissions/index.js';
+import {
+  ASSIGNABLE_RANKS,
+  isAssignableRank,
+} from '@/core/permissions/index.js';
 import type {
   SlashCommand,
   SlashCommandData,

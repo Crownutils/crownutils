@@ -2,13 +2,11 @@ import { Events } from 'discord.js';
 import type { EventModule } from '../registries/index.js';
 import { logger } from '@/shared/index.js';
 import { runCommandPipeline } from '../pipeline/command-pipeline.js';
+import { buildDenialHandlers } from '../pipeline/denial-handlers.js';
 import { config } from '@/core/config/index.js';
-import { lang } from '../lang/index.js';
-import { buildErrorContainer, toError } from '../utils/errors.js';
 import { sendResponseToInteraction } from '../interactions/index.js';
 import { isMaintenanceEnabled } from '@/core/repositories/index.js';
-import { resolveUserLocale } from '../context/locale.js';
-import { resolveUserRank } from '../context/rank.js';
+import { resolveUserContext } from '../context/user.js';
 
 const event = {
   name: Events.InteractionCreate,
@@ -28,8 +26,10 @@ const event = {
     }
 
     const inGuild = interaction.inGuild();
-    const userLanguage = await resolveUserLocale(interaction.user.id);
-    const t = lang[userLanguage].common;
+    const [{ locale, rank }, maintenance] = await Promise.all([
+      resolveUserContext(interaction.user.id),
+      isMaintenanceEnabled(),
+    ]);
 
     await runCommandPipeline(
       {
@@ -39,55 +39,16 @@ const event = {
         inMainGuild:
           inGuild && interaction.guildId === config.mainGuildDiscordId,
         userId: interaction.user.id,
-        rank: await resolveUserRank(interaction.user.id),
-        maintenance: await isMaintenanceEnabled(),
+        rank,
+        maintenance,
       },
       {
         execute: () => command.execute(interaction),
-        onBanned: () =>
-          sendResponseToInteraction(interaction, {
-            container: buildErrorContainer(t.banned),
-            ephemeral: true,
-          }),
-        onMaintenance: () =>
-          sendResponseToInteraction(interaction, {
-            container: buildErrorContainer(t.maintenance),
-            ephemeral: true,
-          }),
-        onScopeDenied: (scope) =>
-          sendResponseToInteraction(interaction, {
-            container: buildErrorContainer(t.scopeDenied(scope)),
-            ephemeral: true,
-          }),
-        onPermissionDenied: () =>
-          sendResponseToInteraction(interaction, {
-            container: buildErrorContainer(t.permissionDenied),
-            ephemeral: true,
-          }),
-        onUnexpectedError: async (error) => {
-          logger.error(
-            { err: toError(error), command: interaction.commandName },
-            'Slash command failed',
-          );
-          await sendResponseToInteraction(interaction, {
-            container: buildErrorContainer(t.unexpectedError),
-            ephemeral: true,
-          });
-        },
-        onLegalNotAccepted: async () =>
-          await sendResponseToInteraction(interaction, {
-            container: buildErrorContainer(t.legalNotAccepted),
-            ephemeral: true,
-          }),
-        ...(command.gate && {
-          gate: () => command.gate!(interaction),
-          onGateDenied: command.onGateDenied
-            ? () => command.onGateDenied!(interaction)
-            : () =>
-                sendResponseToInteraction(interaction, {
-                  container: buildErrorContainer(t.gateDenied),
-                  ephemeral: true,
-                }),
+        ...buildDenialHandlers({
+          locale,
+          commandName: interaction.commandName,
+          logLabel: 'Slash command failed',
+          reply: (response) => sendResponseToInteraction(interaction, response),
         }),
       },
     );

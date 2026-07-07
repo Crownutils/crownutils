@@ -5,3 +5,4 @@ export * from './about.js';
 export * from './rank.js';
 export * from './set-rank.js';
 export * from './data.js';
+export * from './maintenance.js';

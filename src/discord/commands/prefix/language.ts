@@ -3,10 +3,10 @@ import { createLanguageController } from '@/discord/usecases/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 
-export const command = {
+const command = {
   name: 'language',
   aliases: ['lang'],
-  requirements: { scope: 'guild', authorization: 'normal' },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
 
   async execute(message) {
     const channel = message.channel;

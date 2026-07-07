@@ -3,30 +3,30 @@ import {
   sendResponseToMessage,
 } from '@/discord/interactions/index.js';
 import {
-  canRegister,
   createRegisterController,
-  runRegisterGateDenied,
+  runRegisterAlreadyResponse,
 } from '@/discord/usecases/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 
-export const command = {
+const command = {
   name: 'register',
-  requirements: { scope: 'guild', authorization: 'normal' },
-  gate: (message) => canRegister(message.author.id),
-  async onGateDenied(message) {
-    const language = await resolveUserLocale(message.author.id);
-    await sendResponseToMessage(
-      message,
-      await runRegisterGateDenied(message.author.id, language),
-    );
-  },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(message) {
     const channel = message.channel;
     if (!channel.isSendable()) return;
 
     const userId = message.author.id;
     const language = await resolveUserLocale(userId);
+
+    const alreadyRegistered = await runRegisterAlreadyResponse(
+      userId,
+      language,
+    );
+    if (alreadyRegistered) {
+      await sendResponseToMessage(message, alreadyRegistered);
+      return;
+    }
 
     await mountInteractiveMessage(
       channel,
