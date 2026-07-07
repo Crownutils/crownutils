@@ -1,4 +1,5 @@
 import { prisma } from '../persistence/client.js';
+import { TtlCache } from '../cache/ttl-cache.js';
 
 /**
  * Current version of the legal documents. Acceptance is one-time, but the
@@ -17,13 +18,19 @@ export const LEGAL_GATE_EXEMPT_COMMANDS: ReadonlySet<string> = new Set([
   'register',
 ]);
 
+const LEGAL_CACHE_MAX_SIZE = 10_000;
+const LEGAL_CACHE_TTL_MS = 5 * 60 * 1000;
+
 /**
- * In-memory set of user ids known to have accepted, so the gate - which runs on
- * every command - avoids a database round-trip for returning users. Only
- * positive results are cached; {@link prisma.legalAcceptance} stays the source
- * of truth across restarts.
+ * Caches whether a user has accepted the legal documents. The gate runs on
+ * every command, so both positive and negative results are cached to keep
+ * repeat lookups off the database; the cache is bounded and TTL-limited, and
+ * {@link prisma.legalAcceptance} stays the source of truth across restarts.
  */
-const acceptedUserIds = new Set<string>();
+const legalCache = new TtlCache<string, boolean>(
+  LEGAL_CACHE_MAX_SIZE,
+  LEGAL_CACHE_TTL_MS,
+);
 
 /** A user's recorded acceptance: which legal version they accepted, and when. */
 export interface LegalAcceptanceRecord {
@@ -31,19 +38,17 @@ export interface LegalAcceptanceRecord {
   readonly acceptedAt: Date;
 }
 
-/** Returns whether `userId` has accepted the legal documents. */
-export async function hasAcceptedLegal(userId: string): Promise<boolean> {
-  if (acceptedUserIds.has(userId)) {
-    return true;
-  }
+async function loadHasAcceptedLegal(userId: string): Promise<boolean> {
   const acceptance = await prisma.legalAcceptance.findUnique({
     where: { userId },
+    select: { userId: true },
   });
-  if (acceptance) {
-    acceptedUserIds.add(userId);
-    return true;
-  }
-  return false;
+  return acceptance !== null;
+}
+
+/** Returns whether `userId` has accepted the legal documents. */
+export async function hasAcceptedLegal(userId: string): Promise<boolean> {
+  return legalCache.getOrLoad(userId, loadHasAcceptedLegal);
 }
 
 /** Returns `userId`'s acceptance record, or `null` if they have not accepted. */
@@ -54,7 +59,7 @@ export async function getLegalAcceptance(
     where: { userId },
     select: { acceptedVersion: true, acceptedAt: true },
   });
-  if (acceptance) acceptedUserIds.add(userId);
+  legalCache.set(userId, acceptance !== null);
   return acceptance;
 }
 
@@ -65,5 +70,5 @@ export async function acceptLegal(userId: string): Promise<void> {
     create: { userId, acceptedVersion: LEGAL_VERSION },
     update: { acceptedVersion: LEGAL_VERSION },
   });
-  acceptedUserIds.add(userId);
+  legalCache.set(userId, true);
 }
