@@ -93,19 +93,23 @@ function drive<State>(
   initialState: State,
 ): void {
   let state = initialState;
+  // True once the disabled render actually reached the message.
+  let disabledRendered = false;
 
   const collector = message.createMessageComponentCollector({
     idle: controller.idleMs ?? INTERACTIVE_MESSAGE_IDLE_MS,
+    // Disallowed clicks never reach 'collect'.
+    filter: (interaction) =>
+      isAllowed(controller.allowedIds, interaction.user.id),
+  });
+
+  collector.on('ignore', (interaction) => {
+    void refuse(interaction);
   });
 
   collector.on('collect', (interaction) => {
     // Collector callbacks are synchronous; run the async transition detached.
     void (async () => {
-      if (!isAllowed(controller.allowedIds, interaction.user.id)) {
-        await refuse(interaction);
-        return;
-      }
-
       let stopped = false;
       let handled = false;
       state = await controller.reduce(state, interaction, {
@@ -126,6 +130,7 @@ function drive<State>(
           }),
           { action: 'interactiveUpdate' },
         );
+        if (stopped) disabledRendered = true;
       }
 
       // Tagged so the end handler skips its own re-render over this one.
@@ -134,8 +139,8 @@ function drive<State>(
   });
 
   collector.on('end', (_collected, reason) => {
-    // Only the idle timeout finalizes here; an explicit stop already did.
-    if (reason === STOP_REASON) return;
+    // Skip only if an explicit stop already rendered the disabled state.
+    if (reason === STOP_REASON && disabledRendered) return;
     void safeDiscord(
       message.edit({
         flags: MessageFlags.IsComponentsV2,
