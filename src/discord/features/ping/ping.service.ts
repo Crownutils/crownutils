@@ -2,7 +2,7 @@ import type { SupportedLocale } from '@/core/types.js';
 import type { CommandResponse } from '../../interactions/index.js';
 import { buildPingContainer } from './ping.ui.js';
 
-export interface RunPingInput {
+interface RunPingInput {
   readonly totalLatencyMs: number;
   readonly discordLatencyMs: number;
 }

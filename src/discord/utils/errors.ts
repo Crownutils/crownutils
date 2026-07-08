@@ -15,3 +15,7 @@ export function toError(value: unknown): Error {
 export function buildErrorContainer(message: string): Container {
   return createContainer('cancel').add(new Text(message));
 }
+
+export function buildSuccessContainer(message: string): Container {
+  return createContainer('success').add(new Text(message));
+}

@@ -25,4 +25,7 @@ export const commonLang = {
         return 'This command cannot be used here.';
     }
   },
+  dmFailed:
+    'Your DMs are inaccessible, this command could not be executed correctly.',
+  dmSuccess: 'Sent successfully to your DMs.',
 } as const satisfies LangNode;

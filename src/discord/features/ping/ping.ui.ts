@@ -3,7 +3,7 @@ import type { Container } from '../../components/index.js';
 import { createContainer, Separator, Text } from '../../components/index.js';
 import { lang } from '../../lang/index.js';
 
-export interface PingView {
+interface PingView {
   readonly totalLatencyMs: number;
   readonly discordLatencyMs: number;
 }

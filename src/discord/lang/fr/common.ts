@@ -25,4 +25,7 @@ export const commonLang = {
         return 'Cette commande ne peut pas être utilisée ici.';
     }
   },
+  dmFailed:
+    "Vos MPs sont inaccessibles, cette commande n'a pas pu s'exécuter correctement.",
+  dmSuccess: 'Envoyé avec succès dans vos MPs.',
 } as const satisfies LangNode;

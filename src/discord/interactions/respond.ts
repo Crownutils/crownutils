@@ -3,6 +3,7 @@ import type {
   ChatInputCommandInteraction,
   Message,
   OmitPartialGroupDMChannel,
+  User,
 } from 'discord.js';
 import type { Container } from '@/discord/components/index.js';
 
@@ -50,4 +51,25 @@ export async function sendResponseToMessage(
     flags: [MessageFlags.IsComponentsV2] as const,
     components: [response.container.build()],
   });
+}
+
+/**
+ * Deliver a response via DM (works for both prefix and slash commands).
+ * Never ephemeral since DMs are private.
+ * Returns `false` if the DM fails (DMs closed, bot blocked, no shared server, ...)
+ */
+export async function sendResponseToDM(
+  user: User,
+  response: CommandResponse,
+): Promise<boolean> {
+  try {
+    await user.send({
+      flags: [MessageFlags.IsComponentsV2] as const,
+      components: [response.container.build()],
+    });
+
+    return true;
+  } catch {
+    return false;
+  }
 }

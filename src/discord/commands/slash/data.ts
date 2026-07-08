@@ -19,12 +19,16 @@ function createDataCommandData(): SlashCommandData {
 
 const command = {
   data: createDataCommandData(),
-  requirements: { scope: 'dm', authorization: 'normal' },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
     const language = await resolveUserLocale(interaction.user.id);
     await sendResponseToInteraction(
       interaction,
-      await runDataCommand(interaction.user.id, language),
+      await runDataCommand(
+        interaction.user.id,
+        language,
+        interaction.inGuild(),
+      ),
     );
   },
 } satisfies SlashCommand;
