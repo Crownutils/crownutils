@@ -5,11 +5,8 @@ import {
 } from '@/core/repositories/index.js';
 import { isOwner } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
-import type { CommandResponse } from '../interactions/index.js';
-import {
-  buildDataContainer,
-  buildDataCooldownContainer,
-} from '../presentations/index.js';
+import type { CommandResponse } from '../../interactions/index.js';
+import { buildDataContainer, buildDataCooldownContainer } from './data.ui.js';
 
 /**
  * Runs the `data` command: builds `userId`'s export and records the request, or

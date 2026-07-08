@@ -1,5 +1,5 @@
 import { mountInteractiveMessage } from '@/discord/interactions/index.js';
-import { createLanguageController } from '@/discord/usecases/index.js';
+import { createLanguageController } from '@/discord/features/language/language.service.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 

@@ -1,6 +1,6 @@
 import type { SupportedLocale } from '@/core/types.js';
-import type { CommandResponse } from '../interactions/index.js';
-import { buildPingContainer } from '../presentations/index.js';
+import type { CommandResponse } from '../../interactions/index.js';
+import { buildPingContainer } from './ping.ui.js';
 
 export interface RunPingInput {
   readonly totalLatencyMs: number;

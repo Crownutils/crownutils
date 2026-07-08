@@ -1,7 +1,7 @@
 import type { SupportedLocale } from '@/core/types.js';
 import { setMaintenanceEnabled } from '@/core/repositories/index.js';
-import type { CommandResponse } from '../interactions/index.js';
-import { buildMaintenanceContainer } from '../presentations/index.js';
+import type { CommandResponse } from '../../interactions/index.js';
+import { buildMaintenanceContainer } from './maintenance.ui.js';
 
 /**
  * Toggles maintenance mode and returns the owner-facing confirmation. While

@@ -2,7 +2,7 @@ import { Locale, SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/discord/lang/index.js';
 import { sendResponseToInteraction } from '@/discord/interactions/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
-import { runSetRankCommand } from '@/discord/usecases/index.js';
+import { runSetRankCommand } from '@/discord/features/set-rank/set-rank.service.js';
 import { ASSIGNABLE_RANKS, isAssignableRank } from '@/core/types.js';
 import type {
   SlashCommand,

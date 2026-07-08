@@ -6,7 +6,7 @@ import type {
   SlashCommandData,
 } from '@/discord/registries/index.js';
 import { Locale, SlashCommandBuilder } from 'discord.js';
-import { runRankCommand } from '@/discord/usecases/index.js';
+import { runRankCommand } from '@/discord/features/rank/rank.service.js';
 
 function createRankCommandData(): SlashCommandData {
   return new SlashCommandBuilder()

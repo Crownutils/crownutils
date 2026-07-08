@@ -1,14 +1,14 @@
 import type { SupportedLocale } from '@/core/types.js';
-import type { Container } from '../components/index.js';
+import type { Container } from '../../components/index.js';
 import {
   Button,
   ButtonActionRow,
   createContainer,
   Separator,
   Text,
-} from '../components/index.js';
-import { lang } from '../lang/index.js';
-import type { LegalDocument } from '../usecases/index.js';
+} from '../../components/index.js';
+import { lang } from '../../lang/index.js';
+import type { LegalDocument } from './register.service.js';
 
 /** Custom ids of the legal viewer's buttons, matched in the register controller's `reduce`. */
 export const LEGAL_VIEW_CGU_ID = 'register-legal-view-cgu';

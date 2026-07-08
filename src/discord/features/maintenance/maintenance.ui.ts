@@ -1,7 +1,7 @@
 import type { SupportedLocale } from '@/core/types.js';
-import type { Container } from '../components/index.js';
-import { createContainer, Text } from '../components/index.js';
-import { lang } from '../lang/index.js';
+import type { Container } from '../../components/index.js';
+import { createContainer, Text } from '../../components/index.js';
+import { lang } from '../../lang/index.js';
 
 /** Confirmation shown after the owner toggles maintenance mode; colour reflects the new state. */
 export function buildMaintenanceContainer(

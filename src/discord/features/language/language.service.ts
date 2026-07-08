@@ -1,9 +1,9 @@
 import type { SupportedLocale } from '@/core/types.js';
 import { isSupportedLocale } from '@/core/types.js';
 import { setUserLanguage } from '@/core/repositories/index.js';
-import type { Container } from '../components/index.js';
-import type { InteractiveMessage } from '../interactions/index.js';
-import { buildLanguageContainer } from '../presentations/index.js';
+import type { Container } from '../../components/index.js';
+import type { InteractiveMessage } from '../../interactions/index.js';
+import { buildLanguageContainer } from './language.ui.js';
 
 /**
  * Interactive controller for the `language` command: state is the saved locale;

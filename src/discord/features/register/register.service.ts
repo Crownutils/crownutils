@@ -6,13 +6,13 @@ import {
   hasAcceptedLegal,
   registerUser,
 } from '@/core/repositories/index.js';
-import type { Container } from '../components/index.js';
+import type { Container } from '../../components/index.js';
 import type {
   CommandResponse,
   InteractiveMessage,
-} from '../interactions/index.js';
+} from '../../interactions/index.js';
+import { buildLanguageContainer } from '../language/language.ui.js';
 import {
-  buildLanguageContainer,
   buildLegalContainer,
   buildRegisterAlreadyContainer,
   buildRegisterCancelledContainer,
@@ -22,7 +22,7 @@ import {
   LEGAL_DECLINE_ID,
   LEGAL_VIEW_CGU_ID,
   LEGAL_VIEW_PRIVACY_ID,
-} from '../presentations/index.js';
+} from './register.ui.js';
 import { isOwner } from '@/core/permissions/user.js';
 
 /**

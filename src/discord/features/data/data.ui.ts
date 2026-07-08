@@ -1,8 +1,8 @@
 import type { GdprExport } from '@/core/repositories/index.js';
 import type { SupportedLocale } from '@/core/types.js';
-import type { Container } from '../components/index.js';
-import { createContainer, Separator, Text } from '../components/index.js';
-import { lang } from '../lang/index.js';
+import type { Container } from '../../components/index.js';
+import { createContainer, Separator, Text } from '../../components/index.js';
+import { lang } from '../../lang/index.js';
 
 function formatDate(language: SupportedLocale, date: Date): string {
   return new Intl.DateTimeFormat(language, {

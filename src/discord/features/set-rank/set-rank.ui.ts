@@ -1,7 +1,7 @@
 import type { SupportedLocale } from '@/core/types.js';
-import type { Container } from '../components/index.js';
-import { createContainer, Text } from '../components/index.js';
-import { lang } from '../lang/index.js';
+import type { Container } from '../../components/index.js';
+import { createContainer, Text } from '../../components/index.js';
+import { lang } from '../../lang/index.js';
 
 /** Confirmation shown once a user's rank has been changed. */
 export function buildSetRankContainer(

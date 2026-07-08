@@ -5,7 +5,7 @@ import {
 import {
   createRegisterController,
   runRegisterAlreadyResponse,
-} from '@/discord/usecases/index.js';
+} from '@/discord/features/register/register.service.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 

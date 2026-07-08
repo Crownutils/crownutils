@@ -3,7 +3,7 @@ import { sendResponseToMessage } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
-import { runPingCommand } from '@/discord/usecases/index.js';
+import { runPingCommand } from '@/discord/features/ping/ping.service.js';
 import { MessageFlags } from 'discord.js';
 
 const command = {

@@ -1,6 +1,6 @@
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import { sendResponseToMessage } from '@/discord/interactions/index.js';
-import { runDataCommand } from '@/discord/usecases/index.js';
+import { runDataCommand } from '@/discord/features/data/data.service.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 
 const command = {

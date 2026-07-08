@@ -1,5 +1,5 @@
 import { mountInteractiveMessage } from '@/discord/interactions/index.js';
-import { createLegalController } from '@/discord/usecases/index.js';
+import { createLegalController } from '@/discord/features/legal/legal.service.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 

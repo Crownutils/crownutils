@@ -1,14 +1,14 @@
 import type { SupportedLocale } from '@/core/types.js';
 import { SUPPORTED_LOCALES } from '@/core/types.js';
-import type { Container } from '../components/index.js';
+import type { Container } from '../../components/index.js';
 import {
   createContainer,
   SelectActionRow,
   SelectMenu,
   Separator,
   Text,
-} from '../components/index.js';
-import { lang } from '../lang/index.js';
+} from '../../components/index.js';
+import { lang } from '../../lang/index.js';
 
 /** Custom id of the language select menu; read back by the controller's `reduce`. */
 export const LANGUAGE_SELECT_ID = 'language-select';

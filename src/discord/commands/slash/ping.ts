@@ -5,7 +5,7 @@ import type {
   SlashCommand,
   SlashCommandData,
 } from '@/discord/registries/index.js';
-import { runPingCommand } from '@/discord/usecases/index.js';
+import { runPingCommand } from '@/discord/features/ping/ping.service.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 
 function createPingCommandData(): SlashCommandData {

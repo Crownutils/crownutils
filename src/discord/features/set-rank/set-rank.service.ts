@@ -5,10 +5,10 @@ import {
   persistBan,
   setUserRank,
 } from '@/core/repositories/index.js';
-import type { CommandResponse } from '../interactions/index.js';
-import { lang } from '../lang/index.js';
-import { buildErrorContainer } from '../utils/errors.js';
-import { buildSetRankContainer } from '../presentations/index.js';
+import type { CommandResponse } from '../../interactions/index.js';
+import { lang } from '../../lang/index.js';
+import { buildErrorContainer } from '../../utils/errors.js';
+import { buildSetRankContainer } from './set-rank.ui.js';
 
 /**
  * Change `targetId`'s rank, rejecting changes to yourself, to the owner, or to a

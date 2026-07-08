@@ -1,7 +1,7 @@
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import { sendResponseToMessage } from '@/discord/interactions/index.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
-import { runRankCommand } from '@/discord/usecases/index.js';
+import { runRankCommand } from '@/discord/features/rank/rank.service.js';
 
 const command = {
   name: 'rank',

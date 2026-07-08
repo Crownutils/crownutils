@@ -1,7 +1,7 @@
 import { Locale, SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/discord/lang/index.js';
 import { mountInteractiveReply } from '@/discord/interactions/index.js';
-import { createLegalController } from '@/discord/usecases/index.js';
+import { createLegalController } from '@/discord/features/legal/legal.service.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type {
   SlashCommand,

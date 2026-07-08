@@ -1,8 +1,8 @@
 import type { SupportedLocale } from '@/core/types.js';
-import type { Container } from '../components/index.js';
-import type { InteractiveMessage } from '../interactions/index.js';
-import { buildLegalContainer } from '../presentations/index.js';
-import type { LegalDocument } from './register.js';
+import type { Container } from '../../components/index.js';
+import type { InteractiveMessage } from '../../interactions/index.js';
+import { buildLegalContainer } from '../register/register.ui.js';
+import type { LegalDocument } from '../register/register.service.js';
 
 /** Toggle-button ids for the standalone `legal` viewer, kept distinct from the register flow's. */
 const VIEW_CGU_ID = 'legal-view-cgu';

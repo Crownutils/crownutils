@@ -2,7 +2,7 @@ import { Locale, SlashCommandBuilder } from 'discord.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import { sendResponseToInteraction } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import { runDataCommand } from '@/discord/usecases/index.js';
+import { runDataCommand } from '@/discord/features/data/data.service.js';
 import type {
   SlashCommand,
   SlashCommandData,

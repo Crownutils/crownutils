@@ -3,9 +3,9 @@ import {
   rankLevel,
   type SupportedLocale,
 } from '@/core/types.js';
-import type { CommandResponse } from '../interactions/index.js';
+import type { CommandResponse } from '../../interactions/index.js';
 import { getUserRank } from '@/core/repositories/index.js';
-import { buildRankContainer } from '../presentations/index.js';
+import { buildRankContainer } from './rank.ui.js';
 
 /** Builds the `rank` command's response: the caller's own rank and its numeric level. */
 export async function runRankCommand(

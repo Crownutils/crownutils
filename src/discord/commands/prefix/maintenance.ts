@@ -2,7 +2,7 @@ import { buildErrorContainer } from '@/discord/utils/errors.js';
 import { sendResponseToMessage } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
-import { runMaintenanceCommand } from '@/discord/usecases/index.js';
+import { runMaintenanceCommand } from '@/discord/features/maintenance/maintenance.service.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
 
 const ENABLE_ARGS: ReadonlySet<string> = new Set(['on', 'enable', 'true']);

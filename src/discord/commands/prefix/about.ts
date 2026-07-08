@@ -1,7 +1,7 @@
 import { sendResponseToMessage } from '@/discord/interactions/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
-import { runAboutCommand } from '@/discord/usecases/index.js';
+import { runAboutCommand } from '@/discord/features/about/about.service.js';
 
 const command = {
   name: 'about',

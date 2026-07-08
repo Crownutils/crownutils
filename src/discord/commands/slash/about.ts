@@ -5,7 +5,7 @@ import type {
   SlashCommand,
   SlashCommandData,
 } from '@/discord/registries/index.js';
-import { runAboutCommand } from '@/discord/usecases/index.js';
+import { runAboutCommand } from '@/discord/features/about/about.service.js';
 import { Locale, SlashCommandBuilder } from 'discord.js';
 
 function createAboutCommandData(): SlashCommandData {
