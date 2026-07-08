@@ -1,5 +1,5 @@
-import type { SupportedLocale } from '@/core/types.js';
-import { isOwner, type AssignableRank } from '@/core/permissions/index.js';
+import type { AssignableRank, SupportedLocale } from '@/core/types.js';
+import { isOwner } from '@/core/permissions/index.js';
 import {
   getUserRank,
   persistBan,

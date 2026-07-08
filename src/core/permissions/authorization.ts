@@ -1,11 +1,11 @@
-import type { Rank } from './rank.js';
+import type { NotBannedRank, Rank } from '../types.js';
 import { hasRank } from './rank.js';
 
 /**
  * The minimum rank a command requires. `banned` is excluded: banned users are
  * blocked from every command, so it is never a level a command can require.
  */
-export type Authorization = Exclude<Rank, 'banned'>;
+export type Authorization = NotBannedRank;
 
 export interface AuthorizationContext {
   /** The invoking user's effective rank. */

@@ -1,6 +1,9 @@
-import type { SupportedLocale } from '@/core/types.js';
+import {
+  assertNotBanned,
+  rankLevel,
+  type SupportedLocale,
+} from '@/core/types.js';
 import type { CommandResponse } from '../interactions/index.js';
-import { assertNotBanned, rankLevel } from '@/core/permissions/rank.js';
 import { getUserRank } from '@/core/repositories/index.js';
 import { buildRankContainer } from '../presentations/index.js';
 

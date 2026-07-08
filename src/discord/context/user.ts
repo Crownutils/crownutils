@@ -1,7 +1,6 @@
 import { getUserProfile } from '@/core/repositories/index.js';
 import { isOwner } from '@/core/permissions/index.js';
-import type { Rank } from '@/core/permissions/index.js';
-import type { SupportedLocale } from '@/core/types.js';
+import type { Rank, SupportedLocale } from '@/core/types.js';
 
 /** The per-user facts the command pipeline needs, resolved from a single row read. */
 export interface UserContext {

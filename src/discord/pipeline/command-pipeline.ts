@@ -1,13 +1,13 @@
 import type {
   CommandRequirements,
   CommandScope,
-  Rank,
 } from '@/core/permissions/index.js';
 import { checkCommandRequirements } from '@/core/permissions/index.js';
 import {
   hasAcceptedLegal,
   LEGAL_GATE_EXEMPT_COMMANDS,
 } from '@/core/repositories/index.js';
+import type { Rank } from '@/core/types.js';
 import type { Awaitable } from 'discord.js';
 
 /** Everything the pipeline needs to decide whether a command may run. */

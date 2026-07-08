@@ -1,6 +1,6 @@
 import { prisma } from '../persistence/client.js';
-import type { SupportedLocale } from '../types.js';
-import { isOwner, type Rank } from '../permissions/index.js';
+import type { Rank, SupportedLocale } from '../types.js';
+import { isOwner } from '../permissions/index.js';
 import { acceptLegal } from './legal-repository.js';
 import { TtlCache } from '../cache/ttl-cache.js';
 

@@ -1,7 +1,6 @@
 import { prisma } from '../persistence/client.js';
-import type { Rank } from '../permissions/index.js';
 import { hashUserId } from '../security/hash-user-id.js';
-import type { SupportedLocale } from '../types.js';
+import type { Rank, SupportedLocale } from '../types.js';
 import { hasBanHash } from './banned-repository.js';
 import {
   getLegalAcceptance,
