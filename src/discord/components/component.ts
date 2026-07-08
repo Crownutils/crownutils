@@ -2,6 +2,7 @@ import type {
   ButtonBuilder,
   ContainerBuilder,
   StringSelectMenuBuilder,
+  UserSelectMenuBuilder,
 } from 'discord.js';
 
 /**
@@ -15,5 +16,5 @@ export interface ContainerChild {
 
 /** A component that can sit inside an action row (button, select menu). */
 export interface RowChild {
-  toBuilder(): ButtonBuilder | StringSelectMenuBuilder;
+  toBuilder(): ButtonBuilder | StringSelectMenuBuilder | UserSelectMenuBuilder;
 }

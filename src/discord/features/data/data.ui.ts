@@ -1,8 +1,16 @@
 import type { GdprExport } from '@/core/repositories/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '../../components/index.js';
-import { createContainer, Separator, Text } from '../../components/index.js';
+import {
+  createContainer,
+  Separator,
+  Text,
+  UserSelectActionRow,
+  UserSelectMenu,
+} from '../../components/index.js';
 import { lang } from '../../lang/index.js';
+
+const DATA_LOOKUP_SELECT_ID = 'data-lookup-select';
 
 function formatDate(language: SupportedLocale, date: Date): string {
   return new Intl.DateTimeFormat(language, {
@@ -71,5 +79,21 @@ export function buildDataCooldownContainer(
   const messages = lang[language].commandData.messages;
   return createContainer('warn').add(
     new Text(messages.cooldownDenied(formatDate(language, eligibleAt))),
+  );
+}
+
+/** Owner-only picker shown by the prefix front when `data` is run with no target. */
+export function buildDataLookupPickerContainer(
+  language: SupportedLocale,
+  disabled: boolean,
+): Container {
+  const messages = lang[language].commandData.messages;
+  return createContainer('brand').add(
+    new Text(messages.lookupPrompt),
+    new UserSelectActionRow().set(
+      new UserSelectMenu(DATA_LOOKUP_SELECT_ID)
+        .placeholder(messages.lookupPlaceholder)
+        .disabled(disabled),
+    ),
   );
 }

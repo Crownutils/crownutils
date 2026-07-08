@@ -21,5 +21,9 @@ export const data = {
     noDataStored: "Aucune donnée vous concernant n'a été stockée.",
     cooldownDenied: (date: string) =>
       `Vous avez déjà effectué une demande d'accès à vos données récemment. Vous pourrez en refaire une à partir du ${md.bold(date)}.`,
+    userOption:
+      "Owner uniquement : les données d'un autre utilisateur à consulter.",
+    lookupPrompt: 'Choisissez un utilisateur dont consulter les données.',
+    lookupPlaceholder: 'Sélectionner un utilisateur',
   },
 } satisfies CommandNode;

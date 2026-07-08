@@ -19,5 +19,8 @@ export const data = {
     noDataStored: 'No data about you has been stored.',
     cooldownDenied: (date: string) =>
       `You already made a data access request recently. You can make another one starting ${md.bold(date)}.`,
+    userOption: "Owner only: another user's data to look up.",
+    lookupPrompt: 'Pick a user to look up their data.',
+    lookupPlaceholder: 'Select a user',
   },
 } satisfies CommandNode;

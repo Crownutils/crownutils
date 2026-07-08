@@ -1,8 +1,8 @@
 import { MessageFlags } from 'discord.js';
 import type {
-  ChatInputCommandInteraction,
   Message,
   OmitPartialGroupDMChannel,
+  RepliableInteraction,
   User,
 } from 'discord.js';
 import type { Container } from '@/discord/components/index.js';
@@ -20,12 +20,13 @@ export interface CommandResponse {
 }
 
 /**
- * Deliver a response to a slash interaction. Errors are **not** swallowed: a
- * failed primary reply is a command failure and must surface to the pipeline's
- * `onUnexpectedError`. Add cross-cutting defaults (e.g. `allowedMentions`) here.
+ * Deliver a response to a slash or message-component interaction. Errors are
+ * **not** swallowed: a failed primary reply is a command failure and must
+ * surface to the pipeline's `onUnexpectedError`. Add cross-cutting defaults
+ * (e.g. `allowedMentions`) here.
  */
 export async function sendResponseToInteraction(
-  interaction: ChatInputCommandInteraction,
+  interaction: RepliableInteraction,
   response: CommandResponse,
 ): Promise<void> {
   const payload = {
