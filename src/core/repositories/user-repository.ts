@@ -57,6 +57,22 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
   return userCache.getOrLoad(userId, loadUserProfile);
 }
 
+/**
+ * Reads `userId`'s row directly from the database - uncached, and `null` (not
+ * defaulted) when no row exists. Unlike {@link getUserProfile}, which
+ * fabricates `en`/`normal` for permission checks, a GDPR export must report
+ * what is truly stored, not a default that would look like real data.
+ */
+export async function findStoredUserProfile(
+  userId: string,
+): Promise<UserProfile | null> {
+  const user = await prisma.user.findUnique({
+    where: { userId },
+    select: { language: true, rank: true },
+  });
+  return user ? { language: user.language, rank: user.rank } : null;
+}
+
 /** Returns a user's preferred language, defaulting to `en` when they have no row yet. */
 export async function getUserLanguage(
   userId: string,

@@ -6,7 +6,7 @@ import {
   getLegalAcceptance,
   type LegalAcceptanceRecord,
 } from './legal-repository.js';
-import { getUserLanguage, getUserRank } from './user-repository.js';
+import { findStoredUserProfile } from './user-repository.js';
 
 /** Minimum number of days a user must wait between two GDPR access requests. */
 export const GDPR_REQUEST_COOLDOWN_DAYS = 31;
@@ -14,22 +14,35 @@ export const GDPR_REQUEST_COOLDOWN_DAYS = 31;
 /** Everything the bot holds on a user, as returned by the GDPR access-request command. */
 export interface GdprExport {
   readonly userId: string;
-  readonly language: SupportedLocale;
-  readonly rank: Rank;
+  /** `null` when there is no `User` row at all - distinct from a stored value. */
+  readonly language: SupportedLocale | null;
+  /** `null` when there is no `User` row at all - distinct from a stored value. */
+  readonly rank: Rank | null;
   readonly legalAcceptance: LegalAcceptanceRecord | null;
   readonly hasBanHash: boolean;
 }
 
-/** Assembles `userId`'s {@link GdprExport} by reading every repository that stores something about them. */
+/**
+ * Assembles `userId`'s {@link GdprExport} by reading every repository that
+ * stores something about them. Reads the `User` row directly rather than
+ * through {@link getUserProfile}, whose cache would otherwise fabricate and
+ * cache `en`/`normal` defaults for someone with no row - which this export
+ * must not report as if it were real stored data.
+ */
 export async function buildGdprExport(userId: string): Promise<GdprExport> {
-  const [language, rank, legalAcceptance, banHash] = await Promise.all([
-    getUserLanguage(userId),
-    getUserRank(userId),
+  const [profile, legalAcceptance, banHash] = await Promise.all([
+    findStoredUserProfile(userId),
     getLegalAcceptance(userId),
     hasBanHash(userId),
   ]);
 
-  return { userId, language, rank, legalAcceptance, hasBanHash: banHash };
+  return {
+    userId,
+    language: profile?.language ?? null,
+    rank: profile?.rank ?? null,
+    legalAcceptance,
+    hasBanHash: banHash,
+  };
 }
 
 /**

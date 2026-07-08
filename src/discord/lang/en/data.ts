@@ -15,6 +15,8 @@ export const data = {
     legalNotAccepted: `${md.bold('Legal documents accepted:')} no`,
     banHashPresent: `${md.bold('Ban hash:')} yes, a hash of your id is on record`,
     banHashAbsent: `${md.bold('Ban hash:')} none`,
+    notStored: 'not stored',
+    noDataStored: 'No data about you has been stored.',
     cooldownDenied: (date: string) =>
       `You already made a data access request recently. You can make another one starting ${md.bold(date)}.`,
   },

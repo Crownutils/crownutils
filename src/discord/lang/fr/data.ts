@@ -17,6 +17,8 @@ export const data = {
     legalNotAccepted: `${md.bold('Documents légaux acceptés :')} non`,
     banHashPresent: `${md.bold('Empreinte de bannissement :')} oui, une empreinte de votre identifiant est conservée`,
     banHashAbsent: `${md.bold('Empreinte de bannissement :')} aucune`,
+    notStored: 'non enregistré',
+    noDataStored: "Aucune donnée vous concernant n'a été stockée.",
     cooldownDenied: (date: string) =>
       `Vous avez déjà effectué une demande d'accès à vos données récemment. Vous pourrez en refaire une à partir du ${md.bold(date)}.`,
   },

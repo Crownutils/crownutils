@@ -11,12 +11,34 @@ function formatDate(language: SupportedLocale, date: Date): string {
   }).format(date);
 }
 
-/** Renders the `data` command's answer: everything the bot holds about the requester. */
+/** Whether nothing at all is stored: no `User` row, no legal acceptance, no ban hash. */
+function hasNoStoredData(gdprExport: GdprExport): boolean {
+  return (
+    gdprExport.language === null &&
+    gdprExport.rank === null &&
+    gdprExport.legalAcceptance === null &&
+    !gdprExport.hasBanHash
+  );
+}
+
+/**
+ * Renders the `data` command's answer: everything the bot holds about the
+ * requester, or a single notice if nothing is stored at all - reachable since
+ * `data` is exempt from the legal gate, so a never-registered user can run it.
+ */
 export function buildDataContainer(
   language: SupportedLocale,
   gdprExport: GdprExport,
 ): Container {
   const messages = lang[language].commandData.messages;
+
+  if (hasNoStoredData(gdprExport)) {
+    return createContainer('brand').add(
+      new Text(messages.title).title(),
+      new Separator(),
+      new Text(messages.noDataStored),
+    );
+  }
 
   const legalLine = gdprExport.legalAcceptance
     ? messages.legalAccepted(
@@ -30,8 +52,8 @@ export function buildDataContainer(
     new Text(messages.intro).size('subtle'),
     new Separator(),
     new Text(messages.discordId(gdprExport.userId))
-      .newLine(messages.language(gdprExport.language))
-      .newLine(messages.rank(gdprExport.rank))
+      .newLine(messages.language(gdprExport.language ?? messages.notStored))
+      .newLine(messages.rank(gdprExport.rank ?? messages.notStored))
       .newLine(legalLine)
       .newLine(
         gdprExport.hasBanHash
