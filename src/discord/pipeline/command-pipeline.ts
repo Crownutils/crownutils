@@ -8,6 +8,7 @@ import {
   LEGAL_GATE_EXEMPT_COMMANDS,
 } from '@/core/repositories/index.js';
 import type { Rank } from '@/core/types.js';
+import { logger } from '@/shared/index.js';
 import type { Awaitable } from 'discord.js';
 
 /** Everything the pipeline needs to decide whether a command may run. */
@@ -34,7 +35,24 @@ export interface CommandPipelineHandlers {
   onPermissionDenied: () => Awaitable<void>;
   onUnexpectedError: (error: unknown) => Awaitable<void>;
   onLegalNotAccepted: () => Awaitable<unknown>;
-  onSuccess?: () => Awaitable<void>;
+}
+
+/** Where a command was invoked from, for {@link logOutcome}. */
+function invocationLocation(context: CommandPipelineContext): string {
+  if (!context.inGuild) return 'dm';
+  return context.inMainGuild ? 'mainGuild' : 'guild';
+}
+
+/** Logs every pipeline outcome at `debug`, so it is silent in production (see logger.ts) but visible while developing. */
+function logOutcome(context: CommandPipelineContext, outcome: string): void {
+  logger.debug(
+    {
+      command: context.commandName,
+      userId: context.userId,
+      location: invocationLocation(context),
+    },
+    `Command ${outcome}`,
+  );
 }
 
 /**
@@ -50,11 +68,13 @@ export async function runCommandPipeline(
 ): Promise<void> {
   try {
     if (context.rank === 'banned') {
+      logOutcome(context, 'denied (banned)');
       await handlers.onBanned();
       return;
     }
 
     if (context.maintenance && context.rank !== 'owner') {
+      logOutcome(context, 'denied (maintenance)');
       await handlers.onMaintenance();
       return;
     }
@@ -63,6 +83,7 @@ export async function runCommandPipeline(
       !(await hasAcceptedLegal(context.userId)) &&
       !LEGAL_GATE_EXEMPT_COMMANDS.has(context.commandName)
     ) {
+      logOutcome(context, 'denied (legal not accepted)');
       await handlers.onLegalNotAccepted();
       return;
     }
@@ -74,15 +95,17 @@ export async function runCommandPipeline(
     });
     if (!check.ok) {
       if (check.error === 'scope') {
+        logOutcome(context, 'denied (scope)');
         await handlers.onScopeDenied(context.requirements.scope);
       } else {
+        logOutcome(context, 'denied (authorization)');
         await handlers.onPermissionDenied();
       }
       return;
     }
 
     await handlers.execute();
-    await handlers.onSuccess?.();
+    logOutcome(context, 'succeeded');
   } catch (error) {
     await handlers.onUnexpectedError(error);
   }
