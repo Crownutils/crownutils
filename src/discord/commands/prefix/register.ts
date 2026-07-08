@@ -11,6 +11,7 @@ import type { PrefixCommand } from '@/discord/registries/index.js';
 
 const command = {
   name: 'register',
+  aliases: ['reg'],
   requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(message) {
     const channel = message.channel;
