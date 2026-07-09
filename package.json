@@ -15,6 +15,7 @@
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
+    "prisma:format": "prisma format",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
