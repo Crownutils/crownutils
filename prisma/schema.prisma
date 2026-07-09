@@ -54,8 +54,13 @@ model Reminder {
   status    ReminderStatus @default(pending)
   attempts  Int            @default(0)
   claimedAt DateTime?
+  lastError String?
+  sentAt    DateTime?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+
+  @@index([status, dueAt])
+  @@index([userId])
 }
 
 enum ReminderStatus {
