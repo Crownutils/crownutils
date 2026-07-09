@@ -8,7 +8,7 @@ datasource db {
 }
 
 model BotState {
-  id Int @id @default(1)
+  id                 Int     @id @default(1)
   maintenanceEnabled Boolean @default(false)
 }
 
@@ -25,15 +25,15 @@ enum Rank {
 }
 
 model User {
-  userId String @id
+  userId   String   @id
   language Language @default(en)
-  rank Rank @default(normal)
+  rank     Rank     @default(normal)
 }
 
 model LegalAcceptance {
-  userId String @id
+  userId          String   @id
   acceptedVersion String
-  acceptedAt DateTime @default(now())
+  acceptedAt      DateTime @default(now())
 }
 
 model Banned {
@@ -41,6 +41,26 @@ model Banned {
 }
 
 model GdprRequest {
-  hash String @id
+  hash        String   @id
   requestedAt DateTime @default(now())
+}
+
+model Reminder {
+  id        String         @id @default(cuid())
+  userId    String
+  channelId String
+  content   String
+  dueAt     DateTime
+  status    ReminderStatus @default(pending)
+  attempts  Int            @default(0)
+  claimedAt DateTime?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+enum ReminderStatus {
+  pending
+  delivering
+  sent
+  failed
 }
