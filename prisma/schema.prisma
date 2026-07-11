@@ -44,28 +44,3 @@ model GdprRequest {
   hash        String   @id
   requestedAt DateTime @default(now())
 }
-
-model Reminder {
-  id        String         @id @default(cuid())
-  userId    String
-  channelId String
-  content   String
-  dueAt     DateTime
-  status    ReminderStatus @default(pending)
-  attempts  Int            @default(0)
-  claimedAt DateTime?
-  lastError String?
-  sentAt    DateTime?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-
-  @@index([status, dueAt])
-  @@index([userId])
-}
-
-enum ReminderStatus {
-  pending
-  delivering
-  sent
-  failed
-}
