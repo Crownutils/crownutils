@@ -9,4 +9,6 @@ export const icons = {
   scroll: '📜',
   shield: '🛡️',
   info: 'ℹ️',
+  bell: '🔔',
+  trash: '🗑️',
 } as const;

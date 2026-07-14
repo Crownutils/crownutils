@@ -22,6 +22,10 @@ import { data as dataEn } from './en/data.js';
 import { data as dataFr } from './fr/data.js';
 import { maintenance as maintenanceEn } from './en/maintenance.js';
 import { maintenance as maintenanceFr } from './fr/maintenance.js';
+import { remind as remindEn } from './en/remind.js';
+import { remind as remindFr } from './fr/remind.js';
+import { reminders as remindersEn } from './en/reminders.js';
+import { reminders as remindersFr } from './fr/reminders.js';
 
 /**
  * Every command's language pack, both locales listed side by side so adding a
@@ -39,6 +43,8 @@ export const commandPacks = {
     commandSetRank: setRankEn,
     commandData: dataEn,
     commandMaintenance: maintenanceEn,
+    commandRemind: remindEn,
+    commandReminders: remindersEn,
   },
   fr: {
     commandPing: pingFr,
@@ -51,5 +57,7 @@ export const commandPacks = {
     commandSetRank: setRankFr,
     commandData: dataFr,
     commandMaintenance: maintenanceFr,
+    commandRemind: remindFr,
+    commandReminders: remindersFr,
   },
 } as const;

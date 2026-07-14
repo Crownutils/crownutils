@@ -1,15 +1,17 @@
 import { MessageFlags } from 'discord.js';
 import type {
   Message,
+  MessageMentionOptions,
   OmitPartialGroupDMChannel,
   RepliableInteraction,
+  SendableChannels,
   User,
 } from 'discord.js';
 import type { Container } from '@/discord/components/index.js';
 
 /**
  * Transport-agnostic result a use-case hands back to a command front: *what* to
- * show and *whether* it is private. Not a discord.js reply payload — turning it
+ * show and *whether* it is private. Not a discord.js reply payload; turning it
  * into one (the `IsComponentsV2` flag, `container.build()`, reply vs. follow-up)
  * happens here, once, instead of in every command.
  */
@@ -52,6 +54,26 @@ export async function sendResponseToMessage(
     flags: [MessageFlags.IsComponentsV2] as const,
     components: [response.container.build()],
   });
+}
+
+/**
+ * Deliver a response as a fresh message in `channel` (not a reply), for
+ * bot-initiated sends like reminders. `allowedMentions` controls which pings fire.
+ */
+export async function sendResponseToChannel(
+  channel: SendableChannels,
+  response: CommandResponse,
+  options?: { readonly allowedMentions?: MessageMentionOptions },
+): Promise<Message> {
+  // Collapse the SendableChannels union's send overloads to one call.
+  return (async () =>
+    channel.send({
+      flags: [MessageFlags.IsComponentsV2] as const,
+      components: [response.container.build()],
+      ...(options?.allowedMentions
+        ? { allowedMentions: options.allowedMentions }
+        : {}),
+    }))();
 }
 
 /**

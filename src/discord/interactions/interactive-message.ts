@@ -151,6 +151,14 @@ function drive<State>(
   });
 }
 
+/** Attach the self-updating collector to an already-sent `message`; send it yourself when you need custom send options (e.g. `allowedMentions`). */
+export function attachInteractiveCollector<State>(
+  message: Message,
+  controller: InteractiveMessage<State>,
+): void {
+  drive(message, controller, controller.initialState);
+}
+
 /**
  * Post `render(initialState)` in `channel` and keep it in sync: each allowed
  * interaction runs `reduce` and re-renders, until `stop()` or the idle timeout,
