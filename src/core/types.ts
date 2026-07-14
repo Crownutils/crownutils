@@ -48,3 +48,20 @@ export const ASSIGNABLE_RANKS: readonly AssignableRank[] = RANK.filter(
 export function isAssignableRank(value: string): value is AssignableRank {
   return (ASSIGNABLE_RANKS as readonly string[]).includes(value);
 }
+
+/** Reminder lifecycle states; mirrors the Prisma `ReminderStatus` enum. */
+export const REMINDER_STATUSES = [
+  'pending',
+  'delivering',
+  'delivered',
+  'failed',
+] as const;
+
+/** A reminder's lifecycle state. */
+export type ReminderStatus = (typeof REMINDER_STATUSES)[number];
+
+/** Statuses of a reminder still scheduled to fire (not yet settled). */
+export const ACTIVE_REMINDER_STATUSES = [
+  'pending',
+  'delivering',
+] as const satisfies readonly ReminderStatus[];

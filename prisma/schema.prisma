@@ -44,3 +44,29 @@ model GdprRequest {
   hash        String   @id
   requestedAt DateTime @default(now())
 }
+
+enum ReminderStatus {
+  pending
+  delivering
+  delivered
+  failed
+}
+
+model Reminder {
+  id          String         @id @default(cuid())
+  userId      String
+  channelId   String
+  content     String
+  dueAt       DateTime
+  durationMs  Int
+  status      ReminderStatus @default(pending)
+  attempts    Int            @default(0)
+  lastError   String?
+  createdAt   DateTime       @default(now())
+  deliveredAt DateTime?
+
+  // Scheduler next-due lookup and due-batch sweep filter status then order by dueAt.
+  @@index([status, dueAt])
+  // `reminders` list and per-user quota filter userId + active status.
+  @@index([userId, status])
+}
