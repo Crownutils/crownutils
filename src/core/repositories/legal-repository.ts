@@ -6,7 +6,7 @@ import { TtlCache } from '../cache/ttl-cache.js';
  * accepted version is recorded for traceability; bumping this does not, by
  * itself, force users to re-accept.
  */
-export const LEGAL_VERSION = '1.0';
+export const LEGAL_VERSION = '1.1';
 
 /**
  * Commands that must stay usable without having accepted the legal documents:

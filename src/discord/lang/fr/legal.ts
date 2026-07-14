@@ -13,7 +13,7 @@ const privacy = {
   },
   dataCollected: {
     heading: 'Données collectées',
-    body: "Nous conservons uniquement : votre identifiant Discord, la langue choisie, votre rang d'accès, votre acceptation des présents documents et, si vous êtes banni, une empreinte cryptographique (hash) de votre identifiant Discord. Nous ne lisons pas vos messages et ne collectons aucune donnée sensible.",
+    body: "Nous conservons uniquement : votre identifiant Discord, la langue choisie, votre rang d'accès, votre acceptation des présents documents, le contenu des rappels que vous programmez avec leur salon et leur date d'échéance, et, si vous êtes banni, une empreinte cryptographique (hash) de votre identifiant Discord. Hormis le contenu que vous placez volontairement dans un rappel, nous ne lisons pas vos messages et ne collectons aucune donnée sensible.",
   },
   purposes: {
     heading: 'Finalités',

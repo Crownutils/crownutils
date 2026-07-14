@@ -13,7 +13,7 @@ const privacy = {
   },
   dataCollected: {
     heading: 'Data collected',
-    body: 'We only keep: your Discord id, your chosen language, your access rank, your acceptance of these documents and, if you are banned, a cryptographic hash of your Discord id. We do not read your messages and collect no sensitive data.',
+    body: 'We only keep: your Discord id, your chosen language, your access rank, your acceptance of these documents, the content of the reminders you schedule together with their channel and due date, and, if you are banned, a cryptographic hash of your Discord id. Other than the content you deliberately put into a reminder, we do not read your messages and collect no sensitive data.',
   },
   purposes: {
     heading: 'Purposes',
