@@ -3,11 +3,12 @@ import type { ActiveReminder } from '@/core/repositories/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import {
   Button,
+  ButtonActionRow,
   createContainer,
   Section,
   Text,
 } from '../../components/index.js';
-import type { Container } from '../../components/index.js';
+import type { Container, TopLevelComponent } from '../../components/index.js';
 import { icons } from '../../theme/icons.js';
 import { lang } from '../../lang/index.js';
 
@@ -74,24 +75,31 @@ export function buildReminderCancelledContainer(
   );
 }
 
-/** The "DRING!" card sent when a reminder fires, mentioning its owner; `disabled` once the relaunch window closes. */
-export function buildReminderTriggeredContainer(
+/**
+ * The "DRING!" message when a reminder fires, as an ordered list of top-level
+ * components: the author mention, the card, then the relaunch row below it.
+ * `disabled` greys the relaunch button once the window closes.
+ */
+export function buildReminderTriggeredComponents(
   content: string,
   userId: string,
   locale: SupportedLocale,
   options?: { disabled?: boolean },
-): Container {
+): TopLevelComponent[] {
   const t = lang[locale].commandRemind.messages;
   const relaunch = new Button(RELAUNCH_ID)
-    .color('primary')
-    .label(t.triggered.relaunchButton);
+    .color('secondary')
+    .label(t.triggered.relaunchButton)
+    .emoji(icons.relaunch);
   if (options?.disabled === true) relaunch.disabled();
 
-  return createContainer('brand').add(
-    new Text(t.triggered.title).title(),
-    new Section().add(new Text(content)).button(relaunch),
-    new Text(`<@${userId}>`),
-  );
+  return [
+    createContainer('brand').add(
+      new Text(content),
+      new Text(`<@${userId}>`).size('subtle'),
+    ),
+    new ButtonActionRow().add(relaunch),
+  ];
 }
 
 /** `reminders` list: a Section + delete button per reminder, or an empty-state notice. */

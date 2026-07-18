@@ -5,6 +5,7 @@ import { resolveUserLocale } from '../../context/locale.js';
 import type { InteractiveMessage } from '../../interactions/index.js';
 import {
   attachInteractiveCollector,
+  commandResponseFromRender,
   sendResponseToChannel,
 } from '../../interactions/index.js';
 import { toError } from '../../utils/errors.js';
@@ -69,12 +70,12 @@ export const deliverToChannel: ReminderDeliveryTarget = async (
       `Channel ${reminder.channelId} is missing or not sendable`,
     );
   }
-  const container = controller.render(controller.initialState, {
+  const rendered = controller.render(controller.initialState, {
     disabled: false,
   });
   const message = await sendResponseToChannel(
     channel,
-    { container },
+    commandResponseFromRender(rendered),
     { allowedMentions: { parse: [], users: [reminder.userId] } },
   );
   attachInteractiveCollector(message, controller);
@@ -87,12 +88,12 @@ export const deliverToDm: ReminderDeliveryTarget = async (
   controller,
 ) => {
   const dm = await (await client.users.fetch(reminder.userId)).createDM();
-  const container = controller.render(controller.initialState, {
+  const rendered = controller.render(controller.initialState, {
     disabled: false,
   });
   const message = await sendResponseToChannel(
     dm,
-    { container },
+    commandResponseFromRender(rendered),
     { allowedMentions: { parse: [] } },
   );
   attachInteractiveCollector(message, controller);

@@ -11,4 +11,5 @@ export const icons = {
   info: 'ℹ️',
   bell: '🔔',
   trash: '🗑️',
+  relaunch: '🔄',
 } as const;

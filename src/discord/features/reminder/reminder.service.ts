@@ -25,7 +25,7 @@ import {
   buildReminderCancelledContainer,
   buildReminderCreatedContainer,
   buildReminderListContainer,
-  buildReminderTriggeredContainer,
+  buildReminderTriggeredComponents,
   isReminderRelaunchButton,
   parseReminderCancelButtonId,
   parseReminderDeleteButtonId,
@@ -197,7 +197,7 @@ export function createReminderTriggeredController(
     initialState: null,
     allowedIds: [spec.userId],
     render(_state, { disabled }) {
-      return buildReminderTriggeredContainer(
+      return buildReminderTriggeredComponents(
         spec.content,
         spec.userId,
         locale,
