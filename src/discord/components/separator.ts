@@ -19,4 +19,9 @@ export class Separator implements ContainerChild {
   public attachToContainer(container: ContainerBuilder): void {
     container.addSeparatorComponents(this.builder);
   }
+
+  /** This separator as a top-level message component. */
+  public build(): SeparatorBuilder {
+    return this.builder;
+  }
 }

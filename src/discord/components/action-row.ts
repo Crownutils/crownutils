@@ -18,6 +18,11 @@ abstract class ActionRow<
   attachToContainer(container: ContainerBuilder): void {
     container.addActionRowComponents(this.builder);
   }
+
+  /** This action row as a top-level message component (rendered outside/below a container). */
+  build(): ActionRowBuilder<T> {
+    return this.builder;
+  }
 }
 
 /** Wrapper over an action row, only holding buttons. */

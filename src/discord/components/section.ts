@@ -25,4 +25,9 @@ export class Section implements ContainerChild {
   public attachToContainer(container: ContainerBuilder): void {
     container.addSectionComponents(this.builder);
   }
+
+  /** This section as a top-level message component. */
+  public build(): SectionBuilder {
+    return this.builder;
+  }
 }

@@ -7,18 +7,44 @@ import type {
   SendableChannels,
   User,
 } from 'discord.js';
-import type { Container } from '@/discord/components/index.js';
+import type {
+  TopLevelComponent,
+  TopLevelComponentBuilder,
+} from '@/discord/components/index.js';
+import { Container } from '@/discord/components/index.js';
 
 /**
  * Transport-agnostic result a use-case hands back to a command front: *what* to
- * show and *whether* it is private. Not a discord.js reply payload; turning it
- * into one (the `IsComponentsV2` flag, `container.build()`, reply vs. follow-up)
- * happens here, once, instead of in every command.
+ * show and *whether* it is private. Provide `container` for the common
+ * single-component case, or `components` for a fully modular, ordered list of
+ * top-level components (containers, action rows, sections, text, separators).
+ * Turning it into a discord.js payload (the `IsComponentsV2` flag, reply vs.
+ * follow-up) happens here, once, instead of in every command.
  */
 export interface CommandResponse {
-  readonly container: Container;
+  /** Sugar for a single top-level component; equivalent to `components: [container]`. */
+  readonly container?: Container;
+  /** An ordered list of top-level components, when the message is more than one. */
+  readonly components?: readonly TopLevelComponent[];
   /** Slash only: reply privately. Ignored by the prefix front (messages can't be ephemeral). */
   readonly ephemeral?: boolean;
+}
+
+/** Resolves a response's top-level components to discord.js builders (e.g. to `message.edit` yourself). */
+export function responseComponents(
+  response: CommandResponse,
+): TopLevelComponentBuilder[] {
+  const items: readonly TopLevelComponent[] =
+    response.components ?? (response.container ? [response.container] : []);
+  return items.map((component) => component.build());
+}
+
+export function commandResponseFromRender(
+  rendered: Container | readonly TopLevelComponent[],
+): CommandResponse {
+  return rendered instanceof Container
+    ? { container: rendered }
+    : { components: rendered };
 }
 
 /**
@@ -36,7 +62,7 @@ export async function sendResponseToInteraction(
       response.ephemeral === true
         ? ([MessageFlags.IsComponentsV2, MessageFlags.Ephemeral] as const)
         : ([MessageFlags.IsComponentsV2] as const),
-    components: [response.container.build()],
+    components: responseComponents(response),
   };
   if (interaction.replied || interaction.deferred) {
     await interaction.followUp(payload);
@@ -52,7 +78,7 @@ export async function sendResponseToMessage(
 ): Promise<OmitPartialGroupDMChannel<Message<boolean>>> {
   return await message.reply({
     flags: [MessageFlags.IsComponentsV2] as const,
-    components: [response.container.build()],
+    components: responseComponents(response),
   });
 }
 
@@ -69,7 +95,7 @@ export async function sendResponseToChannel(
   return (async () =>
     channel.send({
       flags: [MessageFlags.IsComponentsV2] as const,
-      components: [response.container.build()],
+      components: responseComponents(response),
       ...(options?.allowedMentions
         ? { allowedMentions: options.allowedMentions }
         : {}),
@@ -88,7 +114,7 @@ export async function sendResponseToDM(
   try {
     await user.send({
       flags: [MessageFlags.IsComponentsV2] as const,
-      components: [response.container.build()],
+      components: responseComponents(response),
     });
 
     return true;

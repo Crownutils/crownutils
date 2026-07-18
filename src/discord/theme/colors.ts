@@ -4,6 +4,8 @@ export const colors = {
   cancel: 0xe41b1e,
   success: 0x008000,
   warn: 0xc74d00,
+  blurple: 0x5865f2,
+  gray: 0x5a5458,
 } as const;
 
-export type EmbedColor = keyof typeof colors;
+export type ColorName = keyof typeof colors;

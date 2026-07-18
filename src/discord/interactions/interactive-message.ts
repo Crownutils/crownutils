@@ -1,12 +1,15 @@
 import { MessageFlags } from 'discord.js';
 import type {
-  ContainerBuilder,
   Message,
   MessageComponentInteraction,
   RepliableInteraction,
   SendableChannels,
 } from 'discord.js';
-import type { Container } from '@/discord/components/index.js';
+import {
+  Container,
+  type TopLevelComponent,
+  type TopLevelComponentBuilder,
+} from '@/discord/components/index.js';
 import { INTERACTIVE_MESSAGE_IDLE_MS } from '@/discord/utils/constants.js';
 import { lang } from '@/discord/lang/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
@@ -39,8 +42,11 @@ export interface ReduceContext {
  */
 export interface InteractiveMessage<State> {
   readonly initialState: State;
-  /** Build the container for a state; disable its interactive parts when `context.disabled`. */
-  render(state: State, context: RenderContext): Container;
+  /** Build the message body for a state: a single container, or an ordered list of top-level components. Disable interactive parts when `context.disabled`. */
+  render(
+    state: State,
+    context: RenderContext,
+  ): Container | readonly TopLevelComponent[];
   /** Compute the next state from a collected component interaction. */
   reduce(
     state: State,
@@ -60,8 +66,10 @@ function componentsOf<State>(
   controller: InteractiveMessage<State>,
   state: State,
   disabled: boolean,
-): ContainerBuilder[] {
-  return [controller.render(state, { disabled }).build()];
+): TopLevelComponentBuilder[] {
+  const body = controller.render(state, { disabled });
+  const items = body instanceof Container ? [body] : body;
+  return items.map((component) => component.build());
 }
 
 function isAllowed(

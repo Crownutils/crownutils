@@ -1,5 +1,8 @@
 import { createContainer, Text } from '@/discord/components/index.js';
-import { sendResponseToMessage } from '@/discord/interactions/index.js';
+import {
+  responseComponents,
+  sendResponseToMessage,
+} from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import type { PrefixCommand } from '@/discord/registries/index.js';
@@ -29,7 +32,7 @@ const command = {
 
     await sent.edit({
       flags: [MessageFlags.IsComponentsV2] as const,
-      components: [response.container.build()],
+      components: responseComponents(response),
     });
   },
 } satisfies PrefixCommand;

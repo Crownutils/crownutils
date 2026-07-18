@@ -95,6 +95,11 @@ export class Text implements ContainerChild {
     return this;
   }
 
+  /** This text as a top-level message component. */
+  public build(): TextDisplayBuilder {
+    return this.toBuilder();
+  }
+
   private toBuilder(): TextDisplayBuilder {
     return new TextDisplayBuilder().setContent(this.render());
   }
