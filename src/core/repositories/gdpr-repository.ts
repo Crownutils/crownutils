@@ -6,6 +6,10 @@ import {
   getLegalAcceptance,
   type LegalAcceptanceRecord,
 } from './legal-repository.js';
+import {
+  listRemindersForGdpr,
+  type GdprReminder,
+} from './reminder-repository.js';
 import { findStoredUserProfile } from './user-repository.js';
 
 /** Minimum number of days a user must wait between two GDPR access requests. */
@@ -20,6 +24,8 @@ export interface GdprExport {
   readonly rank: Rank | null;
   readonly legalAcceptance: LegalAcceptanceRecord | null;
   readonly hasBanHash: boolean;
+  /** Every reminder stored for the user, any status; empty when none. */
+  readonly reminders: readonly GdprReminder[];
 }
 
 /**
@@ -30,10 +36,11 @@ export interface GdprExport {
  * must not report as if it were real stored data.
  */
 export async function buildGdprExport(userId: string): Promise<GdprExport> {
-  const [profile, legalAcceptance, banHash] = await Promise.all([
+  const [profile, legalAcceptance, banHash, reminders] = await Promise.all([
     findStoredUserProfile(userId),
     getLegalAcceptance(userId),
     hasBanHash(userId),
+    listRemindersForGdpr(userId),
   ]);
 
   return {
@@ -42,6 +49,7 @@ export async function buildGdprExport(userId: string): Promise<GdprExport> {
     rank: profile?.rank ?? null,
     legalAcceptance,
     hasBanHash: banHash,
+    reminders,
   };
 }
 

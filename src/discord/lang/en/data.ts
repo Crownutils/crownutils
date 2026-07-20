@@ -15,6 +15,16 @@ export const data = {
     legalNotAccepted: `${md.bold('Legal documents accepted:')} no`,
     banHashPresent: `${md.bold('Ban hash:')} yes, a hash of your id is on record`,
     banHashAbsent: `${md.bold('Ban hash:')} none`,
+    remindersTitle: (count: number) => `${md.bold('Reminders on record:')} ${count}`,
+    remindersNone: `${md.bold('Reminders on record:')} none`,
+    reminderItem: (content: string, status: string, due: string) =>
+      `• ${md.code(content)} — ${status}, due ${due}`,
+    reminderStatus: {
+      pending: 'pending',
+      delivering: 'sending',
+      delivered: 'delivered',
+      failed: 'failed',
+    },
     notStored: 'not stored',
     noDataStored: 'No data about you has been stored.',
     cooldownDenied: (date: string) =>

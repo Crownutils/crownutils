@@ -1,5 +1,9 @@
 import { prisma } from '../persistence/client.js';
-import { ACTIVE_REMINDER_STATUSES, type Rank } from '../types.js';
+import {
+  ACTIVE_REMINDER_STATUSES,
+  type Rank,
+  type ReminderStatus,
+} from '../types.js';
 
 /** Longest horizon a reminder may be scheduled for. */
 export const MAX_REMINDER_DELAY_YEARS = 10;
@@ -36,6 +40,14 @@ export interface ActiveReminder {
   readonly id: string;
   readonly content: string;
   readonly dueAt: Date;
+}
+
+/** A reminder as included in a user's GDPR data export, whatever its status. */
+export interface GdprReminder {
+  readonly content: string;
+  readonly dueAt: Date;
+  readonly status: ReminderStatus;
+  readonly createdAt: Date;
 }
 
 /** The fields the scheduler needs to deliver a reminder. */
@@ -80,6 +92,17 @@ export async function listActiveReminders(
     orderBy: { dueAt: 'asc' },
     take: REMINDER_LIST_LIMIT,
     select: { id: true, content: true, dueAt: true },
+  });
+}
+
+/** Every reminder stored for `userId`, any status, newest first - for the GDPR export. */
+export async function listRemindersForGdpr(
+  userId: string,
+): Promise<GdprReminder[]> {
+  return prisma.reminder.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    select: { content: true, dueAt: true, status: true, createdAt: true },
   });
 }
 

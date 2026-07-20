@@ -17,6 +17,17 @@ export const data = {
     legalNotAccepted: `${md.bold('Documents légaux acceptés :')} non`,
     banHashPresent: `${md.bold('Empreinte de bannissement :')} oui, une empreinte de votre identifiant est conservée`,
     banHashAbsent: `${md.bold('Empreinte de bannissement :')} aucune`,
+    remindersTitle: (count: number) =>
+      `${md.bold('Rappels enregistrés :')} ${count}`,
+    remindersNone: `${md.bold('Rappels enregistrés :')} aucun`,
+    reminderItem: (content: string, status: string, due: string) =>
+      `• ${md.code(content)} — ${status}, échéance ${due}`,
+    reminderStatus: {
+      pending: 'en attente',
+      delivering: "en cours d'envoi",
+      delivered: 'envoyé',
+      failed: 'échec',
+    },
     notStored: 'non enregistré',
     noDataStored: "Aucune donnée vous concernant n'a été stockée.",
     cooldownDenied: (date: string) =>

@@ -1,4 +1,4 @@
-import type { GdprExport } from '@/core/repositories/index.js';
+import type { GdprExport, GdprReminder } from '@/core/repositories/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '../../components/index.js';
 import {
@@ -19,14 +19,38 @@ function formatDate(language: SupportedLocale, date: Date): string {
   }).format(date);
 }
 
-/** Whether nothing at all is stored: no `User` row, no legal acceptance, no ban hash. */
+/** Whether nothing at all is stored: no `User` row, no legal acceptance, no ban hash, no reminders. */
 function hasNoStoredData(gdprExport: GdprExport): boolean {
   return (
     gdprExport.language === null &&
     gdprExport.rank === null &&
     gdprExport.legalAcceptance === null &&
-    !gdprExport.hasBanHash
+    !gdprExport.hasBanHash &&
+    gdprExport.reminders.length === 0
   );
+}
+
+/** The reminders block of the export: a count and one line per reminder, or a "none" notice. */
+function buildRemindersText(
+  language: SupportedLocale,
+  reminders: readonly GdprReminder[],
+): Text {
+  const messages = lang[language].commandData.messages;
+  if (reminders.length === 0) {
+    return new Text(messages.remindersNone);
+  }
+
+  const text = new Text(messages.remindersTitle(reminders.length));
+  for (const reminder of reminders) {
+    text.newLine(
+      messages.reminderItem(
+        reminder.content,
+        messages.reminderStatus[reminder.status],
+        formatDate(language, reminder.dueAt),
+      ),
+    );
+  }
+  return text;
 }
 
 /**
@@ -68,6 +92,8 @@ export function buildDataContainer(
           ? messages.banHashPresent
           : messages.banHashAbsent,
       ),
+    new Separator(),
+    buildRemindersText(language, gdprExport.reminders),
   );
 }
 
