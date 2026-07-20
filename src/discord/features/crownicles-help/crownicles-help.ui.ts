@@ -22,9 +22,10 @@ export const LOCATIONS_PER_PAGE = 25;
 const OCCUPIED_EFFECT_ID = 'occupied';
 /** Above this, a duration is treated as permanent and shown as the icon alone. */
 const MAX_SHOWN_DURATION_MINUTES = 100_000;
-/** Value separators: `|` between stats, `-` between a narrative and its stats. */
+/** Separator between an outcome's stats. */
 const STAT_SEPARATOR = ' | ';
-const TEXT_STAT_SEPARATOR = ' - ';
+/** Stand-in emote for the auto-resolved `end` choice, which has no reaction icon. */
+const END_CHOICE_EMOJI = '🔚';
 
 export const CATEGORY_SELECT_ID = 'chelp-category';
 export const LOCATION_SELECT_ID = 'chelp-location';
@@ -64,59 +65,76 @@ function formatDuration(minutes: number, locale: SupportedLocale): string {
   return rest === 0 ? t.hours(hours) : t.hoursMinutes(hours, rest);
 }
 
-/** The effect part of an outcome summary: its icon, and its duration when known. */
+/** Time lost (occupied effect), as `🕑 30 min perdues`, or `undefined` if none. */
+function timeLostPart(
+  outcome: EventOutcome,
+  locale: SupportedLocale,
+): string | undefined {
+  const minutes = outcome.lostTime ?? 0;
+  if (minutes <= 0) return undefined;
+  const t = helpMessages(locale);
+  return `${outcomeIcons.time} ${formatDuration(minutes, locale)} ${t.labels.timeLost}`;
+}
+
+/** An alteration effect, as its icon and duration (e.g. `😴 3 h`); icon alone if permanent. */
 function effectPart(
   outcome: EventOutcome,
   locale: SupportedLocale,
 ): string | undefined {
-  if (outcome.effect === undefined) {
-    return outcome.lostTime && outcome.lostTime > 0
-      ? `${outcomeIcons.time} ${formatDuration(outcome.lostTime, locale)}`
-      : undefined;
+  if (outcome.effect === undefined || outcome.effect === OCCUPIED_EFFECT_ID) {
+    return timeLostPart(outcome, locale);
   }
-
   const info = effects[outcome.effect];
   if (info === undefined) return undefined;
-
-  const duration =
-    outcome.effect === OCCUPIED_EFFECT_ID
-      ? (outcome.lostTime ?? 0)
-      : info.durationMinutes;
-  return duration > 0 && duration <= MAX_SHOWN_DURATION_MINUTES
-    ? `${info.icon} ${formatDuration(duration, locale)}`
+  return info.durationMinutes > 0 &&
+    info.durationMinutes <= MAX_SHOWN_DURATION_MINUTES
+    ? `${info.icon} ${formatDuration(info.durationMinutes, locale)}`
     : info.icon;
 }
 
 /**
  * Compact icon summary of an outcome's mechanical effects, e.g.
- * `⭐ 172 | 💰 +50 | ❤️ -5 | 🕑 30 min`. Empty when the outcome is purely
- * narrative.
+ * `⭐ +172 XP | 💰 +50 argent | 💔 -5 PV`. Empty when the outcome is inert.
  */
 export function outcomeSummary(
   outcome: EventOutcome,
   locale: SupportedLocale,
 ): string {
+  const l = helpMessages(locale).labels;
   const parts: string[] = [];
-  const push = (icon: string, value: string): void => {
-    parts.push(`${icon} ${value}`);
+  const stat = (icon: string, value: string, label: string): void => {
+    parts.push(`${icon} ${value} ${label}`);
   };
 
-  if (outcome.experience > 0) push(outcomeIcons.xp, String(outcome.experience));
-  if (outcome.points) push(outcomeIcons.points, signed(outcome.points));
-  if (outcome.money) push(outcomeIcons.money, signed(outcome.money));
-  if (outcome.health) push(outcomeIcons.health, signed(outcome.health));
-  if (outcome.energy) push(outcomeIcons.energy, signed(outcome.energy));
-  if (outcome.gems) push(outcomeIcons.gems, signed(outcome.gems));
-  if (outcome.tokens) push(outcomeIcons.tokens, signed(outcome.tokens));
+  if (outcome.experience > 0) {
+    stat(outcomeIcons.xp, `+${outcome.experience}`, l.xp);
+  }
+  if (outcome.points)
+    stat(outcomeIcons.points, signed(outcome.points), l.points);
+  if (outcome.money) {
+    const icon =
+      outcome.money > 0 ? outcomeIcons.money : outcomeIcons.moneyLoss;
+    stat(icon, signed(outcome.money), l.money);
+  }
+  if (outcome.health) {
+    const icon =
+      outcome.health > 0 ? outcomeIcons.health : outcomeIcons.healthLoss;
+    stat(icon, signed(outcome.health), l.health);
+  }
+  if (outcome.energy)
+    stat(outcomeIcons.energy, signed(outcome.energy), l.energy);
+  if (outcome.gems) stat(outcomeIcons.gems, signed(outcome.gems), l.gems);
+  if (outcome.tokens)
+    stat(outcomeIcons.tokens, signed(outcome.tokens), l.tokens);
 
   const effect = effectPart(outcome, locale);
   if (effect) parts.push(effect);
-  if (outcome.givesItem) parts.push(outcomeIcons.item);
-  if (outcome.givesPet) parts.push(outcomeIcons.pet);
+  if (outcome.givesItem) parts.push(`${outcomeIcons.item} ${l.item}`);
+  if (outcome.givesPet) parts.push(`${outcomeIcons.pet} ${l.pet}`);
   if (outcome.oneshot) parts.push(outcomeIcons.oneshot);
   if (outcome.travels) parts.push(outcomeIcons.travel);
   if (outcome.nextEventId !== undefined) {
-    push(outcomeIcons.nextEvent, `#${outcome.nextEventId}`);
+    parts.push(`${outcomeIcons.nextEvent} #${outcome.nextEventId}`);
   }
 
   return parts.join(STAT_SEPARATOR);
@@ -147,8 +165,9 @@ export function buildCategorySelectRow(
 }
 
 /**
- * Appends an event's full detail to `container`: its intro, then each choice
- * with its possible outcomes and their icon summaries.
+ * Appends an event's detail to `container`: its intro, then each choice as an
+ * emote + name header followed by its numbered outcomes' icon summaries. The
+ * outcome narratives are omitted on purpose (they blow past the message limit).
  */
 export function appendEventDetail(
   container: Container,
@@ -160,16 +179,19 @@ export function appendEventDetail(
   container.add(new Text(event.text), new Separator());
   container.add(new Text(t.outcomesTitle).size('small'));
 
-  for (const possibility of event.possibilities) {
-    const block = new Text(md.bold(possibility.text ?? t.autoOutcome));
-    for (const outcome of possibility.outcomes) {
+  // The auto-resolved `end` choice is listed last, as in the game.
+  const ordered = [...event.possibilities].sort(
+    (a, b) => Number(a.key === 'end') - Number(b.key === 'end'),
+  );
+  for (const possibility of ordered) {
+    const emoji =
+      possibility.emoji ?? (possibility.key === 'end' ? END_CHOICE_EMOJI : '');
+    const name = possibility.text ?? t.autoOutcome;
+    const block = new Text(`${emoji} ${md.bold(name)}`.trimStart());
+    possibility.outcomes.forEach((outcome, index) => {
       const summary = outcomeSummary(outcome, locale);
-      const text = outcome.text?.trim() ?? '';
-      const line = [text, summary]
-        .filter((part) => part.length > 0)
-        .join(TEXT_STAT_SEPARATOR);
-      if (line.length > 0) block.newLine(`↳ ${line}`);
-    }
+      block.newLine(`${index + 1}. ${summary.length > 0 ? summary : '—'}`);
+    });
     container.add(block);
   }
 }

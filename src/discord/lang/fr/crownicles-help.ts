@@ -9,7 +9,19 @@ export const crowniclesHelp = {
     loadError:
       'Impossible de charger les données Crownicles. Veuillez réessayer plus tard.',
     outcomesTitle: 'Choix et résultats',
-    autoOutcome: 'Résultat automatique',
+    autoOutcome: 'Ne pas répondre',
+    labels: {
+      xp: 'XP',
+      points: 'points',
+      money: 'argent',
+      health: 'PV',
+      energy: 'énergie',
+      gems: 'gemmes',
+      tokens: 'jetons',
+      item: 'Objet',
+      pet: 'Familier',
+      timeLost: 'perdues',
+    },
     minutes: (count: number): string => `${count} min`,
     hours: (count: number): string => `${count} h`,
     hoursMinutes: (hours: number, minutes: number): string =>
