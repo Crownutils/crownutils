@@ -1,5 +1,6 @@
 import { TtlCache } from '@/core/cache/ttl-cache.js';
 import type { SupportedLocale } from '@/core/types.js';
+import { getEventChoiceIcons } from './event-icons.js';
 import { computeOutcomeExperience } from './experience.js';
 import {
   fetchCrowniclesJson,
@@ -46,6 +47,8 @@ export interface EventOutcome {
 /** One choice a player can make on an event, with its possible outcomes. */
 export interface EventPossibility {
   readonly key: string;
+  /** Choice reaction emote, or `undefined` (e.g. the auto-resolved `end` key). */
+  readonly emoji: string | undefined;
   /** Localized choice label; `undefined` for auto-resolved keys (e.g. `end`). */
   readonly text: string | undefined;
   readonly outcomes: readonly EventOutcome[];
@@ -152,6 +155,7 @@ function mergeOutcome(raw: RawOutcome, text: unknown): EventOutcome {
 /** Builds one possibility, unioning the resource's outcome keys with the lang's. */
 function mergePossibility(
   key: string,
+  emoji: string | undefined,
   rawOutcomes: Record<string, RawOutcome>,
   langPossibility:
     { text?: string; outcomes?: Record<string, unknown> } | undefined,
@@ -163,6 +167,7 @@ function mergePossibility(
 
   return {
     key,
+    emoji,
     text: langPossibility?.text,
     outcomes: outcomeKeys.map((n) =>
       mergeOutcome(rawOutcomes[n] ?? {}, langOutcomes[n]),
@@ -175,6 +180,7 @@ function mergeEvent(
   id: number,
   raw: RawEvent,
   lang: RawLangEvents[string] | undefined,
+  choiceIcons: Record<string, string>,
 ): CrowniclesEvent {
   const mapIds = [
     ...new Set(
@@ -188,6 +194,7 @@ function mergeEvent(
   const possibilities = Object.keys(rawPossibilities).map((key) =>
     mergePossibility(
       key,
+      choiceIcons[key],
       rawPossibilities[key]?.outcomes ?? {},
       lang?.possibilities?.[key],
     ),
@@ -205,9 +212,10 @@ function mergeEvent(
 
 /** Fetches every event's logic and merges in its `locale` text, in one pass. */
 async function loadEvents(locale: SupportedLocale): Promise<CrowniclesEvent[]> {
-  const [langEvents, files] = await Promise.all([
+  const [langEvents, files, choiceIcons] = await Promise.all([
     fetchCrowniclesJson<RawLangEvents>(`Lang/${locale}/events.json`),
     listCrowniclesDir(EVENTS_DIR),
+    getEventChoiceIcons(),
   ]);
   const ids = numericIds(files);
 
@@ -216,7 +224,12 @@ async function loadEvents(locale: SupportedLocale): Promise<CrowniclesEvent[]> {
   );
 
   return ids.map((id, index) =>
-    mergeEvent(id, raw[index]!, langEvents[String(id)]),
+    mergeEvent(
+      id,
+      raw[index]!,
+      langEvents[String(id)],
+      choiceIcons.get(id) ?? {},
+    ),
   );
 }
 

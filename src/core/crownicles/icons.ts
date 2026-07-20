@@ -5,16 +5,21 @@
  * emotes stay fetched from the game's icon source when a page needs them.
  */
 
-/** Emotes for the reward/penalty fields of a possibility outcome. */
+/**
+ * Emotes for the reward/penalty fields of a possibility outcome. `money` and
+ * `health` have a distinct emote for a loss, matching the game's own display.
+ */
 export const outcomeIcons = {
   xp: '⭐',
   points: '🏅',
   money: '💰',
+  moneyLoss: '💸',
   health: '❤️',
+  healthLoss: '💔',
   energy: '⚡',
   gems: '💎',
   tokens: '🪙',
-  time: '⏱️',
+  time: '🕑',
   item: '🎁',
   pet: '🐾',
   oneshot: '💀',
