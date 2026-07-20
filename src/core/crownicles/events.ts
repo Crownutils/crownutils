@@ -38,8 +38,12 @@ export interface EventOutcome {
   readonly givesItem: boolean;
   readonly givesPet: boolean;
   readonly oneshot: boolean;
-  /** True when the outcome forces travel (a map link or a destination pick). */
-  readonly travels: boolean;
+  /** Forced map link id, when the outcome sends the player down a specific link. */
+  readonly mapLink?: number;
+  /** Location type codes the player may be sent to (a random one is picked). */
+  readonly mapTypeDestinations?: readonly string[];
+  /** Location type codes excluded from the random destination. */
+  readonly mapTypeExclusions?: readonly string[];
   /** Forced follow-up event id, or `undefined`. */
   readonly nextEventId?: number;
 }
@@ -95,6 +99,7 @@ interface RawOutcome {
   readonly nextEvent?: number;
   readonly mapLink?: number;
   readonly mapTypesDestination?: readonly string[];
+  readonly mapTypesExcludeDestination?: readonly string[];
 }
 
 /** Raw `Lang/<locale>/events.json` shape: text keyed by event id then by choice. */
@@ -139,7 +144,6 @@ function mergeOutcome(raw: RawOutcome, text: unknown): EventOutcome {
     givesItem: raw.randomItem !== undefined,
     givesPet: raw.randomPet !== undefined || raw.givePet !== undefined,
     oneshot: raw.oneshot === true,
-    travels: raw.mapLink !== undefined || raw.mapTypesDestination !== undefined,
     ...opt('lostTime', raw.lostTime),
     ...opt('health', raw.health),
     ...opt('money', raw.money),
@@ -148,6 +152,9 @@ function mergeOutcome(raw: RawOutcome, text: unknown): EventOutcome {
     ...opt('tokens', raw.tokens),
     ...opt('points', raw.bonusPoints),
     ...opt('effect', raw.effect),
+    ...opt('mapLink', raw.mapLink),
+    ...opt('mapTypeDestinations', raw.mapTypesDestination),
+    ...opt('mapTypeExclusions', raw.mapTypesExcludeDestination),
     ...opt('nextEventId', raw.nextEvent),
   };
 }

@@ -1,6 +1,7 @@
 import { TtlCache } from '@/core/cache/ttl-cache.js';
 import type { SupportedLocale } from '@/core/types.js';
 import { locationTypeIcons } from './icons.js';
+import { getModels } from './models.js';
 import {
   fetchCrowniclesJson,
   HTTP_CONCURRENCY,
@@ -30,11 +31,6 @@ interface RawLocation {
   readonly attribute?: string;
 }
 
-/** `models.json` reduced to the location-name map we read from it. */
-interface LocationModels {
-  readonly map_locations?: Record<string, { name?: string }>;
-}
-
 const LOCATIONS_DIR = 'Core/resources/mapLocations';
 
 const cache = new TtlCache<SupportedLocale, CrowniclesLocation[]>(
@@ -47,7 +43,7 @@ async function loadLocations(
   locale: SupportedLocale,
 ): Promise<CrowniclesLocation[]> {
   const [models, files] = await Promise.all([
-    fetchCrowniclesJson<LocationModels>(`Lang/${locale}/models.json`),
+    getModels(locale),
     listCrowniclesDir(LOCATIONS_DIR),
   ]);
   const names = models.map_locations ?? {};
