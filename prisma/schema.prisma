@@ -1,69 +1,72 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/core/persistence/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "sqlite"
 }
 
-model Reminder {
-  id        String   @id @default(cuid())
-  channelId String
-  userId    String
-  triggerAt DateTime
-  message   String
-}
-
-// Singleton row (id always 1) holding bot-wide toggles.
 model BotState {
   id                 Int     @id @default(1)
   maintenanceEnabled Boolean @default(false)
 }
 
-// Last time a user computed a pathfinder route, for the daily usage limit.
-model PathfinderUsage {
-  userId     String   @id
-  lastUsedAt DateTime
+enum Language {
+  fr
+  en
 }
 
-// A team announcement ("mail") broadcast to every user; body is rich Markdown.
-// Auto-deleted two weeks after creation.
-model Mail {
-  id        String   @id @default(cuid())
-  title     String?
-  body      String
-  authorId  String
-  createdAt DateTime @default(now())
+enum Rank {
+  banned
+  normal
+  privileged
+  owner
 }
 
-// Read receipt: this user opened this mail. Unread = active mails without a
-// receipt for the user.
-model MailRead {
-  userId String
-  mailId String
-
-  @@id([userId, mailId])
+model User {
+  userId   String   @id
+  language Language @default(en)
+  rank     Rank     @default(normal)
 }
 
-// Per-user throttle for the in-channel unread reminder (at most once per day).
-model MailNotice {
-  userId         String   @id
-  lastNotifiedAt DateTime
-}
-
-// Records that a user accepted the legal documents. A single acceptance is
-// enough; the row stores which version was accepted and when. Deleting it (via
-// the erasure command) re-locks the bot until the user accepts again.
 model LegalAcceptance {
   userId          String   @id
   acceptedVersion String
   acceptedAt      DateTime @default(now())
 }
 
-// Anti-abuse throttle for the data-access (export) command: at most one request
-// per user every 31 days.
-model DataAccessUsage {
-  userId          String   @id
-  lastRequestedAt DateTime
+model Banned {
+  hash String @id @unique
+}
+
+model GdprRequest {
+  hash        String   @id
+  requestedAt DateTime @default(now())
+}
+
+enum ReminderStatus {
+  pending
+  delivering
+  delivered
+  failed
+}
+
+model Reminder {
+  id          String         @id @default(cuid())
+  userId      String
+  channelId   String
+  content     String
+  dueAt       DateTime
+  durationMs  Int
+  status      ReminderStatus @default(pending)
+  attempts    Int            @default(0)
+  lastError   String?
+  createdAt   DateTime       @default(now())
+  deliveredAt DateTime?
+
+  // Scheduler next-due lookup and due-batch sweep filter status then order by dueAt.
+  @@index([status, dueAt])
+  // `reminders` list and per-user quota filter userId + active status.
+  @@index([userId, status])
 }

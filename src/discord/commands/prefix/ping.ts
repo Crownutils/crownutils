@@ -1,32 +1,40 @@
-import { PREFIX } from '@/discord/constants.js';
+import { createContainer, Text } from '@/discord/components/index.js';
+import {
+  responseComponents,
+  sendResponseToMessage,
+} from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import { Container, Text } from '@/discord/components/index.js';
-import { buildPingResultContainer } from '@/discord/presentations/ping-presentation.js';
-import type { PrefixCommand } from '@/discord/types/command.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
+import type { PrefixCommand } from '@/discord/registries/index.js';
+import { runPingCommand } from '@/discord/features/ping/ping.service.js';
+import { MessageFlags } from 'discord.js';
 
-/** `c!ping` (aliases `p`, `latency`): shows bot and Discord latency. */
-export const command = {
+const command = {
   name: 'ping',
-  description: lang.commands.ping.commandDescription,
   aliases: ['p', 'latency'],
-  requirements: {
-    scope: 'global',
-  },
-  help: {
-    usagePrefix: `${PREFIX}ping`,
-  },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
 
   async execute(message, _args) {
+    const userLanguage = await resolveUserLocale(message.author.id);
     const before = Date.now();
-    const interim = new Container()
-      .color('info')
-      .add(new Text(lang.commands.ping.messages.calculating))
-      .build();
-    const sent = await message.reply(interim);
+    const interim = createContainer('brand').add(
+      new Text(lang[userLanguage].commandPing.messages.calculating),
+    );
+    const sent = await sendResponseToMessage(message, { container: interim });
 
-    const totalMs = sent.createdTimestamp - before;
-    const discordMs = Math.round(message.client.ws.ping);
+    const totalLatencyMs = sent.createdTimestamp - before;
+    const discordLatencyMs = Math.round(message.client.ws.ping);
 
-    await sent.edit(buildPingResultContainer(totalMs, discordMs).build());
+    const response = runPingCommand(
+      { totalLatencyMs, discordLatencyMs },
+      userLanguage,
+    );
+
+    await sent.edit({
+      flags: [MessageFlags.IsComponentsV2] as const,
+      components: responseComponents(response),
+    });
   },
 } satisfies PrefixCommand;
+
+export default command;

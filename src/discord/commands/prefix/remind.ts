@@ -1,55 +1,51 @@
-import { PREFIX } from '@/discord/constants.js';
+import { resolveUserContext } from '@/discord/context/user.js';
+import {
+  mountInteractiveMessage,
+  sendResponseToMessage,
+} from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import { attachReminderCancelCollector } from '@/discord/interactions/reminder-cancel.js';
-import { runRemindCommand } from '@/discord/reminders/remind-command.js';
-import { DEFAULT_REMINDER_DURATION } from '@/discord/reminders/reminder-bridge.js';
-import type { PrefixCommand } from '@/discord/types/command.js';
+import { DEFAULT_REMINDER_DURATION } from '@/discord/features/reminder/reminder.duration.js';
+import {
+  createReminderCancelController,
+  runCreateReminder,
+} from '@/discord/features/reminder/reminder.service.js';
+import type { PrefixCommand } from '@/discord/registries/index.js';
 
-function getReminderArgs(args: string[]): {
-  durationInput: string;
-  remindMessage: string;
-} {
-  if (args.length === 0) {
-    return {
-      durationInput: DEFAULT_REMINDER_DURATION,
-      remindMessage: lang.commands.remind.messages.defaultMessage,
-    };
-  }
-
-  const [durationInput, ...rest] = args;
-  return {
-    durationInput: durationInput ?? '',
-    remindMessage: rest.join(' '),
-  };
-}
-
-/** `c!remind [durée] [message]` (aliases `r`, `rm`, `remindme`, `rappel`): creates a reminder. */
-export const command = {
+const command = {
   name: 'remind',
-  description: lang.commands.remind.commandDescription,
   aliases: ['r', 'rm', 'remindme', 'rappel'],
-  requirements: {
-    scope: 'global',
-  },
-  help: {
-    usagePrefix: `${PREFIX}remind [durée] [message]`,
-  },
-
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(message, args) {
-    const { durationInput, remindMessage } = getReminderArgs(args);
+    const { locale, rank } = await resolveUserContext(message.author.id);
+    const t = lang[locale].commandRemind.messages;
+    const noArgs = args.length === 0;
 
-    const { container, reminder } = await runRemindCommand({
-      client: message.client,
-      channelId: message.channelId,
+    const outcome = await runCreateReminder({
       userId: message.author.id,
-      durationInput,
-      remindMessage,
-      invalidFormatText: lang.commands.remind.messages.invalidFormat.prefix,
+      channelId: message.channelId,
+      rank,
+      locale,
+      durationInput: noArgs ? DEFAULT_REMINDER_DURATION : (args[0] ?? ''),
+      message: noArgs ? t.defaultMessage : args.slice(1).join(' '),
+      invalidFormatText: t.invalidFormat.prefix,
     });
 
-    const sent = await message.reply(container.build());
-    if (reminder) {
-      attachReminderCancelCollector(sent, reminder);
+    if (!outcome.ok) {
+      await sendResponseToMessage(message, { container: outcome.container });
+      return;
+    }
+
+    if (message.channel.isSendable()) {
+      await mountInteractiveMessage(
+        message.channel,
+        createReminderCancelController(
+          outcome.reminder,
+          message.author.id,
+          locale,
+        ),
+      );
     }
   },
 } satisfies PrefixCommand;
+
+export default command;

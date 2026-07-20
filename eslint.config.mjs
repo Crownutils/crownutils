@@ -4,7 +4,12 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    ignores: ['dist/', 'node_modules/', 'prisma.config.ts'],
+    ignores: [
+      'dist/',
+      'node_modules/',
+      'prisma/generated/',
+      'prisma.config.ts',
+    ],
   },
 
   eslint.configs.recommended,
@@ -19,13 +24,70 @@ export default tseslint.config(
       },
     },
     rules: {
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
+    },
+  },
+
+  // Layer boundary: `core/` is pure domain and must never depend on the
+  // presentation layer (discord.js or `@/discord/*`). Enforced, not trusted.
+  {
+    files: ['src/core/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/discord', '@/discord/**', '**/discord/**'],
+              message: 'core/ must not depend on the discord layer.',
+            },
+            {
+              group: ['discord.js'],
+              message: 'core/ must stay free of discord.js.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
+  // Config is the single place allowed to read process.env; everywhere else
+  // must go through @/core/config so env is loaded and validated exactly once.
+  {
+    files: ['src/**/*.ts'],
+    ignores: ['src/core/config/**'],
+    rules: {
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'process',
+          property: 'env',
+          message: 'Read config via @/core/config, not process.env directly.',
+        },
+      ],
+    },
+  },
+
+  // Default exports are reserved for dynamically-loaded modules (commands,
+  // events); everywhere else must use named exports.
+  {
+    files: ['src/**/*.ts'],
+    ignores: ['src/discord/commands/**', 'src/discord/events/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ExportDefaultDeclaration',
+          message:
+            'Use named exports; default is reserved for commands/ and events/ (dynamic loading).',
+        },
+      ],
     },
   },
 

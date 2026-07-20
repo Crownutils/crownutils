@@ -1,28 +1,12 @@
-import type { SlashCommand } from '@/discord/types/command.js';
-import { slashCommands } from '@/discord/registries/slash-registry.js';
-import {
-  hasFunction,
-  hasString,
-  isObject,
-  loadModules,
-} from './base-loader.js';
+import type { SlashCommand } from '../registries/index.js';
+import { isSlashCommand } from '../registries/index.js';
+import { loadModules } from './base-loader.js';
 
-function isSlashCommand(obj: unknown): obj is SlashCommand {
-  if (!isObject(obj) || !hasFunction(obj, 'execute')) {
-    return false;
-  }
-
-  return isObject(obj.data) && hasString(obj.data, 'name');
-}
-
-/** Loads all slash command modules and registers each one in {@link slashCommands}. */
-export async function loadSlashCommands(): Promise<void> {
+export async function loadSlashCommands(): Promise<SlashCommand[]> {
   const commands = await loadModules(
-    'commands/slash',
-    'command',
+    new URL('../commands/slash/', import.meta.url),
     isSlashCommand,
   );
-  for (const command of commands) {
-    slashCommands.set(command.data.name, command);
-  }
+
+  return commands;
 }

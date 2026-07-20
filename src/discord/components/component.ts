@@ -1,50 +1,44 @@
 import type {
   ActionRowBuilder,
   ButtonBuilder,
+  ContainerBuilder,
   SectionBuilder,
   SeparatorBuilder,
   StringSelectMenuBuilder,
   TextDisplayBuilder,
+  UserSelectMenuBuilder,
 } from 'discord.js';
 
 /**
- * Anything that can be added to a {@link Container}. `kind` lets
- * `Container.build()` dispatch to the matching `addXxxComponents` call on
- * the underlying `ContainerBuilder`.
+ * A component that can attach itself to a Components V2 container. Implemented
+ * by every top-level wrapper so `Container.add(...)` stays type-safe without a
+ * discriminated switch.
  */
-export type V2Component =
-  | TextComponent
-  | SeparatorComponent
-  | SectionComponent
-  | ActionRowComponent
-  | SelectComponent;
-
-/** A text display line; `toBuilder` yields a discord.js TextDisplayBuilder. */
-export interface TextComponent {
-  kind: 'text';
-  toBuilder(): TextDisplayBuilder;
+export interface ContainerChild {
+  attachToContainer(container: ContainerBuilder): void;
 }
 
-/** A separator display line; `toBuilder` yields a discord.js SeparatorBuilder. */
-export interface SeparatorComponent {
-  kind: 'separator';
-  toBuilder(): SeparatorBuilder;
+/** A component that can sit inside an action row (button, select menu). */
+export interface RowChild {
+  toBuilder(): ButtonBuilder | StringSelectMenuBuilder | UserSelectMenuBuilder;
 }
 
-/** A section; `toBuilder` yields a discord.js SectionBuilder. */
-export interface SectionComponent {
-  kind: 'section';
-  toBuilder(): SectionBuilder;
-}
+/** A discord.js builder for a component allowed at the top level of a Components V2 message. */
+export type TopLevelComponentBuilder =
+  | ContainerBuilder
+  | SectionBuilder
+  | TextDisplayBuilder
+  | SeparatorBuilder
+  | ActionRowBuilder<ButtonBuilder>
+  | ActionRowBuilder<StringSelectMenuBuilder>
+  | ActionRowBuilder<UserSelectMenuBuilder>;
 
-/** A row of buttons; `toBuilder` yields a discord.js ActionRowBuilder<ButtonBuilder>. */
-export interface ActionRowComponent {
-  kind: 'action-row';
-  toBuilder(): ActionRowBuilder<ButtonBuilder>;
-}
-
-/** A row of a select menu; `toBuilder` yields a discord.js ActionRowBuilder<StringSelectMenuBuilder>. */
-export interface SelectComponent {
-  kind: 'select';
-  toBuilder(): ActionRowBuilder<StringSelectMenuBuilder>;
+/**
+ * A component that can stand on its own as a top-level entry in a message (a
+ * sibling of a container), letting a response mix containers, action rows,
+ * sections, text and separators in any order.
+ */
+export interface TopLevelComponent {
+  /** This component as a discord.js builder, ready to be a top-level message entry. */
+  build(): TopLevelComponentBuilder;
 }

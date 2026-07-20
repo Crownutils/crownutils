@@ -1,76 +1,30 @@
-import { ContainerBuilder, MessageFlags } from 'discord.js';
-import type { V2Component } from './component.js';
+import { ContainerBuilder } from 'discord.js';
+import type { ContainerChild } from './component.js';
+import type { ColorName } from '../theme/colors.js';
+import { colors } from '../theme/colors.js';
 
-const COLORS = {
-  success: 0x57f287,
-  error: 0xed4245,
-  info: 0x5865f2,
-  warning: 0xfee75c,
-  cancelled: 0xe74c3c,
-} as const;
-
-type ColorName = keyof typeof COLORS;
-
-/**
- * Components V2 message builder. Components are added via `add()` in
- * display order, then `build()` produces the `components`/`flags` payload
- * to pass directly to `reply`/`edit`/`update`.
- */
+/** Fluent wrapper over a Components V2 container (the message body). */
 export class Container {
-  private readonly components: V2Component[] = [];
-  private accentColor?: number;
+  private readonly builder = new ContainerBuilder();
 
-  /** Sets the accent color, either a named palette entry or a raw RGB hex. */
-  public color(color: ColorName | number): this {
-    this.accentColor = typeof color === 'number' ? color : COLORS[color];
+  public color(color: number | ColorName): this {
+    const accentColor = typeof color === 'number' ? color : colors[color];
+    this.builder.setAccentColor(accentColor);
     return this;
   }
 
-  public add(...components: V2Component[]): this {
-    this.components.push(...components);
+  public add(...children: ContainerChild[]): this {
+    for (const child of children) {
+      child.attachToContainer(this.builder);
+    }
     return this;
   }
 
-  /**
-   * Builds the `{ components, flags }` payload. `IsComponentsV2` is always
-   * set; pass `ephemeral: true` to also set the `Ephemeral` flag.
-   */
-  public build(options?: { ephemeral?: boolean }): {
-    components: ContainerBuilder[];
-    flags: number;
-  } {
-    const container = new ContainerBuilder();
-    if (this.accentColor !== undefined) {
-      container.setAccentColor(this.accentColor);
-    }
-
-    for (const component of this.components) {
-      switch (component.kind) {
-        case 'text':
-          container.addTextDisplayComponents(component.toBuilder());
-          break;
-        case 'separator':
-          container.addSeparatorComponents(component.toBuilder());
-          break;
-        case 'section':
-          container.addSectionComponents(component.toBuilder());
-          break;
-        case 'action-row':
-          container.addActionRowComponents(component.toBuilder());
-          break;
-        case 'select':
-          container.addActionRowComponents(component.toBuilder());
-          break;
-      }
-    }
-
-    const flags = options?.ephemeral
-      ? MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral
-      : MessageFlags.IsComponentsV2;
-
-    return {
-      components: [container],
-      flags,
-    };
+  public build(): ContainerBuilder {
+    return this.builder;
   }
+}
+
+export function createContainer(accent: ColorName | number): Container {
+  return new Container().color(accent);
 }

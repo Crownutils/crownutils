@@ -1,23 +1,31 @@
+import { sendResponseToInteraction } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import { buildBotInfoContainer } from '@/discord/presentations/about-presentation.js';
-import type { SlashCommand } from '@/discord/types/command.js';
-import { SlashCommandBuilder } from 'discord.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
+import type {
+  SlashCommand,
+  SlashCommandData,
+} from '@/discord/registries/index.js';
+import { runAboutCommand } from '@/discord/features/about/about.service.js';
+import { Locale, SlashCommandBuilder } from 'discord.js';
 
-/** `/about`: shows bot info. */
-export const command = {
-  data: new SlashCommandBuilder()
+function createAboutCommandData(): SlashCommandData {
+  return new SlashCommandBuilder()
     .setName('about')
-    .setDescription(lang.commands.about.commandDescription),
-  requirements: {
-    scope: 'global',
-  },
-  help: {
-    usageSlash: '/about',
-  },
+    .setDescription(lang.en.commandAbout.description)
+    .setDescriptionLocalizations({
+      [Locale.French]: lang.fr.commandAbout.description,
+    });
+}
 
+const command = {
+  data: createAboutCommandData(),
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
-    const reply = buildBotInfoContainer().build();
-
-    await interaction.reply(reply);
+    await sendResponseToInteraction(
+      interaction,
+      runAboutCommand(await resolveUserLocale(interaction.user.id)),
+    );
   },
 } satisfies SlashCommand;
+
+export default command;

@@ -1,42 +1,21 @@
-import { env } from '@/core/config/index.js';
-import type { CommandAuthorization } from './types.js';
+import type { NotBannedRank, Rank } from '../types.js';
+import { hasRank } from './rank.js';
 
-/** Numeric ranking of {@link CommandAuthorization} tiers; higher is more privileged. */
-export const AUTHORIZATION_LEVELS = {
-  owner: 3,
-  privileged: 2,
-  public: 1,
-} as const satisfies Record<CommandAuthorization, number>;
+/**
+ * The minimum rank a command requires. `banned` is excluded: banned users are
+ * blocked from every command, so it is never a level a command can require.
+ */
+export type Authorization = NotBannedRank;
 
-/** Resolves a user's authorization tier from `env.ownerId` / `env.privilegedIds`. */
-export function resolveAuthorization(userId: string): CommandAuthorization {
-  switch (userId) {
-    case env.ownerId:
-      return 'owner';
-
-    default:
-      return env.privilegedIds.includes(userId) ? 'privileged' : 'public';
-  }
+export interface AuthorizationContext {
+  /** The invoking user's effective rank. */
+  readonly rank: Rank;
 }
 
-/** Returns whether `userAuthorization` meets or exceeds `requiredAuthorization`. */
-export function isAuthorizationAllowed(
-  requiredAuthorization: CommandAuthorization,
-  userAuthorization: CommandAuthorization,
+/** Whether the invoking user's rank satisfies the command's required rank. */
+export function isAuthorized(
+  authorization: Authorization,
+  context: AuthorizationContext,
 ): boolean {
-  return (
-    AUTHORIZATION_LEVELS[userAuthorization] >=
-    AUTHORIZATION_LEVELS[requiredAuthorization]
-  );
-}
-
-/** Keeps only the items whose required authorization `userAuthorization` meets. */
-export function filterByAuthorization<T>(
-  items: readonly T[],
-  getRequired: (item: T) => CommandAuthorization,
-  userAuthorization: CommandAuthorization,
-): T[] {
-  return items.filter((item) =>
-    isAuthorizationAllowed(getRequired(item), userAuthorization),
-  );
+  return hasRank(context.rank, authorization);
 }

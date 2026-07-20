@@ -1,22 +1,13 @@
-export { Container } from './container.js';
-export { Text } from './text.js';
-export { Title } from './title.js';
-export { CodeBlock } from './code-block.js';
-export { Separator } from './separator.js';
-export { Section } from './section.js';
-export { Button } from './button.js';
-export { ActionRow } from './action-row.js';
-export { Select } from './select.js';
-export type { TextSize } from './text.js';
-export type { TitleSize } from './title.js';
-export type {
-  V2Component,
-  TextComponent,
-  SeparatorComponent,
-  SectionComponent,
-  ActionRowComponent,
-  SelectComponent,
-} from './component.js';
-export { Modal } from './modal.js';
-export { TextInput } from './text-input.js';
-export type { TextInputStyleName } from './text-input.js';
+// Re-export the discord.js enums our fluent API consumes, so callers never
+// import discord.js directly for component styling.
+export { ButtonStyle, SeparatorSpacingSize } from 'discord.js';
+
+export * from './component.js';
+export * from './text.js';
+export * from './separator.js';
+export * from './button.js';
+export * from './select.js';
+export * from './action-row.js';
+export * from './section.js';
+export * from './container.js';
+export * from './modal.js';

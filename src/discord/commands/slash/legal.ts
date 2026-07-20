@@ -1,25 +1,32 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { Locale, SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/discord/lang/index.js';
-import { runLegalCommand } from '@/discord/legal/legal-command.js';
-import { attachLegalViewer } from '@/discord/presentations/legal-presentation.js';
-import { replyAndFetch } from '@/discord/interactions/reply.js';
-import type { SlashCommand } from '@/discord/types/command.js';
+import { mountInteractiveReply } from '@/discord/interactions/index.js';
+import { createLegalController } from '@/discord/features/legal/legal.service.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
+import type {
+  SlashCommand,
+  SlashCommandData,
+} from '@/discord/registries/index.js';
 
-/** `/legal`: views the privacy policy and terms of service, and accepts them. */
-export const command = {
-  data: new SlashCommandBuilder()
+function createLegalCommandData(): SlashCommandData {
+  return new SlashCommandBuilder()
     .setName('legal')
-    .setDescription(lang.commands.legal.commandDescription),
-  requirements: {
-    scope: 'everywhere',
-  },
-  help: {
-    usageSlash: '/legal',
-  },
+    .setDescription(lang.en.commandLegal.description)
+    .setDescriptionLocalizations({
+      [Locale.French]: lang.fr.commandLegal.description,
+    });
+}
 
+const command = {
+  data: createLegalCommandData(),
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
-    const { container, status } = await runLegalCommand(interaction.user.id);
-    const reply = await replyAndFetch(interaction, container.build());
-    attachLegalViewer(reply, interaction.user.id, status);
+    const language = await resolveUserLocale(interaction.user.id);
+    await mountInteractiveReply(
+      interaction,
+      createLegalController(interaction.user.id, language),
+    );
   },
 } satisfies SlashCommand;
+
+export default command;

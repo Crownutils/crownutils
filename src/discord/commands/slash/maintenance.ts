@@ -1,29 +1,42 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { Locale, SlashCommandBuilder } from 'discord.js';
 import { lang } from '@/discord/lang/index.js';
-import {
-  isMaintenanceEnabled,
-  setMaintenanceEnabled,
-} from '@/core/maintenance/maintenance-repository.js';
-import { buildMaintenanceToggledContainer } from '@/discord/presentations/maintenance-presentation.js';
-import type { SlashCommand } from '@/discord/types/command.js';
+import { sendResponseToInteraction } from '@/discord/interactions/index.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
+import { runMaintenanceCommand } from '@/discord/features/maintenance/maintenance.service.js';
+import type {
+  SlashCommand,
+  SlashCommandData,
+} from '@/discord/registries/index.js';
 
-/** `/maintenance`: toggles maintenance mode. Owner-only. */
-export const command = {
-  data: new SlashCommandBuilder()
+function createMaintenanceCommandData(): SlashCommandData {
+  return new SlashCommandBuilder()
     .setName('maintenance')
-    .setDescription(lang.commands.maintenance.commandDescription),
-  requirements: {
-    scope: 'main_guild',
-    authorization: 'owner',
-  },
-  help: {
-    usageSlash: '/maintenance',
-  },
+    .setDescription(lang.en.commandMaintenance.description)
+    .setDescriptionLocalizations({
+      [Locale.French]: lang.fr.commandMaintenance.description,
+    })
+    .addBooleanOption((option) =>
+      option
+        .setName('enabled')
+        .setDescription(lang.en.commandMaintenance.messages.stateOption)
+        .setDescriptionLocalizations({
+          [Locale.French]: lang.fr.commandMaintenance.messages.stateOption,
+        })
+        .setRequired(true),
+    );
+}
 
+const command = {
+  data: createMaintenanceCommandData(),
+  requirements: { scope: 'anywhere', authorization: 'owner' },
   async execute(interaction) {
-    const enabled = !(await isMaintenanceEnabled());
-    await setMaintenanceEnabled(enabled);
-
-    await interaction.reply(buildMaintenanceToggledContainer(enabled).build());
+    const enabled = interaction.options.getBoolean('enabled', true);
+    const language = await resolveUserLocale(interaction.user.id);
+    await sendResponseToInteraction(
+      interaction,
+      await runMaintenanceCommand(enabled, language),
+    );
   },
 } satisfies SlashCommand;
+
+export default command;

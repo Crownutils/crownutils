@@ -1,27 +1,34 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { Locale, SlashCommandBuilder } from 'discord.js';
+import { listActiveReminders } from '@/core/repositories/index.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
+import { mountInteractiveReply } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import { attachReminderListCollector } from '@/discord/interactions/reminder-list.js';
-import { replyAndFetch } from '@/discord/interactions/reply.js';
-import { runRemindersCommand } from '@/discord/reminders/reminders-command.js';
-import type { SlashCommand } from '@/discord/types/command.js';
+import { createReminderListController } from '@/discord/features/reminder/reminder.service.js';
+import type {
+  SlashCommand,
+  SlashCommandData,
+} from '@/discord/registries/index.js';
 
-/** `/reminders`: lists the caller's reminders with delete buttons. */
-export const command = {
-  data: new SlashCommandBuilder()
+function createRemindersCommandData(): SlashCommandData {
+  return new SlashCommandBuilder()
     .setName('reminders')
-    .setDescription(lang.commands.reminders.commandDescription),
-  requirements: {
-    scope: 'global',
-  },
-  help: {
-    usageSlash: '/reminders',
-  },
+    .setDescription(lang.en.commandReminders.description)
+    .setDescriptionLocalizations({
+      [Locale.French]: lang.fr.commandReminders.description,
+    });
+}
 
+const command = {
+  data: createRemindersCommandData(),
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
-    const { container, reminders } = await runRemindersCommand(
-      interaction.user.id,
+    const locale = await resolveUserLocale(interaction.user.id);
+    const reminders = await listActiveReminders(interaction.user.id);
+    await mountInteractiveReply(
+      interaction,
+      createReminderListController(reminders, interaction.user.id, locale),
     );
-    const reply = await replyAndFetch(interaction, container.build());
-    attachReminderListCollector(reply, interaction.user.id, reminders);
   },
 } satisfies SlashCommand;
+
+export default command;

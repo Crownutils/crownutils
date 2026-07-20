@@ -1,44 +1,80 @@
-import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
-import type { SelectComponent } from './component.js';
+import {
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  UserSelectMenuBuilder,
+} from 'discord.js';
+import type { ComponentEmojiResolvable } from 'discord.js';
+import type { RowChild } from './component.js';
 
-/** A string select menu wrapped in its own action row. */
-export class Select implements SelectComponent {
-  public readonly kind = 'select';
-  private readonly builder: StringSelectMenuBuilder;
+/** One option of a {@link SelectMenu}. */
+export interface SelectOption {
+  readonly label: string;
+  readonly value: string;
+  readonly description?: string;
+  readonly default?: boolean;
+  /** Leading emoji (unicode or custom) shown before the label. */
+  readonly emoji?: ComponentEmojiResolvable;
+}
 
-  public constructor(customId: string) {
-    this.builder = new StringSelectMenuBuilder().setCustomId(customId);
-  }
+/** Shared fluent setters every select menu builder supports, regardless of kind. */
+abstract class BaseSelectMenu<
+  T extends StringSelectMenuBuilder | UserSelectMenuBuilder,
+> implements RowChild {
+  protected constructor(protected readonly builder: T) {}
 
   public placeholder(text: string): this {
     this.builder.setPlaceholder(text);
     return this;
   }
 
-  /** Adds one option. `value` must be unique among this select's options. */
-  public option(
-    label: string,
-    value: string,
-    description?: string,
-    emoji?: string,
-  ): this {
-    this.builder.addOptions({
-      label,
-      value,
-      description,
-      emoji: emoji !== undefined ? { name: emoji } : undefined,
-    });
+  public min(value: number): this {
+    this.builder.setMinValues(value);
     return this;
   }
 
-  public disabled(disabled = true): this {
-    this.builder.setDisabled(disabled);
+  public max(value: number): this {
+    this.builder.setMaxValues(value);
     return this;
   }
 
-  public toBuilder(): ActionRowBuilder<StringSelectMenuBuilder> {
-    return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-      this.builder,
+  public disabled(value = true): this {
+    this.builder.setDisabled(value);
+    return this;
+  }
+
+  public toBuilder(): T {
+    return this.builder;
+  }
+}
+
+/** Fluent wrapper over a string select menu. */
+export class SelectMenu extends BaseSelectMenu<StringSelectMenuBuilder> {
+  public constructor(customId: string) {
+    super(new StringSelectMenuBuilder().setCustomId(customId));
+  }
+
+  public options(options: readonly SelectOption[]): this {
+    this.builder.setOptions(
+      options.map((option) => {
+        const builder = new StringSelectMenuOptionBuilder()
+          .setLabel(option.label)
+          .setValue(option.value);
+        if (option.description !== undefined) {
+          builder.setDescription(option.description);
+        }
+        if (option.default !== undefined) builder.setDefault(option.default);
+        if (option.emoji !== undefined) builder.setEmoji(option.emoji);
+        return builder;
+      }),
     );
+
+    return this;
+  }
+}
+
+/** Fluent wrapper over a user select menu. */
+export class UserSelectMenu extends BaseSelectMenu<UserSelectMenuBuilder> {
+  public constructor(customId: string) {
+    super(new UserSelectMenuBuilder().setCustomId(customId));
   }
 }

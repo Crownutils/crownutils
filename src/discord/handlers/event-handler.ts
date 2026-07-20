@@ -1,17 +1,14 @@
 import type { ClientEvents } from 'discord.js';
-import type { Event } from '@/discord/types/event.js';
-import {
-  hasFunction,
-  hasString,
-  isObject,
-  loadModules,
-} from './base-loader.js';
+import type { EventModule } from '../registries/types.js';
+import { loadModules } from './base-loader.js';
+import { isEventModule } from '../registries/index.js';
 
-function isEvent(obj: unknown): obj is Event<keyof ClientEvents> {
-  return isObject(obj) && hasString(obj, 'name') && hasFunction(obj, 'execute');
-}
+/** Discover event modules and bind each one to the client. */
+export async function loadEvents(): Promise<EventModule<keyof ClientEvents>[]> {
+  const events = await loadModules(
+    new URL('../events/', import.meta.url),
+    isEventModule,
+  );
 
-/** Loads all event modules from `src/discord/events/`. */
-export async function loadEvents(): Promise<Event<keyof ClientEvents>[]> {
-  return loadModules('events', 'event', isEvent);
+  return events;
 }

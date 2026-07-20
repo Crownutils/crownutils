@@ -1,82 +1,61 @@
 import { Events } from 'discord.js';
-import type { Event } from '@/discord/types/event.js';
-import { prefixCommands } from '@/discord/registries/prefix-registry.js';
-import { logger } from '@/shared/logger.js';
-import {
-  buildCommandPermissionsErrorContainer,
-  buildErrorContainer,
-  safeDiscord,
-} from '@/discord/errors.js';
-import { runCommandPipeline } from '@/discord/handlers/command-pipeline.js';
-import { lang } from '@/discord/lang/index.js';
-import { remindUnreadMails } from '@/discord/mails/unread-reminder.js';
-import {
-  attachLegalGate,
-  buildLegalGateContainer,
-} from '@/discord/presentations/legal-presentation.js';
-import { PREFIX } from '@/discord/constants.js';
+import type { EventModule } from '../registries/index.js';
+import { runCommandPipeline } from '../pipeline/command-pipeline.js';
+import { buildDenialHandlers } from '../pipeline/denial-handlers.js';
+import { config } from '@/core/config/index.js';
+import { COMMAND_PREFIX } from '../utils/constants.js';
+import { sendResponseToMessage } from '../interactions/index.js';
+import { resolvePrefixCommand } from '../registries/index.js';
+import { isMaintenanceEnabled } from '@/core/repositories/index.js';
+import { resolveUserContext } from '../context/user.js';
 
-/**
- * Dispatches prefix commands: parses `PREFIX`-prefixed messages, checks
- * maintenance mode and permission requirements, and reports unexpected
- * errors back to the user.
- */
-export const event = {
+const event = {
   name: Events.MessageCreate,
-
   async execute(message) {
     if (message.author.bot) return;
+    const prefix = message.content.slice(0, COMMAND_PREFIX.length);
+    if (prefix.toLowerCase() !== COMMAND_PREFIX) return;
 
-    const lowerMessage = message.content.toLowerCase();
+    const withoutPrefix = message.content.slice(COMMAND_PREFIX.length).trim();
+    if (withoutPrefix.length === 0) return;
 
-    if (!lowerMessage.startsWith(PREFIX)) return;
+    const parts = withoutPrefix.split(/\s+/);
+    const name = parts[0];
+    if (name === undefined) return;
+    const args = parts.slice(1);
 
-    const withoutPrefix = lowerMessage.slice(PREFIX.length);
-    const parts = withoutPrefix.trim().split(/\s+/);
-    const commandName = parts.shift()?.toLowerCase();
-    const args = parts;
-
-    if (!commandName) return;
-
-    const command = prefixCommands.get(commandName);
+    const command = resolvePrefixCommand(message.client.registries, name);
     if (!command) return;
+
+    const inGuild = message.inGuild();
+    const [{ locale, rank }, maintenance] = await Promise.all([
+      resolveUserContext(message.author.id),
+      isMaintenanceEnabled(),
+    ]);
 
     await runCommandPipeline(
       {
-        userId: message.author.id,
         commandName: command.name,
-        guildId: message.guildId,
         requirements: command.requirements,
+        inGuild,
+        inMainGuild: inGuild && message.guildId === config.mainGuildDiscordId,
+        userId: message.author.id,
+        rank,
+        maintenance,
       },
       {
         execute: () => command.execute(message, args),
-        onExecuted:
-          message.guildId !== null && command.name !== 'mails'
-            ? () => remindUnreadMails(message.author.id, message.channel)
-            : undefined,
-        onMaintenance: () =>
-          safeDiscord(
-            message.reply(buildErrorContainer(lang.errors.maintenance).build()),
-            'message-create.maintenance',
-          ),
-        onLegalNotAccepted: async () => {
-          const sent = await safeDiscord(
-            message.reply(buildLegalGateContainer().build()),
-            'message-create.legalGate',
-          );
-          if (sent) attachLegalGate(sent, message.author.id);
-        },
-        onPermissionDenied: (errors) =>
-          message.reply(buildCommandPermissionsErrorContainer(errors).build()),
-        onUnexpectedError: (error) => {
-          logger.error({ error }, `Error in prefix command: ${commandName}`);
-
-          return safeDiscord(
-            message.reply(buildErrorContainer(lang.errors.unexpected).build()),
-            'message-create.unexpected',
-          );
-        },
+        ...buildDenialHandlers({
+          locale,
+          commandName: command.name,
+          logLabel: 'Prefix command failed',
+          reply: async (response) => {
+            await sendResponseToMessage(message, response);
+          },
+        }),
       },
     );
   },
-} satisfies Event<Events.MessageCreate>;
+} satisfies EventModule<Events.MessageCreate>;
+
+export default event;

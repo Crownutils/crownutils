@@ -1,82 +1,50 @@
 import { readdir } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { logger } from '@/shared/logger.js';
+import { logger } from '@/shared/index.js';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-/**
- * Root of `src/discord/`, computed relative to this file's own location
- * (`src/discord/handlers/base-loader.ts`, one level below `discord/`). If
- * this file is ever moved to a different depth, update this path too.
- */
-const DISCORD_DIR = join(__dirname, '..');
-
-/** Type guard helpers shared by the `is*Command`/`isEvent` predicates. */
-export function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-/** Whether `obj[key]` is a `string`. */
-export function hasString(obj: Record<string, unknown>, key: string): boolean {
-  return typeof obj[key] === 'string';
-}
-
-/** Whether `obj[key]` is a `function`. */
-export function hasFunction(
-  obj: Record<string, unknown>,
-  key: string,
-): boolean {
-  return typeof obj[key] === 'function';
+function isModuleFile(file: string): boolean {
+  return (
+    (file.endsWith('.js') || file.endsWith('.ts')) && !file.endsWith('.d.ts')
+  );
 }
 
 /**
- * Dynamically imports every module file in `directory` and collects the
- * `exportName` export from each, skipping files where it's missing or fails
- * `isValid`.
+ * Imports every module file in `directoryUrl` and returns those whose default
+ * export passes `guard`. Generic and layer-agnostic, the guard decides what a
+ * valid module is; import failures and invalid modules are logged and skipped.
  */
 export async function loadModules<T>(
-  directory: string,
-  exportName: string,
-  isValid: (obj: unknown) => obj is T,
+  directoryUrl: URL,
+  guard: (value: unknown) => value is T,
 ): Promise<T[]> {
-  const items: T[] = [];
-  const dirPath = join(DISCORD_DIR, directory);
-
-  let files: string[];
-  try {
-    files = await readdir(dirPath);
-  } catch (error) {
-    logger.error({ error }, `Cannot read directory: ${directory}`);
-    return items;
-  }
-
-  const moduleFiles = files.filter(
-    (file) =>
-      (file.endsWith('.js') || file.endsWith('.ts')) && !file.endsWith('.d.ts'),
+  const directory = fileURLToPath(directoryUrl);
+  const entries = (await readdir(directory, { withFileTypes: true })).filter(
+    (entry) => entry.isFile() && isModuleFile(entry.name),
   );
 
-  for (const file of moduleFiles) {
-    const fileUrl = pathToFileURL(join(dirPath, file)).href;
+  const loaded: T[] = [];
+  for (const entry of entries) {
+    const fileUrl = pathToFileURL(join(directory, entry.name));
 
-    let module: Record<string, unknown>;
+    let imported: { default?: unknown };
     try {
-      module = (await import(fileUrl)) as Record<string, unknown>;
+      imported = (await import(fileUrl.href)) as { default?: unknown };
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error));
-      logger.error({ err }, `Failed to import file: ${fileUrl}, skipping.`);
+      logger.error(
+        { error, file: entry.name },
+        'Failed to import module, skipping',
+      );
       continue;
     }
 
-    const candidate = module[exportName];
-
-    if (!isValid(candidate)) {
-      logger.warn(`${file} does not export a valid "${exportName}", skipping.`);
-      continue;
+    const candidate = imported.default;
+    if (guard(candidate)) {
+      loaded.push(candidate);
+    } else {
+      logger.warn(`${entry.name}: invalid or missing default export, skipping`);
     }
-
-    items.push(candidate);
   }
 
-  return items;
+  return loaded;
 }

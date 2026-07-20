@@ -1,23 +1,22 @@
-import { PREFIX } from '@/discord/constants.js';
-import { lang } from '@/discord/lang/index.js';
-import { runLegalCommand } from '@/discord/legal/legal-command.js';
-import { attachLegalViewer } from '@/discord/presentations/legal-presentation.js';
-import type { PrefixCommand } from '@/discord/types/command.js';
+import { mountInteractiveMessage } from '@/discord/interactions/index.js';
+import { createLegalController } from '@/discord/features/legal/legal.service.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
+import type { PrefixCommand } from '@/discord/registries/index.js';
 
-/** `c!legal`: views the privacy policy and terms of service, and accepts them. */
-export const command = {
+const command = {
   name: 'legal',
-  description: lang.commands.legal.commandDescription,
-  requirements: {
-    scope: 'everywhere',
-  },
-  help: {
-    usagePrefix: `${PREFIX}legal`,
-  },
+  requirements: { scope: 'anywhere', authorization: 'normal' },
 
-  async execute(message, _args) {
-    const { container, status } = await runLegalCommand(message.author.id);
-    const sent = await message.reply(container.build());
-    attachLegalViewer(sent, message.author.id, status);
+  async execute(message) {
+    const channel = message.channel;
+    if (!channel.isSendable()) return;
+
+    const language = await resolveUserLocale(message.author.id);
+    await mountInteractiveMessage(
+      channel,
+      createLegalController(message.author.id, language),
+    );
   },
 } satisfies PrefixCommand;
+
+export default command;

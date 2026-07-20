@@ -1,35 +1,25 @@
-import { env } from '@/core/config/index.js';
-import type { CommandScope, ExecutionContext } from './types.js';
+/** Where a command is allowed to run. */
+export type CommandScope = 'guild' | 'mainGuildOnly' | 'dm' | 'anywhere';
 
-/** Resolves the {@link ExecutionContext} for a guild id (`null` means a DM). */
-export function resolveExecutionContext(
-  guildId: string | null,
-): ExecutionContext {
-  switch (guildId) {
-    case null:
-      return 'dm';
-
-    case env.mainGuildId:
-      return 'main_guild';
-
-    default:
-      return 'other_guild';
-  }
+export interface ScopeContext {
+  readonly inGuild: boolean;
+  /** True only in the configured main guild (implies `inGuild`). */
+  readonly inMainGuild: boolean;
 }
 
-/** Returns whether `context` satisfies `requiredScope`. */
-export function isScopeAllowed(
-  requiredScope: CommandScope,
-  context: ExecutionContext,
+/** Whether the invocation location satisfies the command's scope. */
+export function isScopeSatisfied(
+  scope: CommandScope,
+  context: ScopeContext,
 ): boolean {
-  switch (requiredScope) {
-    case 'everywhere':
+  switch (scope) {
+    case 'anywhere':
       return true;
-
-    case 'global':
-      return context === 'main_guild' || context === 'other_guild';
-
-    case 'main_guild':
-      return context === 'main_guild';
+    case 'guild':
+      return context.inGuild;
+    case 'mainGuildOnly':
+      return context.inMainGuild;
+    case 'dm':
+      return !context.inGuild;
   }
 }

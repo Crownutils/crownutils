@@ -1,26 +1,23 @@
-import { PREFIX } from '@/discord/constants.js';
-import { lang } from '@/discord/lang/index.js';
-import { attachReminderListCollector } from '@/discord/interactions/reminder-list.js';
-import { runRemindersCommand } from '@/discord/reminders/reminders-command.js';
-import type { PrefixCommand } from '@/discord/types/command.js';
+import { listActiveReminders } from '@/core/repositories/index.js';
+import { resolveUserLocale } from '@/discord/context/locale.js';
+import { mountInteractiveMessage } from '@/discord/interactions/index.js';
+import { createReminderListController } from '@/discord/features/reminder/reminder.service.js';
+import type { PrefixCommand } from '@/discord/registries/index.js';
 
-/** `c!reminders` (alias `rl`): lists the caller's reminders with delete buttons. */
-export const command = {
+const command = {
   name: 'reminders',
-  description: lang.commands.reminders.commandDescription,
   aliases: ['rl'],
-  requirements: {
-    scope: 'global',
-  },
-  help: {
-    usagePrefix: `${PREFIX}reminders`,
-  },
-
-  async execute(message, _args) {
-    const { container, reminders } = await runRemindersCommand(
-      message.author.id,
-    );
-    const sent = await message.reply(container.build());
-    attachReminderListCollector(sent, message.author.id, reminders);
+  requirements: { scope: 'anywhere', authorization: 'normal' },
+  async execute(message) {
+    const locale = await resolveUserLocale(message.author.id);
+    const reminders = await listActiveReminders(message.author.id);
+    if (message.channel.isSendable()) {
+      await mountInteractiveMessage(
+        message.channel,
+        createReminderListController(reminders, message.author.id, locale),
+      );
+    }
   },
 } satisfies PrefixCommand;
+
+export default command;

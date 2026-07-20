@@ -1,74 +1,85 @@
-import { SlashCommandBuilder } from 'discord.js';
-import type { ChatInputCommandInteraction } from 'discord.js';
+import { Locale, SlashCommandBuilder } from 'discord.js';
+import { resolveUserContext } from '@/discord/context/user.js';
+import {
+  mountInteractiveReply,
+  sendResponseToInteraction,
+} from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
-import { attachReminderCancelCollector } from '@/discord/interactions/reminder-cancel.js';
-import { replyAndFetch } from '@/discord/interactions/reply.js';
-import { runRemindCommand } from '@/discord/reminders/remind-command.js';
-import { DEFAULT_REMINDER_DURATION } from '@/discord/reminders/reminder-bridge.js';
-import type { SlashCommand } from '@/discord/types/command.js';
+import { DEFAULT_REMINDER_DURATION } from '@/discord/features/reminder/reminder.duration.js';
+import {
+  createReminderCancelController,
+  runCreateReminder,
+} from '@/discord/features/reminder/reminder.service.js';
+import type {
+  SlashCommand,
+  SlashCommandData,
+} from '@/discord/registries/index.js';
 
-function getReminderArgs(interaction: ChatInputCommandInteraction): {
-  durationInput: string;
-  remindMessage: string;
-} {
-  const timeOption = interaction.options.getString('time');
-  const messageOption = interaction.options.getString('message');
-
-  if (!timeOption && !messageOption) {
-    return {
-      durationInput: DEFAULT_REMINDER_DURATION,
-      remindMessage: lang.commands.remind.messages.defaultMessage,
-    };
-  }
-
-  return {
-    durationInput: timeOption ?? '',
-    remindMessage: messageOption ?? '',
-  };
-}
-
-/** `/remind`: creates a reminder. */
-export const command = {
-  data: new SlashCommandBuilder()
+function createRemindCommandData(): SlashCommandData {
+  return new SlashCommandBuilder()
     .setName('remind')
-    .setDescription(lang.commands.remind.commandDescription)
+    .setDescription(lang.en.commandRemind.description)
+    .setDescriptionLocalizations({
+      [Locale.French]: lang.fr.commandRemind.description,
+    })
     .addStringOption((option) =>
       option
         .setName('time')
-        .setDescription(lang.commands.remind.options.time)
+        .setDescription(lang.en.commandRemind.messages.timeOption)
+        .setDescriptionLocalizations({
+          [Locale.French]: lang.fr.commandRemind.messages.timeOption,
+        })
         .setRequired(false),
     )
     .addStringOption((option) =>
       option
         .setName('message')
-        .setDescription(lang.commands.remind.options.message)
+        .setDescription(lang.en.commandRemind.messages.messageOption)
+        .setDescriptionLocalizations({
+          [Locale.French]: lang.fr.commandRemind.messages.messageOption,
+        })
         .setRequired(false),
-    ),
-  requirements: {
-    scope: 'global',
-  },
-  help: {
-    usageSlash: '/remind [time] [message]',
-  },
+    );
+}
 
+const command = {
+  data: createRemindCommandData(),
+  requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
-    const { durationInput, remindMessage } = getReminderArgs(interaction);
+    const { locale, rank } = await resolveUserContext(interaction.user.id);
+    const t = lang[locale].commandRemind.messages;
 
-    const { container, reminder } = await runRemindCommand({
-      client: interaction.client,
-      channelId: interaction.channelId,
+    const time = interaction.options.getString('time');
+    const message = interaction.options.getString('message');
+    const noArgs = time === null && message === null;
+
+    const outcome = await runCreateReminder({
       userId: interaction.user.id,
-      durationInput,
-      remindMessage,
-      invalidFormatText: lang.commands.remind.messages.invalidFormat.slash,
+      channelId: interaction.channelId,
+      rank,
+      locale,
+      durationInput: noArgs ? DEFAULT_REMINDER_DURATION : (time ?? ''),
+      message: noArgs ? t.defaultMessage : (message ?? ''),
+      invalidFormatText: t.invalidFormat.slash,
     });
 
-    if (!reminder) {
-      await interaction.reply(container.build({ ephemeral: true }));
+    if (!outcome.ok) {
+      await sendResponseToInteraction(interaction, {
+        container: outcome.container,
+        ephemeral: true,
+      });
       return;
     }
 
-    const reply = await replyAndFetch(interaction, container.build());
-    attachReminderCancelCollector(reply, reminder);
+    await mountInteractiveReply(
+      interaction,
+      createReminderCancelController(
+        outcome.reminder,
+        interaction.user.id,
+        locale,
+      ),
+    );
   },
 } satisfies SlashCommand;
+
+export default command;

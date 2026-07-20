@@ -1,18 +1,18 @@
-type MessageValue = string | ((...args: any[]) => string) | MessageObject;
+/**
+ * Shape constraint for language packs: every leaf is a plain string or a
+ * formatter that returns a string. Applied with `as const satisfies LangNode`,
+ * so each pack keeps its precise literal type while the invariant "no leaf is
+ * anything but a string or a string formatter" is enforced at compile time.
+ */
+export type LangLeaf = string | ((...args: never[]) => string);
 
-interface MessageObject {
-  [key: string]: MessageValue;
+export interface LangNode {
+  readonly [key: string]: LangLeaf | LangNode;
 }
 
-/**
- * Lang module shape required for a command to appear in `/help`.
- *
- * `messages` may nest objects arbitrarily, but every leaf must be a
- * string or a formatter function - see {@link MessageValue}.
- */
-export interface CommandLang {
-  /** Shown as the command's description in the `/help` select menu. */
-  commandDescription: string;
-  messages: MessageObject;
-  [key: string]: unknown;
+export interface CommandNode {
+  description: string;
+  /** Command-specific strings; omit for commands whose content lives in a shared node. */
+  messages?: LangLeaf | LangNode;
+  readonly [key: string]: LangLeaf | LangNode;
 }

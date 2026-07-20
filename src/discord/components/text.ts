@@ -1,5 +1,7 @@
 import { TextDisplayBuilder } from 'discord.js';
-import type { TextComponent } from './component.js';
+import type { ContainerBuilder, SectionBuilder } from 'discord.js';
+import type { ContainerChild } from './component.js';
+import { md } from '../theme/markdown.js';
 
 /** `subtle` renders as a small, dimmed line; the others map to Markdown headings. */
 export type TextSize = 'normal' | 'subtle' | 'small' | 'medium' | 'large';
@@ -13,14 +15,11 @@ const SIZE_PREFIX = {
 } as const satisfies Record<TextSize, string>;
 
 /**
- * A text display component. Formatting methods (`bold`, `italic`, `code`,
- * etc.) only affect the first line; use `newLine()` to add further lines,
- * each rendered with its own formatting. `quote()` applies `> ` to every
- * line of the final content, including lines added via `newLine()`.
+ * Fluent wrapper over a Components V2 text display. Inline formatting (`bold`,
+ * `code`, `link`, …) affects the current line only; `newLine()` appends further
+ * lines, each with its own formatting; `quote()` blockquotes the whole result.
  */
-export class Text implements TextComponent {
-  public readonly kind = 'text';
-
+export class Text implements ContainerChild {
   private textSize: TextSize = 'normal';
   private isBold = false;
   private isItalic = false;
@@ -68,22 +67,44 @@ export class Text implements TextComponent {
     return this;
   }
 
-  /** Prefixes every line of the rendered content with `> ` (blockquote). */
+  /** Blockquotes every line of the final content (including `newLine()` lines). */
   public quote(): this {
     this.isQuote = true;
     return this;
   }
 
   /**
-   * Appends another line below the current content. Pass a `Text` instance
-   * to apply its own formatting (bold, code, etc.) independently.
+   * Appends a line below the current content. Pass a `{@link Text} to give that line
+   * its own formatting.
    */
   public newLine(line: string | Text = ''): this {
     this.nextLines.push(line instanceof Text ? line : new Text(line));
     return this;
   }
 
-  public toBuilder(): TextDisplayBuilder {
+  public attachToContainer(container: ContainerBuilder): void {
+    container.addTextDisplayComponents(this.toBuilder());
+  }
+
+  public attachToSection(section: SectionBuilder): void {
+    section.addTextDisplayComponents(this.toBuilder());
+  }
+
+  public title(): this {
+    this.textSize = 'medium';
+    return this;
+  }
+
+  /** This text as a top-level message component. */
+  public build(): TextDisplayBuilder {
+    return this.toBuilder();
+  }
+
+  private toBuilder(): TextDisplayBuilder {
+    return new TextDisplayBuilder().setContent(this.render());
+  }
+
+  private render(): string {
     const lines = [
       this.renderLine(),
       ...this.nextLines.map((line) => line.renderLine()),
@@ -91,25 +112,18 @@ export class Text implements TextComponent {
     if (lines.length > 1 && lines[0] === '') {
       lines.shift();
     }
-
-    let content = lines.join('\n');
-    if (this.isQuote) {
-      content = content
-        .split('\n')
-        .map((line) => `> ${line}`)
-        .join('\n');
-    }
-    return new TextDisplayBuilder().setContent(content);
+    const content = lines.join('\n');
+    return this.isQuote ? md.quote(content) : content;
   }
 
   private renderLine(): string {
     let text = this.content;
-    if (this.isCode) text = `\`${text}\``;
-    if (this.isBold) text = `**${text}**`;
-    if (this.isItalic) text = `*${text}*`;
-    if (this.isUnderline) text = `__${text}__`;
-    if (this.isStrikethrough) text = `~~${text}~~`;
-    if (this.linkUrl !== undefined) text = `[${text}](${this.linkUrl})`;
+    if (this.isCode) text = md.code(text);
+    if (this.isBold) text = md.bold(text);
+    if (this.isItalic) text = md.italic(text);
+    if (this.isUnderline) text = md.underline(text);
+    if (this.isStrikethrough) text = md.strikethrough(text);
+    if (this.linkUrl !== undefined) text = md.link(text, this.linkUrl);
 
     const prefix = SIZE_PREFIX[this.textSize];
     return prefix ? `${prefix} ${text}` : text;

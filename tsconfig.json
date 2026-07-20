@@ -8,10 +8,12 @@
     "outDir": "./dist",
     "types": ["node"],
     "strict": true,
+    "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": true,
     "sourceMap": true,
     "paths": {
       "@/*": ["./src/*"]

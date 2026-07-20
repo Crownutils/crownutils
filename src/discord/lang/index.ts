@@ -1,36 +1,18 @@
-import { ping } from './ping.js';
-import { remind } from './remind.js';
-import { reminders } from './reminders.js';
-import { errors } from './errors.js';
-import { about } from './about.js';
-import { grade } from './grade.js';
-import { help } from './help.js';
-import { maintenance } from './maintenance.js';
-import { crowniclesHelp } from './crownicles-help.js';
-import { invite } from './invite.js';
-import { mail, mails } from './mail.js';
-import { legal } from './legal.js';
-import { data } from './data.js';
-import { deleteData } from './delete-data.js';
+import { commonLang as commonEn } from './en/common.js';
+import { commonLang as commonFr } from './fr/common.js';
+import { commandPacks } from './packs.js';
+import type { LangNode } from './types.js';
 
-const commands = {
-  ping,
-  remind,
-  reminders,
-  about,
-  grade,
-  help,
-  maintenance,
-  crowniclesHelp,
-  invite,
-  mail,
-  mails,
-  legal,
-  data,
-  deleteData,
-} as const;
+/** The English language pack: a typed tree of strings and formatters. */
+const en = {
+  common: commonEn,
+  ...commandPacks.en,
+} as const satisfies LangNode;
 
-/** All user-facing strings, grouped by command, plus shared error strings. */
-export const lang = { commands, errors } as const;
+/** The French language pack: a typed tree of strings and formatters. */
+const fr = {
+  common: commonFr,
+  ...commandPacks.fr,
+} as const satisfies LangNode;
 
-export { formatPermissionErrors } from './errors.js';
+export const lang = { en, fr } as const;

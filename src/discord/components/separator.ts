@@ -1,11 +1,27 @@
-import { SeparatorBuilder } from 'discord.js';
-import type { SeparatorComponent } from './component.js';
+import { SeparatorBuilder, type SeparatorSpacingSize } from 'discord.js';
+import type { ContainerBuilder } from 'discord.js';
+import type { ContainerChild } from './component.js';
 
-/** A horizontal divider between components. */
-export class Separator implements SeparatorComponent {
-  public readonly kind = 'separator';
+/** Fluent wrapper over a Components V2 separator. */
+export class Separator implements ContainerChild {
+  private readonly builder = new SeparatorBuilder();
 
-  public toBuilder(): SeparatorBuilder {
-    return new SeparatorBuilder();
+  public divider(value = true): this {
+    this.builder.setDivider(value);
+    return this;
+  }
+
+  public spacing(size: SeparatorSpacingSize): this {
+    this.builder.setSpacing(size);
+    return this;
+  }
+
+  public attachToContainer(container: ContainerBuilder): void {
+    container.addSeparatorComponents(this.builder);
+  }
+
+  /** This separator as a top-level message component. */
+  public build(): SeparatorBuilder {
+    return this.builder;
   }
 }
