@@ -1,5 +1,9 @@
 import type { CrowniclesEvent, EventOutcome } from '@/core/crownicles/index.js';
-import { effects, outcomeIcons } from '@/core/crownicles/index.js';
+import {
+  effects,
+  locationTypeIcons,
+  outcomeIcons,
+} from '@/core/crownicles/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import {
   type Container,
@@ -92,6 +96,27 @@ function effectPart(
     : info.icon;
 }
 
+/** Destination(s) an outcome sends the player to, or `undefined` when it doesn't travel. */
+function travelPart(
+  outcome: EventOutcome,
+  locale: SupportedLocale,
+  mapTypeNames: Record<string, string>,
+): string | undefined {
+  const typeLabel = (code: string): string => {
+    const icon = locationTypeIcons[code] ?? '';
+    const name = mapTypeNames[code];
+    return name ? `${icon} ${name}`.trim() : icon || code;
+  };
+  if (outcome.mapTypeDestinations?.length) {
+    return `${outcomeIcons.travel} ${outcome.mapTypeDestinations.map(typeLabel).join(', ')}`;
+  }
+  if (outcome.mapTypeExclusions?.length) {
+    const except = helpMessages(locale).labels.travelExcept;
+    return `${outcomeIcons.travel} ${except} ${outcome.mapTypeExclusions.map(typeLabel).join(', ')}`;
+  }
+  return outcome.mapLink !== undefined ? outcomeIcons.travel : undefined;
+}
+
 /**
  * Compact icon summary of an outcome's mechanical effects, e.g.
  * `⭐ +172 XP | 💰 +50 argent | 💔 -5 PV`. Empty when the outcome is inert.
@@ -99,6 +124,7 @@ function effectPart(
 export function outcomeSummary(
   outcome: EventOutcome,
   locale: SupportedLocale,
+  mapTypeNames: Record<string, string>,
 ): string {
   const l = helpMessages(locale).labels;
   const parts: string[] = [];
@@ -132,7 +158,8 @@ export function outcomeSummary(
   if (outcome.givesItem) parts.push(`${outcomeIcons.item} ${l.item}`);
   if (outcome.givesPet) parts.push(`${outcomeIcons.pet} ${l.pet}`);
   if (outcome.oneshot) parts.push(outcomeIcons.oneshot);
-  if (outcome.travels) parts.push(outcomeIcons.travel);
+  const travel = travelPart(outcome, locale, mapTypeNames);
+  if (travel) parts.push(travel);
   if (outcome.nextEventId !== undefined) {
     parts.push(`${outcomeIcons.nextEvent} #${outcome.nextEventId}`);
   }
@@ -173,6 +200,7 @@ export function appendEventDetail(
   container: Container,
   event: CrowniclesEvent,
   locale: SupportedLocale,
+  mapTypeNames: Record<string, string>,
 ): void {
   const t = helpMessages(locale);
 
@@ -189,7 +217,7 @@ export function appendEventDetail(
     const name = possibility.text ?? t.autoOutcome;
     const block = new Text(`${emoji} ${md.bold(name)}`.trimStart());
     possibility.outcomes.forEach((outcome, index) => {
-      const summary = outcomeSummary(outcome, locale);
+      const summary = outcomeSummary(outcome, locale, mapTypeNames);
       block.newLine(`${index + 1}. ${summary.length > 0 ? summary : '—'}`);
     });
     container.add(block);

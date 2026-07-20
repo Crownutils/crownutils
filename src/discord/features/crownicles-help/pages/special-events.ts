@@ -64,7 +64,14 @@ export const specialEventsPage: HelpPage = {
       const event = specials.find(
         (entry) => entry.id === state.selectedEventId,
       );
-      if (event) appendEventDetail(container, event, context.locale);
+      if (event) {
+        appendEventDetail(
+          container,
+          event,
+          context.locale,
+          state.data.mapTypeNames,
+        );
+      }
       const back = new Button(BACK_TO_EVENTS_ID)
         .color('secondary')
         .label(t.backToEvents);

@@ -170,10 +170,11 @@ function appendEventPicker(
 function appendEventDetailStep(
   container: Container,
   event: CrowniclesEvent,
+  mapTypeNames: Record<string, string>,
   context: HelpRenderContext,
 ): void {
   const t = messages(context.locale);
-  appendEventDetail(container, event, context.locale);
+  appendEventDetail(container, event, context.locale, mapTypeNames);
   appendBackButton(container, BACK_TO_EVENTS_ID, t.backToEvents, context);
 }
 
@@ -218,7 +219,12 @@ export const eventsPage: HelpPage = {
         state.data.eventsByLocation.get(state.selectedLocationId) ?? []
       ).find((entry) => entry.id === state.selectedEventId);
       if (event) {
-        appendEventDetailStep(container, event, context);
+        appendEventDetailStep(
+          container,
+          event,
+          state.data.mapTypeNames,
+          context,
+        );
       } else {
         appendBackButton(container, BACK_TO_EVENTS_ID, t.backToEvents, context);
       }

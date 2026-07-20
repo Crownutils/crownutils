@@ -19,6 +19,7 @@ export const crowniclesHelp = {
       item: 'Item',
       pet: 'Pet',
       timeLost: 'lost',
+      travelExcept: 'except',
     },
     minutes: (count: number): string => `${count} min`,
     hours: (count: number): string => `${count} h`,

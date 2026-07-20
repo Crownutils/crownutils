@@ -1,6 +1,7 @@
 import {
   getCrowniclesLocations,
   getEvents,
+  getMapTypeNames,
   type CrowniclesEvent,
   type CrowniclesLocation,
 } from '@/core/crownicles/index.js';
@@ -17,6 +18,8 @@ export interface CrowniclesHelpData {
   readonly eventsByLocation: ReadonlyMap<number, readonly CrowniclesEvent[]>;
   /** Global events with no location trigger (seasonal/date-driven). */
   readonly specialEvents: readonly CrowniclesEvent[];
+  /** Localized location-type names, for rendering outcome destinations. */
+  readonly mapTypeNames: Record<string, string>;
 }
 
 /**
@@ -27,9 +30,10 @@ export interface CrowniclesHelpData {
 export async function loadCrowniclesHelpData(
   locale: SupportedLocale,
 ): Promise<CrowniclesHelpData> {
-  const [locations, events] = await Promise.all([
+  const [locations, events, mapTypeNames] = await Promise.all([
     getCrowniclesLocations(locale),
     getEvents(locale),
+    getMapTypeNames(locale),
   ]);
 
   const eventsByLocation = new Map<number, CrowniclesEvent[]>();
@@ -47,5 +51,6 @@ export async function loadCrowniclesHelpData(
       .sort((a, b) => a.name.localeCompare(b.name)),
     eventsByLocation,
     specialEvents: events.filter((event) => event.isSpecial),
+    mapTypeNames,
   };
 }
