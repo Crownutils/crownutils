@@ -12,6 +12,8 @@
     "start": "NODE_ENV=production node --env-file-if-exists=.env dist/index.js",
     "deploy": "NODE_ENV=development tsx --env-file=.env src/deploy-commands.ts",
     "deploy:prod": "NODE_ENV=production node --env-file-if-exists=.env dist/deploy-commands.js",
+    "deploy:clear": "NODE_ENV=development tsx --env-file=.env src/deploy-commands.ts clear",
+    "deploy:clear:prod": "NODE_ENV=production node --env-file-if-exists=.env dist/deploy-commands.js clear",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
