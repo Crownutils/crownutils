@@ -197,26 +197,47 @@ export async function mountInteractiveMessage<State>(
 
 /**
  * Like {@link mountInteractiveMessage}, but reply to `interaction` instead of
- * posting in a channel. The reply is public (not ephemeral) so the timeout
- * re-render can still edit it.
+ * posting in a channel. Public by default so the idle-timeout re-render can
+ * edit it; pass `ephemeral` for a private reply (button clicks still update via
+ * the interaction, but the idle-timeout disable render is silently skipped).
  *
  * @returns the reply message, or `undefined` if the reply failed.
  */
 export async function mountInteractiveReply<State>(
   interaction: RepliableInteraction,
   controller: InteractiveMessage<State>,
+  options?: { readonly ephemeral?: boolean },
 ): Promise<Message | undefined> {
   const state = controller.initialState;
+  const components = componentsOf(controller, state, false);
 
-  const response = await safeDiscord(
-    interaction.reply({
-      flags: MessageFlags.IsComponentsV2,
-      components: componentsOf(controller, state, false),
-      withResponse: true,
-    }),
-    { action: 'interactiveReply' },
-  );
-  const message = response?.resource?.message ?? undefined;
+  /**
+   * A deferred interaction (e.g. to pre-load slow data) already has a reply to
+   * fill in via editReply; a fresh interaction is answered with reply.
+   */
+  let message: Message | undefined;
+  if (interaction.deferred || interaction.replied) {
+    message = await safeDiscord(
+      interaction.editReply({
+        flags: MessageFlags.IsComponentsV2,
+        components,
+      }),
+      { action: 'interactiveReply' },
+    );
+  } else {
+    const response = await safeDiscord(
+      interaction.reply({
+        flags:
+          options?.ephemeral === true
+            ? [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral]
+            : [MessageFlags.IsComponentsV2],
+        components,
+        withResponse: true,
+      }),
+      { action: 'interactiveReply' },
+    );
+    message = response?.resource?.message ?? undefined;
+  }
   if (!message) return undefined;
 
   drive(message, controller, state);
