@@ -14,6 +14,7 @@ import {
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
 import { commandMessages } from '@/discord/lang/index.js';
+import type { CrowniclesHelpData } from './data.js';
 import type { HelpRenderContext } from './page.js';
 
 /** Discord's hard limits on the text a select option can carry. */
@@ -96,15 +97,34 @@ function effectPart(
     : info.icon;
 }
 
+/** The location(s) a forced map link connects, joined by `↔`, or the bare compass. */
+function forcedLinkLabel(
+  outcome: EventOutcome,
+  data: CrowniclesHelpData,
+): string {
+  const link =
+    outcome.mapLink !== undefined
+      ? data.mapLinks.get(outcome.mapLink)
+      : undefined;
+  const names = link
+    ? [link.startMap, link.endMap]
+        .map((id) => data.locationNames[String(id)])
+        .filter((name): name is string => Boolean(name))
+    : [];
+  return names.length > 0
+    ? `${outcomeIcons.travel} ${names.join(' ↔ ')}`
+    : outcomeIcons.travel;
+}
+
 /** Destination(s) an outcome sends the player to, or `undefined` when it doesn't travel. */
 function travelPart(
   outcome: EventOutcome,
   locale: SupportedLocale,
-  mapTypeNames: Record<string, string>,
+  data: CrowniclesHelpData,
 ): string | undefined {
   const typeLabel = (code: string): string => {
     const icon = locationTypeIcons[code] ?? '';
-    const name = mapTypeNames[code];
+    const name = data.mapTypeNames[code];
     return name ? `${icon} ${name}`.trim() : icon || code;
   };
   if (outcome.mapTypeDestinations?.length) {
@@ -114,7 +134,9 @@ function travelPart(
     const except = helpMessages(locale).labels.travelExcept;
     return `${outcomeIcons.travel} ${except} ${outcome.mapTypeExclusions.map(typeLabel).join(', ')}`;
   }
-  return outcome.mapLink !== undefined ? outcomeIcons.travel : undefined;
+  return outcome.mapLink !== undefined
+    ? forcedLinkLabel(outcome, data)
+    : undefined;
 }
 
 /**
@@ -124,7 +146,7 @@ function travelPart(
 export function outcomeSummary(
   outcome: EventOutcome,
   locale: SupportedLocale,
-  mapTypeNames: Record<string, string>,
+  data: CrowniclesHelpData,
 ): string {
   const l = helpMessages(locale).labels;
   const parts: string[] = [];
@@ -158,7 +180,7 @@ export function outcomeSummary(
   if (outcome.givesItem) parts.push(`${outcomeIcons.item} ${l.item}`);
   if (outcome.givesPet) parts.push(`${outcomeIcons.pet} ${l.pet}`);
   if (outcome.oneshot) parts.push(outcomeIcons.oneshot);
-  const travel = travelPart(outcome, locale, mapTypeNames);
+  const travel = travelPart(outcome, locale, data);
   if (travel) parts.push(travel);
   if (outcome.nextEventId !== undefined) {
     parts.push(`${outcomeIcons.nextEvent} #${outcome.nextEventId}`);
@@ -200,7 +222,7 @@ export function appendEventDetail(
   container: Container,
   event: CrowniclesEvent,
   locale: SupportedLocale,
-  mapTypeNames: Record<string, string>,
+  data: CrowniclesHelpData,
 ): void {
   const t = helpMessages(locale);
 
@@ -217,7 +239,7 @@ export function appendEventDetail(
     const name = possibility.text ?? t.autoOutcome;
     const block = new Text(`${emoji} ${md.bold(name)}`.trimStart());
     possibility.outcomes.forEach((outcome, index) => {
-      const summary = outcomeSummary(outcome, locale, mapTypeNames);
+      const summary = outcomeSummary(outcome, locale, data);
       block.newLine(`${index + 1}. ${summary.length > 0 ? summary : '—'}`);
     });
     container.add(block);

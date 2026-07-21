@@ -1,9 +1,12 @@
 import {
   getCrowniclesLocations,
   getEvents,
+  getLocationNames,
+  getMapLinks,
   getMapTypeNames,
   type CrowniclesEvent,
   type CrowniclesLocation,
+  type MapLink,
 } from '@/core/crownicles/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 
@@ -20,6 +23,23 @@ export interface CrowniclesHelpData {
   readonly specialEvents: readonly CrowniclesEvent[];
   /** Localized location-type names, for rendering outcome destinations. */
   readonly mapTypeNames: Record<string, string>;
+  /** Localized location names by id string, for resolving forced-link destinations. */
+  readonly locationNames: Record<string, string>;
+  /** The forced map links referenced by outcomes, resolved to their endpoints. */
+  readonly mapLinks: ReadonlyMap<number, MapLink>;
+}
+
+/** Distinct map-link ids referenced by any outcome across `events`. */
+function referencedMapLinkIds(events: readonly CrowniclesEvent[]): number[] {
+  const ids = new Set<number>();
+  for (const event of events) {
+    for (const possibility of event.possibilities) {
+      for (const outcome of possibility.outcomes) {
+        if (outcome.mapLink !== undefined) ids.add(outcome.mapLink);
+      }
+    }
+  }
+  return [...ids];
 }
 
 /**
@@ -30,11 +50,13 @@ export interface CrowniclesHelpData {
 export async function loadCrowniclesHelpData(
   locale: SupportedLocale,
 ): Promise<CrowniclesHelpData> {
-  const [locations, events, mapTypeNames] = await Promise.all([
+  const [locations, events, mapTypeNames, locationNames] = await Promise.all([
     getCrowniclesLocations(locale),
     getEvents(locale),
     getMapTypeNames(locale),
+    getLocationNames(locale),
   ]);
+  const mapLinks = await getMapLinks(referencedMapLinkIds(events));
 
   const eventsByLocation = new Map<number, CrowniclesEvent[]>();
   for (const event of events) {
@@ -52,5 +74,7 @@ export async function loadCrowniclesHelpData(
     eventsByLocation,
     specialEvents: events.filter((event) => event.isSpecial),
     mapTypeNames,
+    locationNames,
+    mapLinks,
   };
 }
