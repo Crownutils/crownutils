@@ -3,6 +3,7 @@ import type { CommandNode } from '../types.js';
 export const crowniclesHelp = {
   description: 'Browse Crownicles game data (events and their outcomes).',
   messages: {
+    categoryOption: 'Open a category directly',
     categoryPlaceholder: 'Choose a category',
     loading: 'Loading Crownicles data…',
     loadError: 'Could not load Crownicles data. Please try again later.',

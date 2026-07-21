@@ -30,12 +30,16 @@ function pageEntryState(pageId: string, data: HelpState['data']): HelpState {
  * render and reduce delegate to the active page, while the router owns the
  * shared category select (rendered below every page) and the one-time network
  * load a data-backed page needs on first entry.
+ *
+ * Opening straight into `category` pre-loads its data here (there is no
+ * interaction yet to drive the usual loading view), so the front should defer
+ * the reply for a data-backed category.
  */
-export function createCrowniclesHelpController(
+export async function createCrowniclesHelpController(
   userId: string,
   locale: SupportedLocale,
   category?: string,
-): InteractiveMessage<HelpState> {
+): Promise<InteractiveMessage<HelpState>> {
   const renderContext = (disabled: boolean): HelpRenderContext => ({
     locale,
     pages: HELP_PAGES,
@@ -90,8 +94,22 @@ export function createCrowniclesHelpController(
     }
   };
 
+  /** Initial state for a data-backed landing page: pre-load, or flag the error. */
+  const loadInitialState = async (pageId: string): Promise<HelpState> => {
+    try {
+      return pageEntryState(pageId, await loadCrowniclesHelpData(locale));
+    } catch {
+      return { ...pageEntryState(pageId, undefined), dataError: true };
+    }
+  };
+
+  const initialPage = resolveHelpPage(category);
+  const initialState: HelpState = initialPage.requiresData
+    ? await loadInitialState(initialPage.id)
+    : { pageId: initialPage.id };
+
   return {
-    initialState: { pageId: resolveHelpPage(category).id },
+    initialState,
     allowedIds: [userId],
 
     render(state, { disabled }) {

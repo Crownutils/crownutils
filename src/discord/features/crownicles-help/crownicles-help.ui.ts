@@ -240,7 +240,7 @@ export function appendEventDetail(
     const block = new Text(`${emoji} ${md.bold(name)}`.trimStart());
     possibility.outcomes.forEach((outcome, index) => {
       const summary = outcomeSummary(outcome, locale, data);
-      block.newLine(`${index + 1}. ${summary.length > 0 ? summary : '—'}`);
+      block.newLine(`${index + 1}. ${summary.length > 0 ? summary : '-'}`);
     });
     container.add(block);
   }

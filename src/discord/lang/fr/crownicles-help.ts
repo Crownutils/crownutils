@@ -4,6 +4,7 @@ export const crowniclesHelp = {
   description:
     'Parcourez les données de Crownicles (événements et leurs résultats).',
   messages: {
+    categoryOption: 'Ouvrir directement une catégorie',
     categoryPlaceholder: 'Choisissez une catégorie',
     loading: 'Chargement des données Crownicles…',
     loadError:
