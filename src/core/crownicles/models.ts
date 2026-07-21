@@ -40,3 +40,19 @@ export async function getMapTypeNames(
   }
   return names;
 }
+
+/**
+ * Localized location names keyed by id string. Covers every id in `models.json`
+ * (including special ones without a resource file), so it resolves map-link
+ * endpoints the location loader would skip.
+ */
+export async function getLocationNames(
+  locale: SupportedLocale,
+): Promise<Record<string, string>> {
+  const locations = (await getModels(locale)).map_locations ?? {};
+  const names: Record<string, string> = {};
+  for (const [id, info] of Object.entries(locations)) {
+    if (info.name) names[id] = info.name;
+  }
+  return names;
+}

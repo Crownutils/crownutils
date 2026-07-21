@@ -9,7 +9,9 @@ export {
   type CrowniclesLocation,
 } from './locations.js';
 
-export { getMapTypeNames } from './models.js';
+export { getMapTypeNames, getLocationNames } from './models.js';
+
+export { getMapLinks, type MapLink } from './map-links.js';
 
 export {
   getEvents,
