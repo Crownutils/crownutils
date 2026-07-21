@@ -6,6 +6,24 @@ const CONTENTS_API =
 /** Max concurrent Crownicles fetches; bounds the socket fan-out on a small host. */
 export const HTTP_CONCURRENCY = 10;
 
+/** GitHub's REST API requires a User-Agent; sent on every request for good measure. */
+const USER_AGENT = 'crownutils-bot (+https://github.com/Crownutils/crownutils)';
+/** Per-request ceiling so a slow/hung fetch fails fast instead of stalling a data load. */
+const REQUEST_TIMEOUT_MS = 10_000;
+
+/** `fetch` with a User-Agent and a hard timeout; `accept` sets the GitHub API media type. */
+async function crowniclesFetch(
+  url: string,
+  accept?: string,
+): Promise<Response> {
+  const headers: Record<string, string> = { 'User-Agent': USER_AGENT };
+  if (accept !== undefined) headers.Accept = accept;
+  return fetch(url, {
+    headers,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+}
+
 /**
  * Fetches and parses a JSON file from the public Crownicles repository.
  * `path` is repo-relative, e.g. `Core/resources/events/1.json`.
@@ -14,7 +32,7 @@ export const HTTP_CONCURRENCY = 10;
  * project NOTICE; nothing is vendored into this repository.
  */
 export async function fetchCrowniclesJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${RAW_BASE}/${path}`);
+  const response = await crowniclesFetch(`${RAW_BASE}/${path}`);
   if (!response.ok) {
     throw new Error(`Crownicles fetch failed (${response.status}) for ${path}`);
   }
@@ -26,7 +44,7 @@ export async function fetchCrowniclesJson<T>(path: string): Promise<T> {
  * (e.g. the `CrowniclesIcons.ts` emote table).
  */
 export async function fetchCrowniclesText(path: string): Promise<string> {
-  const response = await fetch(`${RAW_BASE}/${path}`);
+  const response = await crowniclesFetch(`${RAW_BASE}/${path}`);
   if (!response.ok) {
     throw new Error(`Crownicles fetch failed (${response.status}) for ${path}`);
   }
@@ -36,10 +54,14 @@ export async function fetchCrowniclesText(path: string): Promise<string> {
 /**
  * Lists the file names in a Crownicles repo directory via the GitHub contents
  * API. Used to discover ids without assuming a contiguous range. One call per
- * directory, meant to be cached by the caller.
+ * directory, meant to be cached by the caller (the API is rate-limited to 60
+ * requests/hour unauthenticated).
  */
 export async function listCrowniclesDir(path: string): Promise<string[]> {
-  const response = await fetch(`${CONTENTS_API}/${path}`);
+  const response = await crowniclesFetch(
+    `${CONTENTS_API}/${path}`,
+    'application/vnd.github+json',
+  );
   if (!response.ok) {
     throw new Error(
       `Crownicles listing failed (${response.status}) for ${path}`,
