@@ -109,3 +109,10 @@ export async function setUserRank(userId: string, rank: Rank): Promise<void> {
 
   patchUserCache(userId, { rank });
 }
+
+/** Deletes `userId`'s row (language and rank) and evicts the cache; returns whether a row existed. */
+export async function deleteUser(userId: string): Promise<boolean> {
+  const { count } = await prisma.user.deleteMany({ where: { userId } });
+  userCache.delete(userId);
+  return count > 0;
+}

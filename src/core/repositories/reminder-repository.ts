@@ -117,6 +117,12 @@ export async function deleteUserReminder(
   return count === 1;
 }
 
+/** Deletes every reminder stored for `userId`, any status (GDPR erasure); returns the count. */
+export async function deleteAllUserReminders(userId: string): Promise<number> {
+  const { count } = await prisma.reminder.deleteMany({ where: { userId } });
+  return count;
+}
+
 /** Earliest pending due date the timer arms on, or `null`. */
 export async function getNextReminderDueAt(): Promise<Date | null> {
   const next = await prisma.reminder.findFirst({

@@ -28,6 +28,8 @@ import { reminders as remindersEn } from './en/reminders.js';
 import { reminders as remindersFr } from './fr/reminders.js';
 import { crowniclesHelp as crowniclesHelpEn } from './en/crownicles-help.js';
 import { crowniclesHelp as crowniclesHelpFr } from './fr/crownicles-help.js';
+import { deleteData as deleteDataEn } from './en/delete-data.js';
+import { deleteData as deleteDataFr } from './fr/delete-data.js';
 
 /**
  * Every command's language pack, both locales listed side by side so adding a
@@ -48,6 +50,7 @@ export const commandPacks = {
     commandRemind: remindEn,
     commandReminders: remindersEn,
     commandCrowniclesHelp: crowniclesHelpEn,
+    commandDeleteData: deleteDataEn,
   },
   fr: {
     commandPing: pingFr,
@@ -63,5 +66,6 @@ export const commandPacks = {
     commandRemind: remindFr,
     commandReminders: remindersFr,
     commandCrowniclesHelp: crowniclesHelpFr,
+    commandDeleteData: deleteDataFr,
   },
 } as const;

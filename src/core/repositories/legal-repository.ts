@@ -15,6 +15,7 @@ export const LEGAL_VERSION = '1.1';
  */
 export const LEGAL_GATE_EXEMPT_COMMANDS: ReadonlySet<string> = new Set([
   'data',
+  'delete-data',
   'register',
 ]);
 
@@ -71,4 +72,13 @@ export async function acceptLegal(userId: string): Promise<void> {
     update: { acceptedVersion: LEGAL_VERSION },
   });
   legalCache.set(userId, true);
+}
+
+/** Deletes `userId`'s legal acceptance and evicts the cache; returns whether a record existed. */
+export async function deleteLegalAcceptance(userId: string): Promise<boolean> {
+  const { count } = await prisma.legalAcceptance.deleteMany({
+    where: { userId },
+  });
+  legalCache.delete(userId);
+  return count > 0;
 }
