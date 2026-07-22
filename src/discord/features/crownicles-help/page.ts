@@ -3,11 +3,9 @@ import type { ItemCategory } from '@/core/crownicles/index.js';
 import type { Authorization } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
-import type {
-  CrowniclesEquipmentData,
-  CrowniclesHelpData,
-  CrowniclesMaterialsData,
-} from './data.js';
+import type { CrowniclesEquipmentData } from './data/equipment.js';
+import type { CrowniclesHelpData } from './data/events.js';
+import type { CrowniclesMaterialsData } from './data/materials.js';
 
 /**
  * Shared state of the help center, threaded through every page. Optional fields

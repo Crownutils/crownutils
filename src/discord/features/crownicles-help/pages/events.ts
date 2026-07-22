@@ -2,29 +2,37 @@ import type { MessageComponentInteraction } from 'discord.js';
 import type { CrowniclesEvent } from '@/core/crownicles/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import {
-  Button,
-  ButtonActionRow,
   type Container,
-  createContainer,
   SelectActionRow,
   SelectMenu,
   Separator,
   Text,
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
-import { loadCrowniclesHelpData, type CrowniclesHelpData } from '../data.js';
+import {
+  loadCrowniclesHelpData,
+  type CrowniclesHelpData,
+} from '../data/events.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import {
+  appendBackButton,
   appendEventDetail,
+  appendLoadFallback,
+  appendPaginationControls,
   BACK_TO_EVENTS_ID,
   BACK_TO_LOCATIONS_ID,
+  clampPage,
+  createHelpPageContainer,
   EVENT_SELECT_ID,
   eventOptionLabel,
   helpMessages,
   LOCATION_NEXT_ID,
   LOCATION_PREV_ID,
   LOCATION_SELECT_ID,
-  LOCATIONS_PER_PAGE,
+  PICKER_PAGE_SIZE,
+  pickerPage,
+  pickerPageCount,
+  SELECT_LABEL_MAX,
   truncate,
 } from '../crownicles-help.ui.js';
 
@@ -32,23 +40,11 @@ import {
 export const EVENTS_PAGE_ID = 'events';
 
 const EVENTS_ICON = '🎭';
-/** Max events listed for a single location (Discord's select-menu ceiling). */
-const EVENTS_PER_LOCATION = 25;
 /** Truncation width of an event's intro in the location's event list. */
 const EVENT_PREVIEW_MAX = 80;
 
 function messages(locale: SupportedLocale) {
   return helpMessages(locale).events;
-}
-
-/** Total location-picker pages for the current data set. */
-function locationPageCount(data: CrowniclesHelpData): number {
-  return Math.max(1, Math.ceil(data.locations.length / LOCATIONS_PER_PAGE));
-}
-
-/** Clamps `page` into `[0, count - 1]`. */
-function clampPage(page: number, count: number): number {
-  return Math.min(Math.max(page, 0), count - 1);
 }
 
 /** Step 1: the paginated location picker, listing the current page's locations. */
@@ -64,11 +60,9 @@ function appendLocationPicker(
     return;
   }
 
-  const pageCount = locationPageCount(data);
-  const page = clampPage(state.locationsPage ?? 0, pageCount);
-  const slice = data.locations.slice(
-    page * LOCATIONS_PER_PAGE,
-    page * LOCATIONS_PER_PAGE + LOCATIONS_PER_PAGE,
+  const { page, pageCount, slice } = pickerPage(
+    data.locations,
+    state.locationsPage,
   );
 
   const list = new Text('');
@@ -81,7 +75,7 @@ function appendLocationPicker(
     .placeholder(t.locationPlaceholder)
     .options(
       slice.map((location) => ({
-        label: truncate(location.name, 100),
+        label: truncate(location.name, SELECT_LABEL_MAX),
         value: String(location.id),
         ...(location.icon ? { emoji: location.icon } : {}),
       })),
@@ -89,30 +83,16 @@ function appendLocationPicker(
   if (context.disabled) select.disabled();
   container.add(new SelectActionRow().set(select));
 
-  if (pageCount > 1) {
-    container.add(
-      new Text(t.locationsPageIndicator(page + 1, pageCount)).size('subtle'),
-    );
-    const previous = new Button(LOCATION_PREV_ID)
-      .color('secondary')
-      .label(t.previous);
-    const next = new Button(LOCATION_NEXT_ID).color('secondary').label(t.next);
-    if (context.disabled || page <= 0) previous.disabled();
-    if (context.disabled || page >= pageCount - 1) next.disabled();
-    container.add(new ButtonActionRow().add(previous, next));
-  }
-}
-
-/** Adds a single back button below the current step. */
-function appendBackButton(
-  container: Container,
-  customId: string,
-  label: string,
-  context: HelpRenderContext,
-): void {
-  const back = new Button(customId).color('secondary').label(label);
-  if (context.disabled) back.disabled();
-  container.add(new ButtonActionRow().add(back));
+  appendPaginationControls(container, {
+    page,
+    pageCount,
+    prevId: LOCATION_PREV_ID,
+    nextId: LOCATION_NEXT_ID,
+    indicator: t.locationsPageIndicator,
+    previousLabel: t.previous,
+    nextLabel: t.next,
+    disabled: context.disabled,
+  });
 }
 
 /** Step 2: the events hosted by the chosen location, with a picker. */
@@ -126,7 +106,7 @@ function appendEventPicker(
   const location = data.locations.find((entry) => entry.id === locationId);
   const events = (data.eventsByLocation.get(locationId) ?? []).slice(
     0,
-    EVENTS_PER_LOCATION,
+    PICKER_PAGE_SIZE,
   );
 
   container.add(
@@ -193,19 +173,10 @@ export const eventsPage: HelpPage = {
 
   render(state: HelpState, context: HelpRenderContext) {
     const t = messages(context.locale);
-    const container = createContainer('brand').add(
-      new Text(`${EVENTS_ICON} ${t.name}`).title(),
-      new Text(t.intro).size('subtle'),
-      new Separator(),
-    );
+    const container = createHelpPageContainer(EVENTS_ICON, t.name, t.intro);
 
     if (!state.data) {
-      const shared = helpMessages(context.locale);
-      container.add(
-        new Text(state.loadError ? shared.loadError : shared.loading).size(
-          'subtle',
-        ),
-      );
+      appendLoadFallback(container, state, context.locale);
       return container;
     }
 
@@ -250,7 +221,7 @@ export const eventsPage: HelpPage = {
     }
 
     if (interaction.isButton()) {
-      const pageCount = state.data ? locationPageCount(state.data) : 1;
+      const pageCount = pickerPageCount(state.data?.locations.length ?? 0);
       switch (interaction.customId) {
         case LOCATION_PREV_ID:
           return {

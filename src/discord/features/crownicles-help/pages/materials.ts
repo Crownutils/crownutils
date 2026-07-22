@@ -5,10 +5,7 @@ import {
 } from '@/core/crownicles/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import {
-  Button,
-  ButtonActionRow,
   type Container,
-  createContainer,
   SelectActionRow,
   SelectMenu,
   Separator,
@@ -19,16 +16,25 @@ import {
   loadMaterialsData,
   type CrowniclesMaterialsData,
   type MaterialExpeditionSource,
-} from '../data.js';
+} from '../data/materials.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
-import { helpMessages, truncate } from '../crownicles-help.ui.js';
+import {
+  appendBackButton,
+  appendLoadFallback,
+  appendPaginationControls,
+  clampPage,
+  createHelpPageContainer,
+  helpMessages,
+  pickerPage,
+  pickerPageCount,
+  SELECT_LABEL_MAX,
+  truncate,
+} from '../crownicles-help.ui.js';
 
 /** Router id of the materials page. */
 export const MATERIALS_PAGE_ID = 'materials';
 
 const MATERIALS_ICON = '⛏️';
-/** Materials per picker page (Discord's select-menu ceiling); a type holds ~9. */
-const MATERIALS_PER_PAGE = 25;
 
 const TYPE_SELECT_ID = 'chelp-mat-type';
 const MATERIAL_SELECT_ID = 'chelp-material';
@@ -112,26 +118,6 @@ function rarityIcon(rarity: number): string {
   return RARITY_ICONS[rarity] ?? '';
 }
 
-function materialPageCount(materials: readonly CrowniclesMaterial[]): number {
-  return Math.max(1, Math.ceil(materials.length / MATERIALS_PER_PAGE));
-}
-
-function clampPage(page: number, count: number): number {
-  return Math.min(Math.max(page, 0), count - 1);
-}
-
-/** Adds a single back button below the current step. */
-function appendBackButton(
-  container: Container,
-  customId: string,
-  label: string,
-  context: HelpRenderContext,
-): void {
-  const back = new Button(customId).color('secondary').label(label);
-  if (context.disabled) back.disabled();
-  container.add(new ButtonActionRow().add(back));
-}
-
 /** Step 1: the type picker, listing each type and its material count. */
 function appendTypePicker(
   container: Container,
@@ -181,12 +167,7 @@ function appendMaterialPicker(
     return;
   }
 
-  const pageCount = materialPageCount(materials);
-  const page = clampPage(state.materialsPage ?? 0, pageCount);
-  const slice = materials.slice(
-    page * MATERIALS_PER_PAGE,
-    page * MATERIALS_PER_PAGE + MATERIALS_PER_PAGE,
-  );
+  const { page, pageCount, slice } = pickerPage(materials, state.materialsPage);
 
   const list = new Text('');
   for (const material of slice) {
@@ -202,7 +183,7 @@ function appendMaterialPicker(
       slice.map((material) => {
         const rarityName = data.rarityNames[String(material.rarity)];
         return {
-          label: truncate(material.name, 100),
+          label: truncate(material.name, SELECT_LABEL_MAX),
           value: String(material.id),
           ...(rarityName ? { description: rarityName } : {}),
           ...(material.icon ? { emoji: material.icon } : {}),
@@ -212,18 +193,16 @@ function appendMaterialPicker(
   if (context.disabled) select.disabled();
   container.add(new SelectActionRow().set(select));
 
-  if (pageCount > 1) {
-    container.add(
-      new Text(t.pageIndicator(page + 1, pageCount)).size('subtle'),
-    );
-    const previous = new Button(MATERIALS_PREV_ID)
-      .color('secondary')
-      .label(t.previous);
-    const next = new Button(MATERIALS_NEXT_ID).color('secondary').label(t.next);
-    if (context.disabled || page <= 0) previous.disabled();
-    if (context.disabled || page >= pageCount - 1) next.disabled();
-    container.add(new ButtonActionRow().add(previous, next));
-  }
+  appendPaginationControls(container, {
+    page,
+    pageCount,
+    prevId: MATERIALS_PREV_ID,
+    nextId: MATERIALS_NEXT_ID,
+    indicator: t.pageIndicator,
+    previousLabel: t.previous,
+    nextLabel: t.next,
+    disabled: context.disabled,
+  });
 
   appendBackButton(container, BACK_TO_TYPES_ID, t.backToTypes, context);
 }
@@ -315,19 +294,10 @@ export const materialsPage: HelpPage = {
 
   render(state: HelpState, context: HelpRenderContext) {
     const t = messages(context.locale);
-    const container = createContainer('brand').add(
-      new Text(`${MATERIALS_ICON} ${t.name}`).title(),
-      new Text(t.intro).size('subtle'),
-      new Separator(),
-    );
+    const container = createHelpPageContainer(MATERIALS_ICON, t.name, t.intro);
 
     if (!state.materialsData) {
-      const shared = helpMessages(context.locale);
-      container.add(
-        new Text(state.loadError ? shared.loadError : shared.loading).size(
-          'subtle',
-        ),
-      );
+      appendLoadFallback(container, state, context.locale);
       return container;
     }
 
@@ -385,7 +355,7 @@ export const materialsPage: HelpPage = {
       const materials = state.selectedType
         ? (state.materialsData?.materialsByType.get(state.selectedType) ?? [])
         : [];
-      const pageCount = materialPageCount(materials);
+      const pageCount = pickerPageCount(materials.length);
       switch (interaction.customId) {
         case MATERIALS_PREV_ID:
           return {

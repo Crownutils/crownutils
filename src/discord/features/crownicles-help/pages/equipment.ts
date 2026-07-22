@@ -13,28 +13,37 @@ import {
   Button,
   ButtonActionRow,
   type Container,
-  createContainer,
   SelectActionRow,
   SelectMenu,
   Separator,
   Text,
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
-import type {
-  CrowniclesEquipmentData,
-  EquipmentItem,
-  EquipmentStats,
-} from '../data.js';
-import { loadEquipmentData } from '../data.js';
+import {
+  loadEquipmentData,
+  type CrowniclesEquipmentData,
+  type EquipmentItem,
+  type EquipmentStats,
+} from '../data/equipment.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
-import { helpMessages, truncate } from '../crownicles-help.ui.js';
+import {
+  appendBackButton,
+  appendLoadFallback,
+  appendPaginationControls,
+  clampPage,
+  createHelpPageContainer,
+  helpMessages,
+  pickerPage,
+  pickerPageCount,
+  SELECT_DESCRIPTION_MAX,
+  SELECT_LABEL_MAX,
+  truncate,
+} from '../crownicles-help.ui.js';
 
 /** Router id of the equipment page. */
 export const EQUIPMENT_PAGE_ID = 'equipment';
 
 const EQUIPMENT_ICON = '⚔️';
-/** Items per picker page (Discord's select-menu ceiling). */
-const ITEMS_PER_PAGE = 25;
 /** Emote of the fight-potion usage count line. */
 const USAGES_ICON = '🔁';
 
@@ -48,9 +57,6 @@ const BACK_TO_RARITIES_ID = 'chelp-eq-back-rarities';
 const BACK_TO_ITEMS_ID = 'chelp-eq-back-items';
 const SHOW_UPGRADES_ID = 'chelp-eq-upgrades';
 const BACK_TO_DETAIL_ID = 'chelp-eq-back-detail';
-
-/** Discord's ceiling on a select option label/description. */
-const SELECT_TEXT_MAX = 100;
 
 function messages(locale: SupportedLocale) {
   return helpMessages(locale).equipment;
@@ -112,26 +118,6 @@ function itemSummary(item: EquipmentItem): string {
     return statParts(item.detail.stats).join(' | ');
   }
   return item.detail.effect;
-}
-
-function itemPageCount(items: readonly EquipmentItem[]): number {
-  return Math.max(1, Math.ceil(items.length / ITEMS_PER_PAGE));
-}
-
-function clampPage(page: number, count: number): number {
-  return Math.min(Math.max(page, 0), count - 1);
-}
-
-/** Adds a single back button below the current step. */
-function appendBackButton(
-  container: Container,
-  customId: string,
-  label: string,
-  context: HelpRenderContext,
-): void {
-  const back = new Button(customId).color('secondary').label(label);
-  if (context.disabled) back.disabled();
-  container.add(new ButtonActionRow().add(back));
 }
 
 /** Step 1: the category picker, listing each category and its item count. */
@@ -197,7 +183,7 @@ function appendRarityPicker(
     .placeholder(t.rarityPlaceholder)
     .options(
       rarities.map(({ rarity, count }) => ({
-        label: truncate(rarityName(data, rarity), SELECT_TEXT_MAX),
+        label: truncate(rarityName(data, rarity), SELECT_LABEL_MAX),
         value: String(rarity),
         description: t.itemCount(count),
         ...(itemRarityIcons[rarity] ? { emoji: itemRarityIcons[rarity] } : {}),
@@ -237,12 +223,7 @@ function appendItemPicker(
     return;
   }
 
-  const pageCount = itemPageCount(items);
-  const page = clampPage(state.itemsPage ?? 0, pageCount);
-  const slice = items.slice(
-    page * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE + ITEMS_PER_PAGE,
-  );
+  const { page, pageCount, slice } = pickerPage(items, state.itemsPage);
 
   const list = new Text('');
   for (const item of slice) {
@@ -256,10 +237,10 @@ function appendItemPicker(
       slice.map((item) => {
         const summary = itemSummary(item);
         return {
-          label: truncate(item.name, SELECT_TEXT_MAX),
+          label: truncate(item.name, SELECT_LABEL_MAX),
           value: String(item.id),
           ...(summary
-            ? { description: truncate(summary, SELECT_TEXT_MAX) }
+            ? { description: truncate(summary, SELECT_DESCRIPTION_MAX) }
             : {}),
           ...(item.icon ? { emoji: item.icon } : {}),
         };
@@ -268,18 +249,16 @@ function appendItemPicker(
   if (context.disabled) select.disabled();
   container.add(new SelectActionRow().set(select));
 
-  if (pageCount > 1) {
-    container.add(
-      new Text(t.pageIndicator(page + 1, pageCount)).size('subtle'),
-    );
-    const previous = new Button(ITEMS_PREV_ID)
-      .color('secondary')
-      .label(t.previous);
-    const next = new Button(ITEMS_NEXT_ID).color('secondary').label(t.next);
-    if (context.disabled || page <= 0) previous.disabled();
-    if (context.disabled || page >= pageCount - 1) next.disabled();
-    container.add(new ButtonActionRow().add(previous, next));
-  }
+  appendPaginationControls(container, {
+    page,
+    pageCount,
+    prevId: ITEMS_PREV_ID,
+    nextId: ITEMS_NEXT_ID,
+    indicator: t.pageIndicator,
+    previousLabel: t.previous,
+    nextLabel: t.next,
+    disabled: context.disabled,
+  });
 
   appendBackButton(container, BACK_TO_RARITIES_ID, t.backToRarities, context);
 }
@@ -387,19 +366,10 @@ export const equipmentPage: HelpPage = {
 
   render(state: HelpState, context: HelpRenderContext) {
     const t = messages(context.locale);
-    const container = createContainer('brand').add(
-      new Text(`${EQUIPMENT_ICON} ${t.name}`).title(),
-      new Text(t.intro).size('subtle'),
-      new Separator(),
-    );
+    const container = createHelpPageContainer(EQUIPMENT_ICON, t.name, t.intro);
 
     if (!state.equipmentData) {
-      const shared = helpMessages(context.locale);
-      container.add(
-        new Text(state.loadError ? shared.loadError : shared.loading).size(
-          'subtle',
-        ),
-      );
+      appendLoadFallback(container, state, context.locale);
       return container;
     }
 
@@ -494,7 +464,7 @@ export const equipmentPage: HelpPage = {
             ...state,
             itemsPage: clampPage(
               (state.itemsPage ?? 0) + 1,
-              itemPageCount(items),
+              pickerPageCount(items.length),
             ),
           };
         case BACK_TO_CATEGORIES_ID:
