@@ -111,5 +111,39 @@ export const crowniclesHelp = {
       cookingRecipe: (level: number, quantity: number): string =>
         `(level ${level}, gives ×${quantity})`,
     },
+
+    equipment: {
+      name: 'Equipment',
+      description: 'The game weapons, armour, potions and objects',
+      intro: 'Pick a category, a rarity, then an item to see its stats.',
+      categoryPlaceholder: 'Choose a category',
+      rarityPlaceholder: 'Choose a rarity',
+      itemPlaceholder: 'Choose an item',
+      categories: {
+        weapons: 'Weapons',
+        armors: 'Armour',
+        potions: 'Potions',
+        objects: 'Objects',
+      },
+      selectedCategory: (name: string): string => `Category: ${name}`,
+      selectedRarity: (name: string): string => `Rarity: ${name}`,
+      itemCount: (count: number): string =>
+        count === 1 ? '1 item' : `${count} items`,
+      noItems: 'No item of this rarity.',
+      previous: 'Previous',
+      next: 'Next',
+      pageIndicator: (current: number, total: number): string =>
+        `Page ${current}/${total}`,
+      backToCategories: 'Back to categories',
+      backToRarities: 'Back to rarities',
+      backToItems: 'Back to items',
+      backToDetail: 'Back to the item',
+      rarityLabel: 'Rarity',
+      valueLabel: 'Sell value',
+      usagesLabel: 'Uses',
+      upgradesButton: 'Upgrade',
+      upgradesTitle: 'Upgrade',
+      levelLabel: (level: number): string => `Level ${level}`,
+    },
   },
 } as const satisfies CommandNode;

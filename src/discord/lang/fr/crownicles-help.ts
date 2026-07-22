@@ -113,5 +113,40 @@ export const crowniclesHelp = {
       cookingRecipe: (level: number, quantity: number): string =>
         `(niveau ${level}, donne ×${quantity})`,
     },
+
+    equipment: {
+      name: 'Équipements',
+      description: 'Les armes, armures, potions et objets du jeu',
+      intro:
+        'Choisissez une catégorie, une rareté, puis un item pour voir ses statistiques.',
+      categoryPlaceholder: 'Choisissez une catégorie',
+      rarityPlaceholder: 'Choisissez une rareté',
+      itemPlaceholder: 'Choisissez un item',
+      categories: {
+        weapons: 'Armes',
+        armors: 'Armures',
+        potions: 'Potions',
+        objects: 'Objets',
+      },
+      selectedCategory: (name: string): string => `Catégorie : ${name}`,
+      selectedRarity: (name: string): string => `Rareté : ${name}`,
+      itemCount: (count: number): string =>
+        count === 1 ? '1 item' : `${count} items`,
+      noItems: 'Aucun item de cette rareté.',
+      previous: 'Précédent',
+      next: 'Suivant',
+      pageIndicator: (current: number, total: number): string =>
+        `Page ${current}/${total}`,
+      backToCategories: 'Retour aux catégories',
+      backToRarities: 'Retour aux raretés',
+      backToItems: 'Retour aux items',
+      backToDetail: "Retour à l'item",
+      rarityLabel: 'Rareté',
+      valueLabel: 'Valeur de vente',
+      usagesLabel: 'Consommations',
+      upgradesButton: 'Amélioration',
+      upgradesTitle: 'Amélioration',
+      levelLabel: (level: number): string => `Niveau ${level}`,
+    },
   },
 } as const satisfies CommandNode;
