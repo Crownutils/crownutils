@@ -36,17 +36,11 @@ function pageEntryState(
 }
 
 /**
- * Builds the `/crownicles-help` controller: one self-updating message whose
- * render and reduce delegate to the active page, while the router owns the
- * shared category select (rendered below every page) and the one-time network
- * load a data-backed page needs on first entry.
- *
- * Opening straight into `category` pre-loads its data here (there is no
- * interaction yet to drive the usual loading view), so the front should defer
- * the reply for a data-backed category.
- *
- * `rank` gates the pages: only those the user's rank allows are offered in the
- * select or reachable, and a deep link to a restricted page falls back to home.
+ * Builds the help center controller: render and reduce delegate to the active
+ * page, while the router owns the shared category select and each page's
+ * one-time data load. `rank` filters the reachable pages (a restricted deep
+ * link falls back to home). Opening straight into a data-backed `category`
+ * pre-loads it here, so the front should defer the reply.
  */
 export async function createCrowniclesHelpController(
   userId: string,

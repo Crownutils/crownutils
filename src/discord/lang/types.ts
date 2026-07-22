@@ -1,8 +1,6 @@
 /**
- * Shape constraint for language packs: every leaf is a plain string or a
- * formatter that returns a string. Applied with `as const satisfies LangNode`,
- * so each pack keeps its precise literal type while the invariant "no leaf is
- * anything but a string or a string formatter" is enforced at compile time.
+ * A language-pack leaf: a plain string or a formatter returning one. Packs
+ * apply it with `as const satisfies`, keeping their precise literal types.
  */
 export type LangLeaf = string | ((...args: never[]) => string);
 

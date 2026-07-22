@@ -52,18 +52,16 @@ export async function registerUser(userId: string, language: SupportedLocale) {
 
 /**
  * Reads `userId`'s language and rank together, caching the whole row so
- * repeated lookups within the TTL never touch the database. Preferred over
- * {@link getUserLanguage} plus {@link getUserRank}, which now delegate here.
+ * repeated lookups within the TTL never touch the database.
  */
 export async function getUserProfile(userId: string): Promise<UserProfile> {
   return userCache.getOrLoad(userId, loadUserProfile);
 }
 
 /**
- * Reads `userId`'s row directly from the database - uncached, and `null` (not
- * defaulted) when no row exists. Unlike {@link getUserProfile}, which
- * fabricates `en`/`normal` for permission checks, a GDPR export must report
- * what is truly stored, not a default that would look like real data.
+ * Uncached read of `userId`'s row, `null` when absent. Unlike
+ * {@link getUserProfile}, no default is fabricated: a GDPR export must report
+ * only what is truly stored.
  */
 export async function findStoredUserProfile(
   userId: string,

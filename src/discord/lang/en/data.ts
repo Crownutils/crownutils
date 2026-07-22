@@ -19,7 +19,7 @@ export const data = {
       `${md.bold('Reminders on record:')} ${count}`,
     remindersNone: `${md.bold('Reminders on record:')} none`,
     reminderItem: (content: string, status: string, due: string) =>
-      `• ${md.code(content)} — ${status}, due ${due}`,
+      `• ${md.code(content)} - ${status}, due ${due}`,
     reminderStatus: {
       pending: 'pending',
       delivering: 'sending',

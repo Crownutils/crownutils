@@ -21,7 +21,7 @@ export const data = {
       `${md.bold('Rappels enregistrés :')} ${count}`,
     remindersNone: `${md.bold('Rappels enregistrés :')} aucun`,
     reminderItem: (content: string, status: string, due: string) =>
-      `• ${md.code(content)} — ${status}, échéance ${due}`,
+      `• ${md.code(content)} - ${status}, échéance ${due}`,
     reminderStatus: {
       pending: 'en attente',
       delivering: "en cours d'envoi",

@@ -25,10 +25,8 @@ const LEGAL_CACHE_MAX_SIZE = 10_000;
 const LEGAL_CACHE_TTL_MS = 5 * 60 * 1000;
 
 /**
- * Caches whether a user has accepted the legal documents. The gate runs on
- * every command, so both positive and negative results are cached to keep
- * repeat lookups off the database; the cache is bounded and TTL-limited, and
- * {@link prisma.legalAcceptance} stays the source of truth across restarts.
+ * Caches acceptance per user, both outcomes: the legal gate runs on every
+ * command. The database stays the source of truth.
  */
 const legalCache = new TtlCache<string, boolean>(
   LEGAL_CACHE_MAX_SIZE,

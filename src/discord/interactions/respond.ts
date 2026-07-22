@@ -14,12 +14,9 @@ import type {
 import { Container } from '@/discord/components/index.js';
 
 /**
- * Transport-agnostic result a use-case hands back to a command front: *what* to
- * show and *whether* it is private. Provide `container` for the common
- * single-component case, or `components` for a fully modular, ordered list of
- * top-level components (containers, action rows, sections, text, separators).
- * Turning it into a discord.js payload (the `IsComponentsV2` flag, reply vs.
- * follow-up) happens here, once, instead of in every command.
+ * Transport-agnostic result a use-case hands back to a command front: what to
+ * show and whether it is private. This module alone turns it into a discord.js
+ * payload (`IsComponentsV2` flag, reply vs. follow-up).
  */
 export interface CommandResponse {
   /** Sugar for a single top-level component; equivalent to `components: [container]`. */

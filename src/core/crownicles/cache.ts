@@ -2,14 +2,10 @@ import { TtlCache } from '@/core/cache/ttl-cache.js';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '@/core/types.js';
 
 /**
- * Caching strategy for all Crownicles game data fetched at runtime.
- *
- * The game's data changes rarely, so every loader is wrapped so its result is
- * fetched once and reused for a long TTL: the first command pays the network
- * cost, every later one is instant, and stale data still self-heals when the
- * TTL lapses. A failed load is never cached (the wrappers rely on
- * {@link TtlCache.getOrLoad}, which only stores a resolved value), so the next
- * call retries. This module is the single place that decides all of that.
+ * Caching strategy for all Crownicles game data fetched at runtime: the data
+ * changes rarely, so each loader runs once and its result is reused for a long
+ * TTL. A failed load is never cached ({@link TtlCache.getOrLoad} only stores a
+ * resolved value), so the next call retries.
  */
 
 /** Lifetime of a cached game-data value. */
