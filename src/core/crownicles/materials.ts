@@ -2,13 +2,13 @@ import type { SupportedLocale } from '@/core/types.js';
 import { cachePerLocale, cacheShared } from './cache.js';
 import { getMaterialNames } from './models.js';
 import {
-  extractIconBlock,
   fetchCrowniclesJson,
   fetchCrowniclesText,
   HTTP_CONCURRENCY,
   listCrowniclesDir,
   mapWithConcurrency,
   numericIds,
+  parseIconIdBlock,
 } from './source.js';
 
 /** The ten thematic material types, in display order. */
@@ -49,20 +49,9 @@ interface RawMaterial {
 const MATERIALS_DIR = 'Core/resources/materials';
 const ICONS_SOURCE_PATH = 'Lib/src/CrowniclesIcons.ts';
 
-/** Parses the flat `materials` emote block (`<id>: "<emote>"`) of the icon source. */
-function parseMaterialIcons(source: string): Record<string, string> {
-  const block = extractIconBlock(source, 'materials');
-  const icons: Record<string, string> = {};
-  if (block === undefined) return icons;
-  for (const [, id, emote] of block.matchAll(/(\d+):\s*"([^"\\]*)"/g)) {
-    if (id !== undefined && emote !== undefined) icons[id] = emote;
-  }
-  return icons;
-}
-
 /** Material emotes by id string, parsed from the game's icon source and cached. */
 const getMaterialIcons = cacheShared(async () =>
-  parseMaterialIcons(await fetchCrowniclesText(ICONS_SOURCE_PATH)),
+  parseIconIdBlock(await fetchCrowniclesText(ICONS_SOURCE_PATH), 'materials'),
 );
 
 /** Fetches every material with its `locale` name, rarity, type and emote. */

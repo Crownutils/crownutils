@@ -94,6 +94,23 @@ export function extractIconBlock(
   return value.slice(header.index + header[0].length, end - 1);
 }
 
+/**
+ * Parses a flat `<id>: "<emote>"` icon block of the icon source into an
+ * id -> emote record; empty when the block is absent.
+ */
+export function parseIconIdBlock(
+  source: string,
+  key: string,
+): Record<string, string> {
+  const block = extractIconBlock(source, key);
+  const icons: Record<string, string> = {};
+  if (block === undefined) return icons;
+  for (const [, id, emote] of block.matchAll(/(\d+):\s*"([^"\\]*)"/g)) {
+    if (id !== undefined && emote !== undefined) icons[id] = emote;
+  }
+  return icons;
+}
+
 /** Parses `<id>.json` file names into a sorted, de-duplicated list of numeric ids. */
 export function numericIds(fileNames: readonly string[]): number[] {
   const ids = new Set<number>();
