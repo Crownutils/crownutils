@@ -71,6 +71,29 @@ export async function listCrowniclesDir(path: string): Promise<string[]> {
   return entries.map((entry) => entry.name);
 }
 
+/**
+ * Extracts the `key: { ... }` value object from a `CrowniclesIcons.ts` source
+ * (after its `} = {` type/value split), brace-matched so nested objects and
+ * later blocks are not captured. `undefined` when the block is absent.
+ */
+export function extractIconBlock(
+  source: string,
+  key: string,
+): string | undefined {
+  const value = source.split('} = {')[1] ?? source;
+  const header = new RegExp(`\\n\\t${key}:\\s*\\{\\n`).exec(value);
+  if (!header) return undefined;
+
+  let depth = 1;
+  let end = header.index + header[0].length;
+  while (depth > 0 && end < value.length) {
+    const char = value[end++];
+    if (char === '{') depth++;
+    else if (char === '}') depth--;
+  }
+  return value.slice(header.index + header[0].length, end - 1);
+}
+
 /** Parses `<id>.json` file names into a sorted, de-duplicated list of numeric ids. */
 export function numericIds(fileNames: readonly string[]): number[] {
   const ids = new Set<number>();
