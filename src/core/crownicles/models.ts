@@ -6,9 +6,9 @@ import { fetchCrowniclesJson } from './source.js';
 export interface CrowniclesModels {
   readonly map_locations?: Record<string, { name?: string }>;
   readonly map_types?: Record<string, { name?: string; prefix?: string }>;
-  /** Material id → official name. */
+  /** Material id -> official name. */
   readonly materials?: Record<string, string>;
-  /** Material rarity level (`1`..`3`) → official name. */
+  /** Material rarity level (`1`..`3`) -> official name. */
   readonly materialRarityNames?: Record<string, string>;
   /** Cooking display strings; `recipes` maps a recipe id to its official name. */
   readonly cooking?: { readonly recipes?: Record<string, string> };
@@ -23,7 +23,7 @@ export const getModels = cachePerLocale((locale: SupportedLocale) =>
   fetchCrowniclesJson<CrowniclesModels>(`Lang/${locale}/models.json`),
 );
 
-/** Localized location-type names keyed by type code (e.g. `ci` → `City`); empty ones dropped. */
+/** Localized location-type names keyed by type code (e.g. `ci` -> `City`); empty ones dropped. */
 export async function getMapTypeNames(
   locale: SupportedLocale,
 ): Promise<Record<string, string>> {

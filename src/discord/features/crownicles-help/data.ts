@@ -102,7 +102,7 @@ export interface MaterialBossSource {
 
 /** An expedition terrain that can drop a material (terrain key + probability). */
 export interface MaterialExpeditionSource {
-  /** Expedition terrain code (forest, cave, …); the page resolves its icon/label. */
+  /** Expedition terrain code (forest, cave, ...); the page resolves its icon/label. */
   readonly terrain: string;
   readonly chance: number;
 }

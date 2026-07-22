@@ -16,7 +16,7 @@ const LOCALE_CACHE_SIZE = SUPPORTED_LOCALES.length;
 
 /**
  * Wraps a per-locale loader so it runs at most once per locale per TTL. Use for
- * anything whose result depends on the language (names, localized events, …).
+ * anything whose result depends on the language (names, localized events, ...).
  */
 export function cachePerLocale<V extends NonNullable<unknown>>(
   load: (locale: SupportedLocale) => Promise<V>,
@@ -30,7 +30,7 @@ export function cachePerLocale<V extends NonNullable<unknown>>(
 
 /**
  * Wraps a locale-independent loader so it runs at most once per TTL. Use for
- * shared tables (icon sets, loot tables, …) identical in every language.
+ * shared tables (icon sets, loot tables, ...) identical in every language.
  */
 export function cacheShared<V extends NonNullable<unknown>>(
   load: () => Promise<V>,

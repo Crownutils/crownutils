@@ -1,13 +1,13 @@
 import { cacheShared } from './cache.js';
 import { extractIconBlock, fetchCrowniclesText } from './source.js';
 
-/** Per-event map of possibility key → its choice emote (the reaction icon). */
+/** Per-event map of possibility key -> its choice emote (the reaction icon). */
 export type EventChoiceIcons = ReadonlyMap<number, Record<string, string>>;
 
 const ICONS_SOURCE_PATH = 'Lib/src/CrowniclesIcons.ts';
 
 /**
- * Parses the `events` block of the icon source into `eventId → { possibility →
+ * Parses the `events` block of the icon source into `eventId -> { possibility ->
  * emote }`. The `end` possibility maps to a per-outcome object rather than a
  * single emote, so its inner object is stripped before reading the flat
  * `possibility: "emote"` pairs.

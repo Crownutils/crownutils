@@ -179,7 +179,7 @@ function appendEventDetailStep(
   appendBackButton(container, BACK_TO_EVENTS_ID, t.backToEvents, context);
 }
 
-/** Events browsable by location: location → event → outcomes. */
+/** Events browsable by location: location -> event -> outcomes. */
 export const eventsPage: HelpPage = {
   id: EVENTS_PAGE_ID,
   authorization: 'normal',

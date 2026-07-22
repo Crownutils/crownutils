@@ -75,7 +75,7 @@ const EXPEDITION_ICONS: Record<string, string> = {
   coast: '🌊',
 };
 
-/** A `0..1` probability as a trimmed percentage (e.g. `0.167` → `16.7%`, `0.2` → `20%`). */
+/** A `0..1` probability as a trimmed percentage (e.g. `0.167` -> `16.7%`, `0.2` -> `20%`). */
 function formatPercent(chance: number): string {
   return `${+(chance * 100).toFixed(1)}%`;
 }
@@ -299,7 +299,7 @@ function appendMaterialDetail(
   appendBackButton(container, BACK_TO_MATERIALS_ID, t.backToMaterials, context);
 }
 
-/** Materials browsable by type: type → material → how to obtain it. */
+/** Materials browsable by type: type -> material -> how to obtain it. */
 export const materialsPage: HelpPage = {
   id: MATERIALS_PAGE_ID,
   authorization: 'privileged',

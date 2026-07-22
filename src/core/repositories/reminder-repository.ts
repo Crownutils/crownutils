@@ -155,7 +155,7 @@ export async function getDueReminders(
 }
 
 /**
- * Atomically claims `id` (`pending → delivering`, bumps `attempts`). The guarded
+ * Atomically claims `id` (`pending -> delivering`, bumps `attempts`). The guarded
  * `updateMany` is race-free on single-process SQLite, so a reminder fires once.
  */
 export async function claimReminder(id: string): Promise<boolean> {

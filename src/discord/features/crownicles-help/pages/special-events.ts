@@ -33,7 +33,7 @@ function messages(locale: SupportedLocale) {
   return helpMessages(locale).special;
 }
 
-/** Location-less seasonal events (Halloween, Christmas, ...): event → outcomes. */
+/** Location-less seasonal events (Halloween, Christmas, ...): event -> outcomes. */
 export const specialEventsPage: HelpPage = {
   id: SPECIAL_EVENTS_PAGE_ID,
   authorization: 'normal',

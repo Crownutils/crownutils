@@ -35,7 +35,7 @@ export interface EffectInfo {
 }
 
 /**
- * Alteration `effect` id → emote and base duration, mirroring the game's
+ * Alteration `effect` id -> emote and base duration, mirroring the game's
  * `Effect` table. `none` is intentionally absent: "no effect" renders nothing.
  * `occupied` lasts the outcome's `lostTime`, so its base duration is `0` here.
  */

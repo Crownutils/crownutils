@@ -7,7 +7,7 @@ import {
   mapWithConcurrency,
 } from './source.js';
 
-/** Material ids that can drop, keyed by expedition terrain type (forest, cave, …). */
+/** Material ids that can drop, keyed by expedition terrain type (forest, cave, ...). */
 export type ExpeditionLootTables = Readonly<Record<string, readonly number[]>>;
 /** Material ids that can drop, keyed by PVE boss map id. */
 export type BossLootTables = ReadonlyMap<number, readonly number[]>;
