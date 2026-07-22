@@ -1,5 +1,5 @@
 import { TtlCache } from '@/core/cache/ttl-cache.js';
-import type { SupportedLocale } from '@/core/types.js';
+import { SUPPORTED_LOCALES, type SupportedLocale } from '@/core/types.js';
 
 /**
  * Caching strategy for all Crownicles game data fetched at runtime.
@@ -15,8 +15,8 @@ import type { SupportedLocale } from '@/core/types.js';
 /** Lifetime of a cached game-data value. */
 export const GAME_DATA_TTL_MS = 12 * 60 * 60 * 1000;
 
-/** Enough entries to hold every locale the bot serves at once. */
-const LOCALE_CACHE_SIZE = 4;
+/** One cache slot per served locale, so no locale ever evicts another. */
+const LOCALE_CACHE_SIZE = SUPPORTED_LOCALES.length;
 
 /**
  * Wraps a per-locale loader so it runs at most once per locale per TTL. Use for
