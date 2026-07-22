@@ -19,8 +19,11 @@ const TIMEOUT_MAX = 2_147_483_647;
 /** Delivery attempts (including the first) before a reminder is given up as failed. */
 const MAX_DELIVERY_ATTEMPTS = 3;
 
+/** First retry delay; doubles per attempt up to {@link RETRY_CAP_MS}. */
 const RETRY_BASE_MS = 30_000;
+/** Ceiling of the retry backoff. */
 const RETRY_CAP_MS = 15 * 60_000;
+/** Reminders delivered in parallel within one batch. */
 const DELIVERY_CONCURRENCY = 5;
 /** Backstop re-scan interval; self-heals against any timer-bookkeeping bug, never the primary path. */
 const SAFETY_NET_MS = 5 * 60_000;

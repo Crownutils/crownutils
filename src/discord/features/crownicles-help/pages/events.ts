@@ -28,6 +28,7 @@ import {
   truncate,
 } from '../crownicles-help.ui.js';
 
+/** Router id of the events page. */
 export const EVENTS_PAGE_ID = 'events';
 
 const EVENTS_ICON = '🎭';

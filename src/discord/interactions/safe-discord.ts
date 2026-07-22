@@ -1,6 +1,7 @@
 import { logger } from '@/shared/index.js';
 import { toError } from '@/discord/utils/errors.js';
 
+/** Key-value context attached to the failure log (at least an `action` name). */
 export type SafeDiscordContext = Record<string, unknown>;
 
 /**

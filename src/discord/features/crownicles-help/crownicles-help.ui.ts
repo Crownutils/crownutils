@@ -32,6 +32,7 @@ const STAT_SEPARATOR = ' | ';
 /** Stand-in emote for the auto-resolved `end` choice, which has no reaction icon. */
 const END_CHOICE_EMOJI = '🔚';
 
+/** Custom ids of the help center's controls, matched by the router and its pages. */
 export const CATEGORY_SELECT_ID = 'chelp-category';
 export const LOCATION_SELECT_ID = 'chelp-location';
 export const LOCATION_PREV_ID = 'chelp-loc-prev';

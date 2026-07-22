@@ -7,6 +7,7 @@ interface RunPingInput {
   readonly discordLatencyMs: number;
 }
 
+/** Builds the ping response showing both measured latencies. */
 export function runPingCommand(
   input: RunPingInput,
   language: SupportedLocale,

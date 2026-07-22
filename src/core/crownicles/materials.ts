@@ -25,6 +25,7 @@ export const MATERIAL_TYPES = [
   'wood',
 ] as const;
 
+/** One of the {@link MATERIAL_TYPES}. */
 export type MaterialType = (typeof MATERIAL_TYPES)[number];
 
 /** One crafting material, merging its stats with its localized name and emote. */

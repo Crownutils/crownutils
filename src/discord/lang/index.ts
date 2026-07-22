@@ -16,6 +16,7 @@ const fr = {
   ...commandPacks.fr,
 } as const satisfies LangNode;
 
+/** Both language packs keyed by locale - the single entry point for user-facing text. */
 export const lang = { en, fr } as const;
 
 /** The English pack shape; both locales mirror it, so it types every lookup. */

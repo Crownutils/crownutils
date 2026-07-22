@@ -21,6 +21,7 @@ import {
   truncate,
 } from '../crownicles-help.ui.js';
 
+/** Router id of the special-events page. */
 export const SPECIAL_EVENTS_PAGE_ID = 'special-events';
 
 const SPECIAL_ICON = '✨';

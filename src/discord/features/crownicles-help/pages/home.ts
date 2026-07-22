@@ -3,6 +3,7 @@ import { createContainer, Text } from '@/discord/components/index.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import { helpMessages } from '../crownicles-help.ui.js';
 
+/** Router id of the home page, the fallback of every category resolution. */
 export const HOME_PAGE_ID = 'home';
 
 const HOME_ICON = '🏠';

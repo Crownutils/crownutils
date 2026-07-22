@@ -19,7 +19,9 @@ export const LEGAL_GATE_EXEMPT_COMMANDS: ReadonlySet<string> = new Set([
   'register',
 ]);
 
+/** Bounds the acceptance cache; comfortably holds every recently active user. */
 const LEGAL_CACHE_MAX_SIZE = 10_000;
+/** Short TTL so an out-of-band database edit applies within 5 minutes. */
 const LEGAL_CACHE_TTL_MS = 5 * 60 * 1000;
 
 /**

@@ -23,6 +23,7 @@ import {
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import { helpMessages, truncate } from '../crownicles-help.ui.js';
 
+/** Router id of the materials page. */
 export const MATERIALS_PAGE_ID = 'materials';
 
 const MATERIALS_ICON = '⛏️';

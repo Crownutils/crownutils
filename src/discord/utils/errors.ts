@@ -12,10 +12,12 @@ export function toError(value: unknown): Error {
   return new Error(typeof value === 'string' ? value : String(value));
 }
 
+/** Red container holding a single error message. */
 export function buildErrorContainer(message: string): Container {
   return createContainer('cancel').add(new Text(message));
 }
 
+/** Green container holding a single success message. */
 export function buildSuccessContainer(message: string): Container {
   return createContainer('success').add(new Text(message));
 }

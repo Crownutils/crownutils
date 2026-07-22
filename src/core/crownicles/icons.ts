@@ -41,6 +41,7 @@ export interface EffectInfo {
  */
 export const effects: Record<string, EffectInfo> = {
   notStarted: { icon: '👶', durationMinutes: 0 },
+  // The game's "until revived" sentinel (~32 years), kept verbatim.
   dead: { icon: '💀', durationMinutes: 16666667 },
   sleeping: { icon: '😴', durationMinutes: 180 },
   drunk: { icon: '🥴', durationMinutes: 240 },

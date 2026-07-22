@@ -4,6 +4,7 @@ import { createContainer, Separator, Text } from '../../components/index.js';
 import { lang } from '../../lang/index.js';
 import { config } from '@/core/config/index.js';
 
+/** The about card: presentation, version, license and project links. */
 export function buildAboutContainer(language: SupportedLocale): Container {
   const messages = lang[language].commandAbout.messages;
 

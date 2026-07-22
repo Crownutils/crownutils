@@ -39,6 +39,7 @@ export function responseComponents(
   return items.map((component) => component.build());
 }
 
+/** Wraps an interactive render's output in a {@link CommandResponse}. */
 export function commandResponseFromRender(
   rendered: Container | readonly TopLevelComponent[],
 ): CommandResponse {

@@ -1,6 +1,7 @@
 /** Where a command is allowed to run. */
 export type CommandScope = 'guild' | 'mainGuildOnly' | 'dm' | 'anywhere';
 
+/** Where the invocation happened, as the scope check reads it. */
 export interface ScopeContext {
   readonly inGuild: boolean;
   /** True only in the configured main guild (implies `inGuild`). */

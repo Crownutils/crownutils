@@ -10,6 +10,7 @@ export const COMMAND_CATEGORIES = [
   'moderation',
 ] as const;
 
+/** One of the {@link COMMAND_CATEGORIES}. */
 export type CommandCategory = (typeof COMMAND_CATEGORIES)[number];
 
 /** Emote shown before each category header in the help overview. */
