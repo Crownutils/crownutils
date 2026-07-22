@@ -1,5 +1,5 @@
 import { MessageFlags } from 'discord.js';
-import type { SupportedLocale } from '@/core/types.js';
+import type { Rank, SupportedLocale } from '@/core/types.js';
 import type { TopLevelComponent } from '@/discord/components/index.js';
 import {
   type InteractiveMessage,
@@ -10,7 +10,11 @@ import {
   CATEGORY_SELECT_ID,
 } from './crownicles-help.ui.js';
 import type { HelpPage, HelpRenderContext, HelpState } from './page.js';
-import { findHelpPage, HELP_PAGES, resolveHelpPage } from './pages/index.js';
+import {
+  findHelpPage,
+  resolveHelpPage,
+  visibleHelpPages,
+} from './pages/index.js';
 
 /** Base state after switching category: page reset, every page's loaded data carried over. */
 function pageEntryState(
@@ -40,15 +44,20 @@ function pageEntryState(
  * Opening straight into `category` pre-loads its data here (there is no
  * interaction yet to drive the usual loading view), so the front should defer
  * the reply for a data-backed category.
+ *
+ * `rank` gates the pages: only those the user's rank allows are offered in the
+ * select or reachable, and a deep link to a restricted page falls back to home.
  */
 export async function createCrowniclesHelpController(
   userId: string,
   locale: SupportedLocale,
+  rank: Rank,
   category?: string,
 ): Promise<InteractiveMessage<HelpState>> {
+  const pages = visibleHelpPages(rank);
   const renderContext = (disabled: boolean): HelpRenderContext => ({
     locale,
-    pages: HELP_PAGES,
+    pages,
     disabled,
   });
 
@@ -56,7 +65,7 @@ export async function createCrowniclesHelpController(
     state: HelpState,
     context: HelpRenderContext,
   ): TopLevelComponent[] => {
-    const page = findHelpPage(state.pageId) ?? resolveHelpPage();
+    const page = findHelpPage(pages, state.pageId) ?? resolveHelpPage(pages);
     return [
       page.render(state, context),
       buildCategorySelectRow(page.id, context),
@@ -110,7 +119,7 @@ export async function createCrowniclesHelpController(
     }
   };
 
-  const initialPage = resolveHelpPage(category);
+  const initialPage = resolveHelpPage(pages, category);
   const initialState: HelpState = await loadInitialState(initialPage);
 
   return {
@@ -127,7 +136,7 @@ export async function createCrowniclesHelpController(
         interaction.customId === CATEGORY_SELECT_ID
       ) {
         const target = interaction.values[0];
-        const page = target ? findHelpPage(target) : undefined;
+        const page = target ? findHelpPage(pages, target) : undefined;
         if (!page) return state;
 
         const base = pageEntryState(page.id, state);
@@ -139,7 +148,7 @@ export async function createCrowniclesHelpController(
         });
       }
 
-      const page = findHelpPage(state.pageId);
+      const page = findHelpPage(pages, state.pageId);
       return page ? page.reduce(state, interaction) : state;
     },
   };

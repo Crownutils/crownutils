@@ -301,6 +301,7 @@ function appendMaterialDetail(
 /** Materials browsable by type: type → material → how to obtain it. */
 export const materialsPage: HelpPage = {
   id: MATERIALS_PAGE_ID,
+  authorization: 'privileged',
   icon: MATERIALS_ICON,
 
   loadData: async (locale) => ({

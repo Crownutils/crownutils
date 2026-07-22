@@ -10,6 +10,7 @@ const HOME_ICON = '🏠';
 /** Landing page: a welcome and a nudge toward the category select below it. */
 export const homePage: HelpPage = {
   id: HOME_PAGE_ID,
+  authorization: 'normal',
   icon: HOME_ICON,
 
   name: (locale: SupportedLocale) => helpMessages(locale).home.name,

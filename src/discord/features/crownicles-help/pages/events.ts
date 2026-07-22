@@ -181,6 +181,7 @@ function appendEventDetailStep(
 /** Events browsable by location: location → event → outcomes. */
 export const eventsPage: HelpPage = {
   id: EVENTS_PAGE_ID,
+  authorization: 'normal',
   icon: EVENTS_ICON,
 
   loadData: async (locale) => ({ data: await loadCrowniclesHelpData(locale) }),

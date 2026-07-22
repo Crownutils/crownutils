@@ -1,4 +1,5 @@
 import type { MessageComponentInteraction } from 'discord.js';
+import type { Authorization } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
 import type { CrowniclesHelpData, CrowniclesMaterialsData } from './data.js';
@@ -51,6 +52,8 @@ export interface HelpRenderContext {
  */
 export interface HelpPage {
   readonly id: string;
+  /** Minimum rank required to see and open this page. */
+  readonly authorization: Authorization;
   /** Emote shown in the category select and page title. */
   readonly icon: string;
   /** Localized category label for the select. */

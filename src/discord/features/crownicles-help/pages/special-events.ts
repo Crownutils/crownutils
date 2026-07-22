@@ -35,6 +35,7 @@ function messages(locale: SupportedLocale) {
 /** Location-less seasonal events (Halloween, Christmas, ...): event → outcomes. */
 export const specialEventsPage: HelpPage = {
   id: SPECIAL_EVENTS_PAGE_ID,
+  authorization: 'normal',
   icon: SPECIAL_ICON,
 
   loadData: async (locale) => ({ data: await loadCrowniclesHelpData(locale) }),
