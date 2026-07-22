@@ -54,8 +54,8 @@ function parseMaterialIcons(source: string): Record<string, string> {
   const block = extractIconBlock(source, 'materials');
   const icons: Record<string, string> = {};
   if (block === undefined) return icons;
-  for (const pair of block.matchAll(/(\d+):\s*"([^"\\]*)"/g)) {
-    icons[pair[1]!] = pair[2]!;
+  for (const [, id, emote] of block.matchAll(/(\d+):\s*"([^"\\]*)"/g)) {
+    if (id !== undefined && emote !== undefined) icons[id] = emote;
   }
   return icons;
 }
@@ -76,17 +76,18 @@ async function loadMaterials(
   ]);
   const ids = numericIds(files);
 
-  const raw = await mapWithConcurrency(ids, HTTP_CONCURRENCY, (id) =>
-    fetchCrowniclesJson<RawMaterial>(`${MATERIALS_DIR}/${id}.json`),
-  );
-
-  return ids.map((id, index) => ({
-    id,
-    name: names[String(id)] ?? '???',
-    rarity: raw[index]!.rarity,
-    type: raw[index]!.type,
-    icon: icons[String(id)],
-  }));
+  return mapWithConcurrency(ids, HTTP_CONCURRENCY, async (id) => {
+    const raw = await fetchCrowniclesJson<RawMaterial>(
+      `${MATERIALS_DIR}/${id}.json`,
+    );
+    return {
+      id,
+      name: names[String(id)] ?? '???',
+      rarity: raw.rarity,
+      type: raw.type,
+      icon: icons[String(id)],
+    };
+  });
 }
 
 /** Every material for `locale`, cached per locale (see {@link cachePerLocale}). */

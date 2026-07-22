@@ -52,8 +52,10 @@ function parseIdTable(
 ): Record<string, number[]> {
   const result: Record<string, number[]> = {};
   const entry = new RegExp(`(${keyPattern})\\s*:\\s*\\[([^\\]]*)\\]`, 'g');
-  for (const match of block.matchAll(entry)) {
-    result[match[1]!] = (match[2]!.match(/\d+/g) ?? []).map(Number);
+  for (const [, key, list] of block.matchAll(entry)) {
+    if (key !== undefined && list !== undefined) {
+      result[key] = (list.match(/\d+/g) ?? []).map(Number);
+    }
   }
   return result;
 }
@@ -89,11 +91,12 @@ export const getBiomeMaterialTypes = cacheShared(
     const block = extractConstBlock(source, 'BIOME_MATERIAL_TYPES');
     const result: Record<string, string[]> = {};
     if (block === undefined) return result;
-    for (const entry of block.matchAll(/(\w+)\s*:\s*\[([^\]]*)\]/g)) {
-      const types = [...entry[2]!.matchAll(/MaterialType\.(\w+)/g)].map((ref) =>
-        ref[1]!.toLowerCase(),
+    for (const [, biome, list] of block.matchAll(/(\w+)\s*:\s*\[([^\]]*)\]/g)) {
+      if (biome === undefined || list === undefined) continue;
+      const types = [...list.matchAll(/MaterialType\.(\w+)/g)].flatMap(
+        ([, ref]) => (ref === undefined ? [] : [ref.toLowerCase()]),
       );
-      if (types.length > 0) result[entry[1]!] = types;
+      if (types.length > 0) result[biome] = types;
     }
     return result;
   },
@@ -112,17 +115,27 @@ export const getMaterialCraftRecipes = cacheShared(
     const files = (await listCrowniclesDir(RECIPES_DIR)).filter((name) =>
       name.startsWith('material_'),
     );
-    const recipes = await mapWithConcurrency(files, HTTP_CONCURRENCY, (name) =>
-      fetchCrowniclesJson<RawCraftRecipe>(`${RECIPES_DIR}/${name}`),
+    const recipes = await mapWithConcurrency(
+      files,
+      HTTP_CONCURRENCY,
+      async (file) => ({
+        file,
+        recipe: await fetchCrowniclesJson<RawCraftRecipe>(
+          `${RECIPES_DIR}/${file}`,
+        ),
+      }),
     );
-    return recipes
-      .map((recipe, index) => ({ recipe, file: files[index]! }))
-      .filter(({ recipe }) => recipe.outputMaterialId !== undefined)
-      .map(({ recipe, file }) => ({
-        id: file.replace(/\.json$/, ''),
-        outputMaterialId: recipe.outputMaterialId!,
-        level: recipe.level ?? 0,
-        quantity: recipe.outputMaterialQuantity ?? 1,
-      }));
+    return recipes.flatMap(({ file, recipe }) =>
+      recipe.outputMaterialId === undefined
+        ? []
+        : [
+            {
+              id: file.replace(/\.json$/, ''),
+              outputMaterialId: recipe.outputMaterialId,
+              level: recipe.level ?? 0,
+              quantity: recipe.outputMaterialQuantity ?? 1,
+            },
+          ],
+    );
   },
 );

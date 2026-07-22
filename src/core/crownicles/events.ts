@@ -216,18 +216,15 @@ async function loadEvents(locale: SupportedLocale): Promise<CrowniclesEvent[]> {
   ]);
   const ids = numericIds(files);
 
-  const raw = await mapWithConcurrency(ids, HTTP_CONCURRENCY, (id) =>
-    fetchCrowniclesJson<RawEvent>(`${EVENTS_DIR}/${id}.json`),
-  );
-
-  return ids.map((id, index) =>
-    mergeEvent(
+  return mapWithConcurrency(ids, HTTP_CONCURRENCY, async (id) => {
+    const raw = await fetchCrowniclesJson<RawEvent>(`${EVENTS_DIR}/${id}.json`);
+    return mergeEvent(
       id,
-      raw[index]!,
+      raw,
       langEvents[String(id)],
       choiceIcons.get(id) ?? {},
-    ),
-  );
+    );
+  });
 }
 
 /** Every Crownicles event for `locale`, cached per locale (see {@link cachePerLocale}). */

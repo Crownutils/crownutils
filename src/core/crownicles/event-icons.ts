@@ -32,8 +32,8 @@ function parseEventChoiceIcons(source: string): EventChoiceIcons {
 
     const body = block.slice(bodyStart, end - 1).replace(/\{[^{}]*\}/g, '');
     const emotes: Record<string, string> = {};
-    for (const pair of body.matchAll(/(\w+):\s*"([^"\\]*)"/g)) {
-      emotes[pair[1]!] = pair[2]!;
+    for (const [, key, emote] of body.matchAll(/(\w+):\s*"([^"\\]*)"/g)) {
+      if (key !== undefined && emote !== undefined) emotes[key] = emote;
     }
     result.set(id, emotes);
 

@@ -39,12 +39,10 @@ async function loadLocations(
   const names = models.map_locations ?? {};
   const ids = numericIds(files);
 
-  const raw = await mapWithConcurrency(ids, HTTP_CONCURRENCY, (id) =>
-    fetchCrowniclesJson<RawLocation>(`${LOCATIONS_DIR}/${id}.json`),
-  );
-
-  return ids.map((id, index) => {
-    const type = raw[index]!.type;
+  return mapWithConcurrency(ids, HTTP_CONCURRENCY, async (id) => {
+    const { type } = await fetchCrowniclesJson<RawLocation>(
+      `${LOCATIONS_DIR}/${id}.json`,
+    );
     return {
       id,
       name: names[String(id)]?.name ?? '???',

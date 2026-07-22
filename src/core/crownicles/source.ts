@@ -115,14 +115,14 @@ export async function mapWithConcurrency<T, R>(
   task: (item: T, index: number) => Promise<R>,
 ): Promise<R[]> {
   const results = new Array<R>(items.length);
-  let next = 0;
+  // One iterator shared by every worker, so each entry is claimed exactly once.
+  const entries = items.entries();
 
   const workers = Array.from(
     { length: Math.min(concurrency, items.length) },
     async () => {
-      while (next < items.length) {
-        const index = next++;
-        results[index] = await task(items[index]!, index);
+      for (const [index, item] of entries) {
+        results[index] = await task(item, index);
       }
     },
   );
