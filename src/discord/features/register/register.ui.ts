@@ -128,6 +128,7 @@ export function buildRegisterAlreadyContainer(
   );
 }
 
+/** Card shown when a ban hash forbids the user from registering. */
 export function buildRegisterCannotRegisterContainer(
   language: SupportedLocale,
 ) {

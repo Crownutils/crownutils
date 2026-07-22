@@ -9,6 +9,7 @@ import {
 import { icons } from '@/discord/theme/icons.js';
 import { lang } from '@/discord/lang/index.js';
 
+/** Custom ids of the confirmation buttons, matched in the delete-data controller's `reduce`. */
 export const DELETE_DATA_CONFIRM_ID = 'delete-data-confirm';
 export const DELETE_DATA_CANCEL_ID = 'delete-data-cancel';
 

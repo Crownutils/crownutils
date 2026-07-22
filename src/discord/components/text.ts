@@ -16,7 +16,7 @@ const SIZE_PREFIX = {
 
 /**
  * Fluent wrapper over a Components V2 text display. Inline formatting (`bold`,
- * `code`, `link`, …) affects the current line only; `newLine()` appends further
+ * `code`, `link`, ...) affects the current line only; `newLine()` appends further
  * lines, each with its own formatting; `quote()` blockquotes the whole result.
  */
 export class Text implements ContainerChild {

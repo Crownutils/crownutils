@@ -1,5 +1,5 @@
-import { TtlCache } from '@/core/cache/ttl-cache.js';
 import type { SupportedLocale } from '@/core/types.js';
+import { cachePerLocale } from './cache.js';
 import { getEventChoiceIcons } from './event-icons.js';
 import { computeOutcomeExperience } from './experience.js';
 import {
@@ -9,11 +9,6 @@ import {
   mapWithConcurrency,
   numericIds,
 } from './source.js';
-
-/** Locales the bot serves; a lifetime bound sized to hold every one at once. */
-const MAX_CACHED_LOCALES = 4;
-/** Game data changes rarely; a long TTL keeps it warm while still self-healing. */
-const DATA_TTL_MS = 12 * 60 * 60 * 1000;
 
 /**
  * One possible result of a choice: its localized narrative plus the mechanical
@@ -115,11 +110,6 @@ type RawLangEvents = Record<
 >;
 
 const EVENTS_DIR = 'Core/resources/events';
-
-const cache = new TtlCache<SupportedLocale, CrowniclesEvent[]>(
-  MAX_CACHED_LOCALES,
-  DATA_TTL_MS,
-);
 
 /** `{ key: value }`, or `{}` when `value` is absent, so optional keys stay unset. */
 function opt<K extends string, V>(
@@ -226,25 +216,16 @@ async function loadEvents(locale: SupportedLocale): Promise<CrowniclesEvent[]> {
   ]);
   const ids = numericIds(files);
 
-  const raw = await mapWithConcurrency(ids, HTTP_CONCURRENCY, (id) =>
-    fetchCrowniclesJson<RawEvent>(`${EVENTS_DIR}/${id}.json`),
-  );
-
-  return ids.map((id, index) =>
-    mergeEvent(
+  return mapWithConcurrency(ids, HTTP_CONCURRENCY, async (id) => {
+    const raw = await fetchCrowniclesJson<RawEvent>(`${EVENTS_DIR}/${id}.json`);
+    return mergeEvent(
       id,
-      raw[index]!,
+      raw,
       langEvents[String(id)],
       choiceIcons.get(id) ?? {},
-    ),
-  );
+    );
+  });
 }
 
-/**
- * Every Crownicles event for `locale`, fetched from the public repo on first
- * access and cached per locale ({@link DATA_TTL_MS}). A failed load throws
- * before caching, so the next call retries.
- */
-export function getEvents(locale: SupportedLocale): Promise<CrowniclesEvent[]> {
-  return cache.getOrLoad(locale, loadEvents);
-}
+/** Every Crownicles event for `locale`, cached per locale (see {@link cachePerLocale}). */
+export const getEvents = cachePerLocale(loadEvents);

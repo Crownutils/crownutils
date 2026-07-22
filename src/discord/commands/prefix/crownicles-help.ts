@@ -1,3 +1,4 @@
+import { getUserRank } from '@/core/repositories/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import { mountInteractiveMessage } from '@/discord/interactions/index.js';
 import { createCrowniclesHelpController } from '@/discord/features/crownicles-help/crownicles-help.service.js';
@@ -9,11 +10,15 @@ const command = {
   aliases: ['chelp', 'ch'],
   requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(message, args) {
-    const locale = await resolveUserLocale(message.author.id);
+    const [locale, rank] = await Promise.all([
+      resolveUserLocale(message.author.id),
+      getUserRank(message.author.id),
+    ]);
     const category = args[0] ? resolveCategoryArg(args[0]) : undefined;
     const controller = await createCrowniclesHelpController(
       message.author.id,
       locale,
+      rank,
       category,
     );
     if (message.channel.isSendable()) {

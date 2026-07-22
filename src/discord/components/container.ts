@@ -25,6 +25,7 @@ export class Container {
   }
 }
 
+/** New {@link Container} with its accent color already set. */
 export function createContainer(accent: ColorName | number): Container {
   return new Container().color(accent);
 }

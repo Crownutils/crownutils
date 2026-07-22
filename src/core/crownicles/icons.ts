@@ -35,12 +35,13 @@ export interface EffectInfo {
 }
 
 /**
- * Alteration `effect` id → emote and base duration, mirroring the game's
+ * Alteration `effect` id -> emote and base duration, mirroring the game's
  * `Effect` table. `none` is intentionally absent: "no effect" renders nothing.
  * `occupied` lasts the outcome's `lostTime`, so its base duration is `0` here.
  */
 export const effects: Record<string, EffectInfo> = {
   notStarted: { icon: '👶', durationMinutes: 0 },
+  // The game's "until revived" sentinel (~32 years), kept verbatim.
   dead: { icon: '💀', durationMinutes: 16666667 },
   sleeping: { icon: '😴', durationMinutes: 180 },
   drunk: { icon: '🥴', durationMinutes: 240 },

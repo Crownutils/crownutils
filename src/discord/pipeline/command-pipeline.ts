@@ -57,7 +57,7 @@ function logOutcome(context: CommandPipelineContext, outcome: string): void {
 
 /**
  * Single, declarative dispatch shared by both command fronts:
- * banned → maintenance → legal → requirements → execution.
+ * banned -> maintenance -> legal -> requirements -> execution.
  * This is the only place access rules live, so slash and prefix never drift.
  * The whole run is wrapped so a failing *denial* reply (not just `execute`)
  * still surfaces through `onUnexpectedError` instead of being lost.

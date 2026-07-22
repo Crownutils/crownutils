@@ -10,6 +10,7 @@ export const COMMAND_CATEGORIES = [
   'moderation',
 ] as const;
 
+/** One of the {@link COMMAND_CATEGORIES}. */
 export type CommandCategory = (typeof COMMAND_CATEGORIES)[number];
 
 /** Emote shown before each category header in the help overview. */
@@ -28,7 +29,7 @@ export interface CommandDescription {
 }
 
 /**
- * The single source the help listing reads: command name → its category and
+ * The single source the help listing reads: command name -> its category and
  * localized description (pulled from the command's own lang pack, so the text
  * stays defined once). Commands absent here are hidden from help.
  */

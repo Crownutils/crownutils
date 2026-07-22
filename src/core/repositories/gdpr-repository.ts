@@ -31,11 +31,9 @@ export interface GdprExport {
 }
 
 /**
- * Assembles `userId`'s {@link GdprExport} by reading every repository that
- * stores something about them. Reads the `User` row directly rather than
- * through {@link getUserProfile}, whose cache would otherwise fabricate and
- * cache `en`/`normal` defaults for someone with no row - which this export
- * must not report as if it were real stored data.
+ * Assembles `userId`'s {@link GdprExport} from every repository that stores
+ * something about them, via uncached reads that report only what truly exists
+ * (see {@link findStoredUserProfile}).
  */
 export async function buildGdprExport(userId: string): Promise<GdprExport> {
   const [profile, legalAcceptance, banHash, reminders] = await Promise.all([
@@ -92,10 +90,8 @@ export async function eraseUserData(
 }
 
 /**
- * `userId`'s last recorded GDPR access request, or `null` if they never made
- * one. Keyed by hash (like {@link hasBanHash}) so the cooldown survives a data
- * erasure - otherwise a user could reset it by deleting their data and
- * requesting again immediately.
+ * `userId`'s last recorded GDPR access request, or `null`. Keyed by hash so the
+ * cooldown survives a data erasure instead of resetting with it.
  */
 export async function getLastGdprRequestAt(
   userId: string,

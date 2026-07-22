@@ -8,6 +8,7 @@ import type { CommandPipelineHandlers } from './command-pipeline.js';
 /** Deliver a pre-built response through whichever front (interaction/message) is in play. */
 export type ReplyFn = (response: CommandResponse) => Promise<void>;
 
+/** What {@link buildDenialHandlers} needs from the invoking front. */
 export interface DenialHandlerParams {
   readonly locale: SupportedLocale;
   readonly commandName: string;

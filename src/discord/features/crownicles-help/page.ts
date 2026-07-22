@@ -1,25 +1,37 @@
 import type { MessageComponentInteraction } from 'discord.js';
+import type { Authorization } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
-import type { CrowniclesHelpData } from './data.js';
+import type { CrowniclesHelpData, CrowniclesMaterialsData } from './data.js';
 
 /**
  * Shared state of the help center, threaded through every page. Optional fields
  * accept `undefined` so a navigation reset (`{ ...state, selectedEventId:
- * undefined }`) type-checks under `exactOptionalPropertyTypes`.
+ * undefined }`) type-checks under `exactOptionalPropertyTypes`. Each data-backed
+ * page keeps its own loaded-data slot, so entering one never loads another's.
  */
 export interface HelpState {
   readonly pageId: string;
-  /** Help data, loaded once on entering a data-backed page, then reused. */
+  /** Events/locations data, loaded on entering the events pages. */
   readonly data?: CrowniclesHelpData | undefined;
+  /** Materials data, loaded on entering the materials page. */
+  readonly materialsData?: CrowniclesMaterialsData | undefined;
   /** True when the last data load failed, so pages can show an error. */
-  readonly dataError?: boolean | undefined;
+  readonly loadError?: boolean | undefined;
+
   /** Zero-based pagination index of the location picker. */
   readonly locationsPage?: number | undefined;
   /** Location whose events are being browsed. */
   readonly selectedLocationId?: number | undefined;
   /** Event whose outcomes are being shown. */
   readonly selectedEventId?: number | undefined;
+
+  /** Material type currently browsed. */
+  readonly selectedType?: string | undefined;
+  /** Material whose details are being shown. */
+  readonly selectedMaterialId?: number | undefined;
+  /** Zero-based pagination index of the material picker. */
+  readonly materialsPage?: number | undefined;
 }
 
 /** Context passed to a page's `render`. */
@@ -35,13 +47,15 @@ export interface HelpRenderContext {
  * One category of the help center. A page renders its own content container and
  * folds a component interaction into the next state; the router owns the shared
  * category select (always placed below the container) and the network loading.
+ * A data-backed page declares `loadData` (and `hasData`); the router calls it
+ * once on first entry.
  */
 export interface HelpPage {
   readonly id: string;
+  /** Minimum rank required to see and open this page. */
+  readonly authorization: Authorization;
   /** Emote shown in the category select and page title. */
   readonly icon: string;
-  /** Whether opening this page needs the network-loaded help data. */
-  readonly requiresData: boolean;
   /** Localized category label for the select. */
   name(locale: SupportedLocale): string;
   /** Localized category description for the select. */
@@ -51,4 +65,8 @@ export interface HelpPage {
     state: HelpState,
     interaction: MessageComponentInteraction,
   ): HelpState | Promise<HelpState>;
+  /** Loads this page's data into a state patch on first entry; absent when the page needs no network data. */
+  loadData?(locale: SupportedLocale): Promise<Partial<HelpState>>;
+  /** Whether this page's data is already present in `state` (data-backed pages only). */
+  hasData?(state: HelpState): boolean;
 }

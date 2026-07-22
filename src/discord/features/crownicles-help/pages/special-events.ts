@@ -10,6 +10,7 @@ import {
   Text,
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
+import { loadCrowniclesHelpData } from '../data.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import {
   appendEventDetail,
@@ -20,6 +21,7 @@ import {
   truncate,
 } from '../crownicles-help.ui.js';
 
+/** Router id of the special-events page. */
 export const SPECIAL_EVENTS_PAGE_ID = 'special-events';
 
 const SPECIAL_ICON = '✨';
@@ -31,11 +33,14 @@ function messages(locale: SupportedLocale) {
   return helpMessages(locale).special;
 }
 
-/** Location-less seasonal events (Halloween, Christmas, ...): event → outcomes. */
+/** Location-less seasonal events (Halloween, Christmas, ...): event -> outcomes. */
 export const specialEventsPage: HelpPage = {
   id: SPECIAL_EVENTS_PAGE_ID,
+  authorization: 'normal',
   icon: SPECIAL_ICON,
-  requiresData: true,
+
+  loadData: async (locale) => ({ data: await loadCrowniclesHelpData(locale) }),
+  hasData: (state) => state.data !== undefined,
 
   name: (locale: SupportedLocale) => messages(locale).name,
   description: (locale: SupportedLocale) => messages(locale).description,
@@ -51,7 +56,7 @@ export const specialEventsPage: HelpPage = {
     if (!state.data) {
       const shared = helpMessages(context.locale);
       container.add(
-        new Text(state.dataError ? shared.loadError : shared.loading).size(
+        new Text(state.loadError ? shared.loadError : shared.loading).size(
           'subtle',
         ),
       );
