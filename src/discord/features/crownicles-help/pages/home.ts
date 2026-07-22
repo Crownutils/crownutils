@@ -11,7 +11,6 @@ const HOME_ICON = '🏠';
 export const homePage: HelpPage = {
   id: HOME_PAGE_ID,
   icon: HOME_ICON,
-  requiresData: false,
 
   name: (locale: SupportedLocale) => helpMessages(locale).home.name,
   description: (locale: SupportedLocale) =>

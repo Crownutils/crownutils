@@ -12,7 +12,7 @@ import {
   Text,
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
-import type { CrowniclesHelpData } from '../data.js';
+import { loadCrowniclesHelpData, type CrowniclesHelpData } from '../data.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import {
   appendEventDetail,
@@ -182,7 +182,9 @@ function appendEventDetailStep(
 export const eventsPage: HelpPage = {
   id: EVENTS_PAGE_ID,
   icon: EVENTS_ICON,
-  requiresData: true,
+
+  loadData: async (locale) => ({ data: await loadCrowniclesHelpData(locale) }),
+  hasData: (state) => state.data !== undefined,
 
   name: (locale: SupportedLocale) => messages(locale).name,
   description: (locale: SupportedLocale) => messages(locale).description,
@@ -198,7 +200,7 @@ export const eventsPage: HelpPage = {
     if (!state.data) {
       const shared = helpMessages(context.locale);
       container.add(
-        new Text(state.dataError ? shared.loadError : shared.loading).size(
+        new Text(state.loadError ? shared.loadError : shared.loading).size(
           'subtle',
         ),
       );

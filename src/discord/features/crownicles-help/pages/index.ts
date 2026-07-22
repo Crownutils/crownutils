@@ -3,12 +3,14 @@ import type { HelpPage } from '../page.js';
 import { homePage, HOME_PAGE_ID } from './home.js';
 import { eventsPage } from './events.js';
 import { specialEventsPage } from './special-events.js';
+import { materialsPage } from './materials.js';
 
 /** All help center pages, in category-select order. */
 export const HELP_PAGES: readonly HelpPage[] = [
   homePage,
   eventsPage,
   specialEventsPage,
+  materialsPage,
 ];
 
 /** Pages a user can open directly (every one but the default home page). */

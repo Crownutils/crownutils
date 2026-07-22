@@ -9,19 +9,25 @@ import {
   buildCategorySelectRow,
   CATEGORY_SELECT_ID,
 } from './crownicles-help.ui.js';
-import { loadCrowniclesHelpData } from './data.js';
-import type { HelpRenderContext, HelpState } from './page.js';
+import type { HelpPage, HelpRenderContext, HelpState } from './page.js';
 import { findHelpPage, HELP_PAGES, resolveHelpPage } from './pages/index.js';
 
-/** Base state after switching category: page reset, help data carried over. */
-function pageEntryState(pageId: string, data: HelpState['data']): HelpState {
+/** Base state after switching category: page reset, every page's loaded data carried over. */
+function pageEntryState(
+  pageId: string,
+  carried: Pick<HelpState, 'data' | 'materialsData'>,
+): HelpState {
   return {
     pageId,
-    data,
-    dataError: false,
+    data: carried.data,
+    materialsData: carried.materialsData,
+    loadError: false,
     locationsPage: 0,
     selectedLocationId: undefined,
     selectedEventId: undefined,
+    selectedType: undefined,
+    selectedMaterialId: undefined,
+    materialsPage: 0,
   };
 }
 
@@ -66,27 +72,26 @@ export async function createCrowniclesHelpController(
 
   /** Enters a data-backed page: show a loading view, fetch, then swap in the data. */
   const loadPage = async (
+    page: HelpPage,
     base: HelpState,
     interaction: Parameters<InteractiveMessage<HelpState>['reduce']>[1],
     markHandled: () => void,
   ): Promise<HelpState> => {
-    if (!interaction.isMessageComponent()) return base;
-    await safeDiscord(
-      interaction.update(payload({ ...base, data: undefined })),
-      {
-        action: 'crowniclesHelp.loading',
-      },
-    );
+    if (page.loadData === undefined || !interaction.isMessageComponent()) {
+      return base;
+    }
+    await safeDiscord(interaction.update(payload(base)), {
+      action: 'crowniclesHelp.loading',
+    });
     markHandled();
     try {
-      const data = await loadCrowniclesHelpData(locale);
-      const loaded = { ...base, data };
+      const loaded = { ...base, ...(await page.loadData(locale)) };
       await safeDiscord(interaction.message.edit(payload(loaded)), {
         action: 'crowniclesHelp.loaded',
       });
       return loaded;
     } catch {
-      const errored: HelpState = { ...base, data: undefined, dataError: true };
+      const errored: HelpState = { ...base, loadError: true };
       await safeDiscord(interaction.message.edit(payload(errored)), {
         action: 'crowniclesHelp.loadError',
       });
@@ -94,19 +99,19 @@ export async function createCrowniclesHelpController(
     }
   };
 
-  /** Initial state for a data-backed landing page: pre-load, or flag the error. */
-  const loadInitialState = async (pageId: string): Promise<HelpState> => {
+  /** Initial state when opening straight into `page`: pre-load its data, or flag the error. */
+  const loadInitialState = async (page: HelpPage): Promise<HelpState> => {
+    const base = pageEntryState(page.id, {});
+    if (page.loadData === undefined) return base;
     try {
-      return pageEntryState(pageId, await loadCrowniclesHelpData(locale));
+      return { ...base, ...(await page.loadData(locale)) };
     } catch {
-      return { ...pageEntryState(pageId, undefined), dataError: true };
+      return { ...base, loadError: true };
     }
   };
 
   const initialPage = resolveHelpPage(category);
-  const initialState: HelpState = initialPage.requiresData
-    ? await loadInitialState(initialPage.id)
-    : { pageId: initialPage.id };
+  const initialState: HelpState = await loadInitialState(initialPage);
 
   return {
     initialState,
@@ -125,9 +130,11 @@ export async function createCrowniclesHelpController(
         const page = target ? findHelpPage(target) : undefined;
         if (!page) return state;
 
-        const base = pageEntryState(page.id, state.data);
-        if (!page.requiresData || state.data) return base;
-        return loadPage(base, interaction, () => {
+        const base = pageEntryState(page.id, state);
+        if (page.loadData === undefined || (page.hasData?.(state) ?? false)) {
+          return base;
+        }
+        return loadPage(page, base, interaction, () => {
           context.markHandled();
         });
       }

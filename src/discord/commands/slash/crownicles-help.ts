@@ -47,7 +47,7 @@ const command = {
     const category = interaction.options.getString('category') ?? undefined;
 
     // Pre-loading a data-backed category can outlast the 3s reply window.
-    if (resolveHelpPage(category).requiresData) {
+    if (resolveHelpPage(category).loadData !== undefined) {
       await interaction.deferReply();
     }
 
