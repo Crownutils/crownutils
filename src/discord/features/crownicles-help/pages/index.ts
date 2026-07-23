@@ -6,6 +6,13 @@ import { eventsPage } from './events.js';
 import { specialEventsPage } from './special-events.js';
 import { materialsPage } from './materials.js';
 import { equipmentPage } from './equipment.js';
+import {
+  leaguesPage,
+  missionsPage,
+  ragePage,
+  routePage,
+  witchPage,
+} from './stubs.js';
 
 /** All help center pages, in category-select order. */
 export const HELP_PAGES: readonly HelpPage[] = [
@@ -14,6 +21,11 @@ export const HELP_PAGES: readonly HelpPage[] = [
   specialEventsPage,
   materialsPage,
   equipmentPage,
+  ragePage,
+  witchPage,
+  leaguesPage,
+  routePage,
+  missionsPage,
 ];
 
 /** Pages a user can open directly (every one but the default home page). */

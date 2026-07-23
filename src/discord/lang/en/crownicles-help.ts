@@ -148,5 +148,26 @@ export const crowniclesHelp = {
       levelIndicator: (current: number, total: number): string =>
         `Level ${current}/${total}`,
     },
+
+    rage: {
+      name: 'Rage',
+      description: 'How rage works',
+    },
+    witch: {
+      name: 'Witch',
+      description: 'The witch event and its potions',
+    },
+    leagues: {
+      name: 'Leagues',
+      description: 'Leagues and their rewards',
+    },
+    route: {
+      name: 'Route',
+      description: 'The map and its paths',
+    },
+    missions: {
+      name: 'Missions',
+      description: 'Missions and their goals',
+    },
   },
 } as const satisfies CommandNode;
