@@ -11,6 +11,7 @@ export const crowniclesHelp = {
       'Impossible de charger les données Crownicles. Veuillez réessayer plus tard.',
     outcomesTitle: 'Choix et résultats',
     autoOutcome: 'Ne pas répondre',
+    comingSoon: 'Sort bientôt !',
     labels: {
       xp: 'XP',
       points: 'points',

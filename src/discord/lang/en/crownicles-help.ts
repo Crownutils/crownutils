@@ -9,6 +9,7 @@ export const crowniclesHelp = {
     loadError: 'Could not load Crownicles data. Please try again later.',
     outcomesTitle: 'Choices and outcomes',
     autoOutcome: 'No answer',
+    comingSoon: 'Coming soon!',
     labels: {
       xp: 'XP',
       points: 'points',
