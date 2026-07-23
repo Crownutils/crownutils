@@ -7,6 +7,7 @@ import { hasRank } from './rank.js';
  */
 export type Authorization = NotBannedRank;
 
+/** The per-user facts an authorization check reads. */
 export interface AuthorizationContext {
   /** The invoking user's effective rank. */
   readonly rank: Rank;

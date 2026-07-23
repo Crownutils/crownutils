@@ -11,10 +11,7 @@ const packageJson = JSON.parse(
   license: string;
 };
 
-/**
- * Returns `value` narrowed to non-null, or throws if it is missing or empty.
- * The `== null` guard lets the compiler prove the return is present — no cast.
- */
+/** Returns `value` narrowed to non-null; throws if it is missing or empty. */
 function required<T>(key: string, value: T): NonNullable<T> {
   if (value == null || (typeof value === 'string' && value.length === 0)) {
     throw new Error(`Missing required config: ${key}`);

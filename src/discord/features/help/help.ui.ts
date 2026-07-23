@@ -19,6 +19,7 @@ import {
   type CommandCategory,
 } from './command-descriptions.js';
 
+/** Custom ids of the help browser's controls, matched in the help controller's `reduce`. */
 export const HELP_COMMAND_SELECT_ID = 'help-command';
 export const HELP_BACK_ID = 'help-back';
 

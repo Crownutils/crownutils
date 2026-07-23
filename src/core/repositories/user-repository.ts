@@ -7,7 +7,9 @@ import { TtlCache } from '../cache/ttl-cache.js';
 const DEFAULT_LANGUAGE: SupportedLocale = 'en';
 const DEFAULT_RANK: Rank = 'normal';
 
+/** Bounds the profile cache; comfortably holds every recently active user. */
 const USER_CACHE_MAX_SIZE = 10_000;
+/** Short TTL so an out-of-band database edit applies within 5 minutes. */
 const USER_CACHE_TTL_MS = 5 * 60 * 1000;
 
 /** A user's stored language and rank, resolved together from a single row read. */
@@ -50,18 +52,16 @@ export async function registerUser(userId: string, language: SupportedLocale) {
 
 /**
  * Reads `userId`'s language and rank together, caching the whole row so
- * repeated lookups within the TTL never touch the database. Preferred over
- * {@link getUserLanguage} plus {@link getUserRank}, which now delegate here.
+ * repeated lookups within the TTL never touch the database.
  */
 export async function getUserProfile(userId: string): Promise<UserProfile> {
   return userCache.getOrLoad(userId, loadUserProfile);
 }
 
 /**
- * Reads `userId`'s row directly from the database - uncached, and `null` (not
- * defaulted) when no row exists. Unlike {@link getUserProfile}, which
- * fabricates `en`/`normal` for permission checks, a GDPR export must report
- * what is truly stored, not a default that would look like real data.
+ * Uncached read of `userId`'s row, `null` when absent. Unlike
+ * {@link getUserProfile}, no default is fabricated: a GDPR export must report
+ * only what is truly stored.
  */
 export async function findStoredUserProfile(
   userId: string,

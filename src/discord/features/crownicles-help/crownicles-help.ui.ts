@@ -6,7 +6,10 @@ import {
 } from '@/core/crownicles/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import {
+  Button,
+  ButtonActionRow,
   type Container,
+  createContainer,
   SelectActionRow,
   SelectMenu,
   Separator,
@@ -14,14 +17,14 @@ import {
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
 import { commandMessages } from '@/discord/lang/index.js';
-import type { CrowniclesHelpData } from './data.js';
-import type { HelpRenderContext } from './page.js';
+import type { CrowniclesHelpData } from './data/events.js';
+import type { HelpRenderContext, HelpState } from './page.js';
 
 /** Discord's hard limits on the text a select option can carry. */
-const SELECT_LABEL_MAX = 100;
-const SELECT_DESCRIPTION_MAX = 100;
-/** Options per location page, at Discord's select-menu ceiling. */
-export const LOCATIONS_PER_PAGE = 25;
+export const SELECT_LABEL_MAX = 100;
+export const SELECT_DESCRIPTION_MAX = 100;
+/** Options per picker page, at Discord's select-menu ceiling. */
+export const PICKER_PAGE_SIZE = 25;
 
 /** Effect whose duration is the outcome's variable `lostTime`, not a fixed base. */
 const OCCUPIED_EFFECT_ID = 'occupied';
@@ -32,6 +35,7 @@ const STAT_SEPARATOR = ' | ';
 /** Stand-in emote for the auto-resolved `end` choice, which has no reaction icon. */
 const END_CHOICE_EMOJI = '🔚';
 
+/** Custom ids of the help center's controls, matched by the router and its pages. */
 export const CATEGORY_SELECT_ID = 'chelp-category';
 export const LOCATION_SELECT_ID = 'chelp-location';
 export const LOCATION_PREV_ID = 'chelp-loc-prev';
@@ -54,6 +58,100 @@ export function truncate(text: string, max: number): string {
 export function eventOptionLabel(text: string, fallback: string): string {
   const trimmed = text.trim();
   return truncate(trimmed.length > 0 ? trimmed : fallback, SELECT_LABEL_MAX);
+}
+
+/** Total picker pages needed for `length` options (at least one). */
+export function pickerPageCount(length: number): number {
+  return Math.max(1, Math.ceil(length / PICKER_PAGE_SIZE));
+}
+
+/** Clamps `page` into `[0, count - 1]`. */
+export function clampPage(page: number, count: number): number {
+  return Math.min(Math.max(page, 0), count - 1);
+}
+
+/** The clamped current picker page and its slice of `items`. */
+export function pickerPage<T>(
+  items: readonly T[],
+  requestedPage: number | undefined,
+): { page: number; pageCount: number; slice: readonly T[] } {
+  const pageCount = pickerPageCount(items.length);
+  const page = clampPage(requestedPage ?? 0, pageCount);
+  return {
+    page,
+    pageCount,
+    slice: items.slice(page * PICKER_PAGE_SIZE, (page + 1) * PICKER_PAGE_SIZE),
+  };
+}
+
+/** Adds the `Page x/y` indicator and prev/next buttons when several pages exist. */
+export function appendPaginationControls(
+  container: Container,
+  options: {
+    readonly page: number;
+    readonly pageCount: number;
+    readonly prevId: string;
+    readonly nextId: string;
+    readonly indicator: (current: number, total: number) => string;
+    readonly previousLabel: string;
+    readonly nextLabel: string;
+    readonly disabled: boolean;
+  },
+): void {
+  if (options.pageCount <= 1) return;
+  container.add(
+    new Text(options.indicator(options.page + 1, options.pageCount)).size(
+      'subtle',
+    ),
+  );
+  const previous = new Button(options.prevId)
+    .color('secondary')
+    .label(options.previousLabel);
+  const next = new Button(options.nextId)
+    .color('secondary')
+    .label(options.nextLabel);
+  if (options.disabled || options.page <= 0) previous.disabled();
+  if (options.disabled || options.page >= options.pageCount - 1) {
+    next.disabled();
+  }
+  container.add(new ButtonActionRow().add(previous, next));
+}
+
+/** Adds a single back button below the current step. */
+export function appendBackButton(
+  container: Container,
+  customId: string,
+  label: string,
+  context: HelpRenderContext,
+): void {
+  const back = new Button(customId).color('secondary').label(label);
+  if (context.disabled) back.disabled();
+  container.add(new ButtonActionRow().add(back));
+}
+
+/** The standard page container: emote + title line, subtle intro, separator. */
+export function createHelpPageContainer(
+  icon: string,
+  name: string,
+  intro: string,
+): Container {
+  return createContainer('brand').add(
+    new Text(`${icon} ${name}`).title(),
+    new Text(intro).size('subtle'),
+    new Separator(),
+  );
+}
+
+/** Adds the shared loading/error line shown while a page's data is missing. */
+export function appendLoadFallback(
+  container: Container,
+  state: HelpState,
+  locale: SupportedLocale,
+): void {
+  const t = helpMessages(locale);
+  container.add(
+    new Text(state.loadError ? t.loadError : t.loading).size('subtle'),
+  );
 }
 
 /** `+n` for a gain, `-n` for a loss (the value already carries its sign). */

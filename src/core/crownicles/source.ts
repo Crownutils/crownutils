@@ -71,6 +71,46 @@ export async function listCrowniclesDir(path: string): Promise<string[]> {
   return entries.map((entry) => entry.name);
 }
 
+/**
+ * Extracts the `key: { ... }` value object from a `CrowniclesIcons.ts` source
+ * (after its `} = {` type/value split), brace-matched so nested objects and
+ * later blocks are not captured. `undefined` when the block is absent.
+ */
+export function extractIconBlock(
+  source: string,
+  key: string,
+): string | undefined {
+  const value = source.split('} = {')[1] ?? source;
+  const header = new RegExp(`\\n\\t${key}:\\s*\\{\\n`).exec(value);
+  if (!header) return undefined;
+
+  let depth = 1;
+  let end = header.index + header[0].length;
+  while (depth > 0 && end < value.length) {
+    const char = value[end++];
+    if (char === '{') depth++;
+    else if (char === '}') depth--;
+  }
+  return value.slice(header.index + header[0].length, end - 1);
+}
+
+/**
+ * Parses a flat `<id>: "<emote>"` icon block of the icon source into an
+ * id -> emote record; empty when the block is absent.
+ */
+export function parseIconIdBlock(
+  source: string,
+  key: string,
+): Record<string, string> {
+  const block = extractIconBlock(source, key);
+  const icons: Record<string, string> = {};
+  if (block === undefined) return icons;
+  for (const [, id, emote] of block.matchAll(/(\d+):\s*"([^"\\]*)"/g)) {
+    if (id !== undefined && emote !== undefined) icons[id] = emote;
+  }
+  return icons;
+}
+
 /** Parses `<id>.json` file names into a sorted, de-duplicated list of numeric ids. */
 export function numericIds(fileNames: readonly string[]): number[] {
   const ids = new Set<number>();
@@ -92,14 +132,14 @@ export async function mapWithConcurrency<T, R>(
   task: (item: T, index: number) => Promise<R>,
 ): Promise<R[]> {
   const results = new Array<R>(items.length);
-  let next = 0;
+  // One iterator shared by every worker, so each entry is claimed exactly once.
+  const entries = items.entries();
 
   const workers = Array.from(
     { length: Math.min(concurrency, items.length) },
     async () => {
-      while (next < items.length) {
-        const index = next++;
-        results[index] = await task(items[index]!, index);
+      for (const [index, item] of entries) {
+        results[index] = await task(item, index);
       }
     },
   );

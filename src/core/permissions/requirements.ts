@@ -19,6 +19,7 @@ export interface CommandRequirements {
 /** Which requirement failed, lets the caller pick a distinct response. */
 export type RequirementFailure = 'scope' | 'authorization';
 
+/** Everything a full requirements check needs: location and rank facts. */
 export type RequirementContext = ScopeContext & AuthorizationContext;
 
 /**

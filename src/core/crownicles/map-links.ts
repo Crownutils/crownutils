@@ -1,4 +1,5 @@
 import { TtlCache } from '@/core/cache/ttl-cache.js';
+import { GAME_DATA_TTL_MS } from './cache.js';
 import { fetchCrowniclesJson } from './source.js';
 
 /** The two locations a Crownicles map link connects. */
@@ -8,12 +9,14 @@ export interface MapLink {
 }
 
 const LINKS_DIR = 'Core/resources/mapLinks';
-/** Game data changes rarely; a long TTL keeps it warm while still self-healing. */
-const DATA_TTL_MS = 12 * 60 * 60 * 1000;
 /** Few distinct links are ever referenced by events; this bound comfortably holds them. */
 const MAX_CACHED_LINKS = 64;
 
-const cache = new TtlCache<number, MapLink>(MAX_CACHED_LINKS, DATA_TTL_MS);
+/**
+ * A per-id cache (not one of the {@link cacheShared} helpers): links are fetched
+ * individually and missing ids (404) must stay uncached so they can retry.
+ */
+const cache = new TtlCache<number, MapLink>(MAX_CACHED_LINKS, GAME_DATA_TTL_MS);
 
 /** Fetches one link, or `undefined` if it has no resource file (some ids 404). */
 async function fetchLink(id: number): Promise<MapLink | undefined> {

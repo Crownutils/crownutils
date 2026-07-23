@@ -1,5 +1,5 @@
 import { MessageFlags } from 'discord.js';
-import type { SupportedLocale } from '@/core/types.js';
+import type { Rank, SupportedLocale } from '@/core/types.js';
 import type { TopLevelComponent } from '@/discord/components/index.js';
 import {
   type InteractiveMessage,
@@ -9,40 +9,49 @@ import {
   buildCategorySelectRow,
   CATEGORY_SELECT_ID,
 } from './crownicles-help.ui.js';
-import { loadCrowniclesHelpData } from './data.js';
-import type { HelpRenderContext, HelpState } from './page.js';
-import { findHelpPage, HELP_PAGES, resolveHelpPage } from './pages/index.js';
+import type { HelpPage, HelpRenderContext, HelpState } from './page.js';
+import {
+  findHelpPage,
+  resolveHelpPage,
+  visibleHelpPages,
+} from './pages/index.js';
 
-/** Base state after switching category: page reset, help data carried over. */
-function pageEntryState(pageId: string, data: HelpState['data']): HelpState {
+/** Base state after switching category: page reset, every page's loaded data carried over. */
+function pageEntryState(
+  pageId: string,
+  carried: Pick<HelpState, 'data' | 'materialsData'>,
+): HelpState {
   return {
     pageId,
-    data,
-    dataError: false,
+    data: carried.data,
+    materialsData: carried.materialsData,
+    loadError: false,
     locationsPage: 0,
     selectedLocationId: undefined,
     selectedEventId: undefined,
+    selectedType: undefined,
+    selectedMaterialId: undefined,
+    materialsPage: 0,
   };
 }
 
 /**
- * Builds the `/crownicles-help` controller: one self-updating message whose
- * render and reduce delegate to the active page, while the router owns the
- * shared category select (rendered below every page) and the one-time network
- * load a data-backed page needs on first entry.
- *
- * Opening straight into `category` pre-loads its data here (there is no
- * interaction yet to drive the usual loading view), so the front should defer
- * the reply for a data-backed category.
+ * Builds the help center controller: render and reduce delegate to the active
+ * page, while the router owns the shared category select and each page's
+ * one-time data load. `rank` filters the reachable pages (a restricted deep
+ * link falls back to home). Opening straight into a data-backed `category`
+ * pre-loads it here, so the front should defer the reply.
  */
 export async function createCrowniclesHelpController(
   userId: string,
   locale: SupportedLocale,
+  rank: Rank,
   category?: string,
 ): Promise<InteractiveMessage<HelpState>> {
+  const pages = visibleHelpPages(rank);
   const renderContext = (disabled: boolean): HelpRenderContext => ({
     locale,
-    pages: HELP_PAGES,
+    pages,
     disabled,
   });
 
@@ -50,7 +59,7 @@ export async function createCrowniclesHelpController(
     state: HelpState,
     context: HelpRenderContext,
   ): TopLevelComponent[] => {
-    const page = findHelpPage(state.pageId) ?? resolveHelpPage();
+    const page = findHelpPage(pages, state.pageId) ?? resolveHelpPage(pages);
     return [
       page.render(state, context),
       buildCategorySelectRow(page.id, context),
@@ -66,27 +75,26 @@ export async function createCrowniclesHelpController(
 
   /** Enters a data-backed page: show a loading view, fetch, then swap in the data. */
   const loadPage = async (
+    page: HelpPage,
     base: HelpState,
     interaction: Parameters<InteractiveMessage<HelpState>['reduce']>[1],
     markHandled: () => void,
   ): Promise<HelpState> => {
-    if (!interaction.isMessageComponent()) return base;
-    await safeDiscord(
-      interaction.update(payload({ ...base, data: undefined })),
-      {
-        action: 'crowniclesHelp.loading',
-      },
-    );
+    if (page.loadData === undefined || !interaction.isMessageComponent()) {
+      return base;
+    }
+    await safeDiscord(interaction.update(payload(base)), {
+      action: 'crowniclesHelp.loading',
+    });
     markHandled();
     try {
-      const data = await loadCrowniclesHelpData(locale);
-      const loaded = { ...base, data };
+      const loaded = { ...base, ...(await page.loadData(locale)) };
       await safeDiscord(interaction.message.edit(payload(loaded)), {
         action: 'crowniclesHelp.loaded',
       });
       return loaded;
     } catch {
-      const errored: HelpState = { ...base, data: undefined, dataError: true };
+      const errored: HelpState = { ...base, loadError: true };
       await safeDiscord(interaction.message.edit(payload(errored)), {
         action: 'crowniclesHelp.loadError',
       });
@@ -94,19 +102,19 @@ export async function createCrowniclesHelpController(
     }
   };
 
-  /** Initial state for a data-backed landing page: pre-load, or flag the error. */
-  const loadInitialState = async (pageId: string): Promise<HelpState> => {
+  /** Initial state when opening straight into `page`: pre-load its data, or flag the error. */
+  const loadInitialState = async (page: HelpPage): Promise<HelpState> => {
+    const base = pageEntryState(page.id, {});
+    if (page.loadData === undefined) return base;
     try {
-      return pageEntryState(pageId, await loadCrowniclesHelpData(locale));
+      return { ...base, ...(await page.loadData(locale)) };
     } catch {
-      return { ...pageEntryState(pageId, undefined), dataError: true };
+      return { ...base, loadError: true };
     }
   };
 
-  const initialPage = resolveHelpPage(category);
-  const initialState: HelpState = initialPage.requiresData
-    ? await loadInitialState(initialPage.id)
-    : { pageId: initialPage.id };
+  const initialPage = resolveHelpPage(pages, category);
+  const initialState: HelpState = await loadInitialState(initialPage);
 
   return {
     initialState,
@@ -122,17 +130,19 @@ export async function createCrowniclesHelpController(
         interaction.customId === CATEGORY_SELECT_ID
       ) {
         const target = interaction.values[0];
-        const page = target ? findHelpPage(target) : undefined;
+        const page = target ? findHelpPage(pages, target) : undefined;
         if (!page) return state;
 
-        const base = pageEntryState(page.id, state.data);
-        if (!page.requiresData || state.data) return base;
-        return loadPage(base, interaction, () => {
+        const base = pageEntryState(page.id, state);
+        if (page.loadData === undefined || (page.hasData?.(state) ?? false)) {
+          return base;
+        }
+        return loadPage(page, base, interaction, () => {
           context.markHandled();
         });
       }
 
-      const page = findHelpPage(state.pageId);
+      const page = findHelpPage(pages, state.pageId);
       return page ? page.reduce(state, interaction) : state;
     },
   };

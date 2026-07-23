@@ -31,6 +31,7 @@ import {
   parseReminderDeleteButtonId,
 } from './reminder.ui.js';
 
+/** Everything `remind` collected to create a reminder. */
 export interface CreateReminderInput {
   readonly userId: string;
   readonly channelId: string;
@@ -42,6 +43,7 @@ export interface CreateReminderInput {
   readonly invalidFormatText: string;
 }
 
+/** The created reminder, or the error card to show instead. */
 export type CreateReminderOutcome =
   | { readonly ok: true; readonly reminder: ActiveReminder }
   | { readonly ok: false; readonly container: Container };

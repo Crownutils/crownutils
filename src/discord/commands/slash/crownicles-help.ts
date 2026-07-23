@@ -1,4 +1,5 @@
 import { Locale, SlashCommandBuilder } from 'discord.js';
+import { getUserRank } from '@/core/repositories/index.js';
 import { resolveUserLocale } from '@/discord/context/locale.js';
 import { mountInteractiveReply } from '@/discord/interactions/index.js';
 import { lang } from '@/discord/lang/index.js';
@@ -6,6 +7,7 @@ import { createCrowniclesHelpController } from '@/discord/features/crownicles-he
 import {
   DEEP_LINK_PAGES,
   resolveHelpPage,
+  visibleHelpPages,
 } from '@/discord/features/crownicles-help/pages/index.js';
 import type {
   SlashCommand,
@@ -43,11 +45,16 @@ const command = {
   data: createCrowniclesHelpCommandData(),
   requirements: { scope: 'anywhere', authorization: 'normal' },
   async execute(interaction) {
-    const locale = await resolveUserLocale(interaction.user.id);
+    const [locale, rank] = await Promise.all([
+      resolveUserLocale(interaction.user.id),
+      getUserRank(interaction.user.id),
+    ]);
     const category = interaction.options.getString('category') ?? undefined;
 
     // Pre-loading a data-backed category can outlast the 3s reply window.
-    if (resolveHelpPage(category).requiresData) {
+    if (
+      resolveHelpPage(visibleHelpPages(rank), category).loadData !== undefined
+    ) {
       await interaction.deferReply();
     }
 
@@ -56,6 +63,7 @@ const command = {
       await createCrowniclesHelpController(
         interaction.user.id,
         locale,
+        rank,
         category,
       ),
     );

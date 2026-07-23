@@ -5,6 +5,8 @@
  * emotes stay fetched from the game's icon source when a page needs them.
  */
 
+import type { ItemCategory } from './item-constants.js';
+
 /**
  * Emotes for the reward/penalty fields of a possibility outcome. `money` and
  * `health` have a distinct emote for a loss, matching the game's own display.
@@ -35,12 +37,13 @@ export interface EffectInfo {
 }
 
 /**
- * Alteration `effect` id → emote and base duration, mirroring the game's
+ * Alteration `effect` id -> emote and base duration, mirroring the game's
  * `Effect` table. `none` is intentionally absent: "no effect" renders nothing.
  * `occupied` lasts the outcome's `lostTime`, so its base duration is `0` here.
  */
 export const effects: Record<string, EffectInfo> = {
   notStarted: { icon: '👶', durationMinutes: 0 },
+  // The game's "until revived" sentinel (~32 years), kept verbatim.
   dead: { icon: '💀', durationMinutes: 16666667 },
   sleeping: { icon: '😴', durationMinutes: 180 },
   drunk: { icon: '🥴', durationMinutes: 240 },
@@ -57,6 +60,49 @@ export const effects: Record<string, EffectInfo> = {
   lost: { icon: '🧐', durationMinutes: 270 },
   fished: { icon: '🐟', durationMinutes: 5 },
 };
+
+/**
+ * Emote per item category, in the game's `ItemCategory` order. Vendored from
+ * the `itemKinds` table of `CrowniclesIcons.ts`.
+ */
+export const itemCategoryIcons = {
+  weapons: '⚔️',
+  armors: '🛡️',
+  potions: '⚗️',
+  objects: '🧸',
+} as const satisfies Record<ItemCategory, string>;
+
+/** Emote per item rarity (`0` basic .. `8` mythical), vendored from the `rarity` table. */
+export const itemRarityIcons: readonly string[] = [
+  '🔸',
+  '🔶',
+  '🔥',
+  '🔱',
+  '☄️',
+  '💫',
+  '⭐',
+  '🌟',
+  '💎',
+];
+
+/** Emote per `ItemNature` id (`0` none .. `7` energy), vendored from the `itemNatures` table. */
+export const itemNatureIcons: readonly string[] = [
+  '❌',
+  '❤️',
+  '🚀',
+  '🗡️',
+  '🛡️',
+  '🕥',
+  '💰',
+  '⚡',
+];
+
+/** Emotes of the displayed item stats, vendored from the `unitValues` table. */
+export const itemStatIcons = {
+  attack: '🗡️',
+  defense: '🛡️',
+  speed: '🚀',
+} as const;
 
 /**
  * Emote per location `type` code, for the location select. The full `mapTypes`
