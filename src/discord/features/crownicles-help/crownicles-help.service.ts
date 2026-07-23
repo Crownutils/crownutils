@@ -54,6 +54,7 @@ export async function createCrowniclesHelpController(
     locale,
     pages,
     disabled,
+    rank,
   });
 
   const renderTopLevel = (

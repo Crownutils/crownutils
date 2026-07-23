@@ -1,7 +1,7 @@
 import type { MessageComponentInteraction } from 'discord.js';
 import type { ItemCategory } from '@/core/crownicles/index.js';
 import type { Authorization } from '@/core/permissions/index.js';
-import type { SupportedLocale } from '@/core/types.js';
+import type { Rank, SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
 import type { CrowniclesEquipmentData } from './data/equipment.js';
 import type { CrowniclesHelpData } from './data/events.js';
@@ -57,6 +57,8 @@ export interface HelpRenderContext {
   readonly pages: readonly HelpPage[];
   /** True on the final render, once the message stops collecting. */
   readonly disabled: boolean;
+  /** The viewer's rank, so a page can gate parts of its content. */
+  readonly rank: Rank;
 }
 
 /**
