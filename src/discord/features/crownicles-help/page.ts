@@ -1,8 +1,11 @@
 import type { MessageComponentInteraction } from 'discord.js';
+import type { ItemCategory } from '@/core/crownicles/index.js';
 import type { Authorization } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
-import type { CrowniclesHelpData, CrowniclesMaterialsData } from './data.js';
+import type { CrowniclesEquipmentData } from './data/equipment.js';
+import type { CrowniclesHelpData } from './data/events.js';
+import type { CrowniclesMaterialsData } from './data/materials.js';
 
 /**
  * Shared state of the help center, threaded through every page. Optional fields
@@ -32,6 +35,19 @@ export interface HelpState {
   readonly selectedMaterialId?: number | undefined;
   /** Zero-based pagination index of the material picker. */
   readonly materialsPage?: number | undefined;
+
+  /** Equipment data, loaded on entering the equipment page. */
+  readonly equipmentData?: CrowniclesEquipmentData | undefined;
+  /** Item category currently browsed. */
+  readonly selectedItemCategory?: ItemCategory | undefined;
+  /** Item rarity currently browsed. */
+  readonly selectedItemRarity?: number | undefined;
+  /** Item whose details are being shown. */
+  readonly selectedItemId?: number | undefined;
+  /** Zero-based pagination index of the item picker. */
+  readonly itemsPage?: number | undefined;
+  /** Zero-based upgrade level shown in the upgrade view; `undefined` shows the item detail. */
+  readonly upgradesPage?: number | undefined;
 }
 
 /** Context passed to a page's `render`. */

@@ -11,6 +11,7 @@ export const crowniclesHelp = {
       'Impossible de charger les données Crownicles. Veuillez réessayer plus tard.',
     outcomesTitle: 'Choix et résultats',
     autoOutcome: 'Ne pas répondre',
+    comingSoon: 'Sort bientôt !',
     labels: {
       xp: 'XP',
       points: 'points',
@@ -34,7 +35,7 @@ export const crowniclesHelp = {
       description: "Le point d'entrée du centre d'aide",
       title: "Centre d'aide Crownicles",
       welcome:
-        'Choisissez une catégorie ci-dessous pour explorer le jeu. Pour le moment, vous pouvez parcourir les événements et les récompenses de leurs choix.',
+        'Choisissez une catégorie ci-dessous pour explorer les données du jeu : les événements et leurs résultats, les équipements et leurs améliorations, et plus encore.',
     },
 
     events: {
@@ -112,6 +113,64 @@ export const crowniclesHelp = {
       sourceCooking: 'Cuisine',
       cookingRecipe: (level: number, quantity: number): string =>
         `(niveau ${level}, donne ×${quantity})`,
+    },
+
+    equipment: {
+      name: 'Équipements',
+      description: 'Les armes, armures, potions et objets du jeu',
+      intro:
+        'Choisissez une catégorie, une rareté, puis un item pour voir ses statistiques.',
+      categoryPlaceholder: 'Choisissez une catégorie',
+      rarityPlaceholder: 'Choisissez une rareté',
+      itemPlaceholder: 'Choisissez un item',
+      categories: {
+        weapons: 'Armes',
+        armors: 'Armures',
+        potions: 'Potions',
+        objects: 'Objets',
+      },
+      selectedCategory: (name: string): string => `Catégorie : ${name}`,
+      selectedRarity: (name: string): string => `Rareté : ${name}`,
+      itemCount: (count: number): string =>
+        count === 1 ? '1 item' : `${count} items`,
+      noItems: 'Aucun item de cette rareté.',
+      previous: 'Précédent',
+      next: 'Suivant',
+      pageIndicator: (current: number, total: number): string =>
+        `Page ${current}/${total}`,
+      backToCategories: 'Retour aux catégories',
+      backToRarities: 'Retour aux raretés',
+      backToItems: 'Retour aux items',
+      backToDetail: "Retour à l'item",
+      rarityLabel: 'Rareté',
+      valueLabel: 'Valeur de vente',
+      usagesLabel: 'Consommations',
+      upgradesButton: 'Amélioration',
+      upgradesTitle: 'Amélioration',
+      levelLabel: (level: number): string => `Niveau ${level}`,
+      levelIndicator: (current: number, total: number): string =>
+        `Niveau ${current}/${total}`,
+    },
+
+    rage: {
+      name: 'Rage',
+      description: 'Le fonctionnement de la rage',
+    },
+    witch: {
+      name: 'Sorcière',
+      description: "L'événement de la sorcière et ses potions",
+    },
+    leagues: {
+      name: 'Ligues',
+      description: 'Les ligues et leurs récompenses',
+    },
+    route: {
+      name: 'Itinéraire',
+      description: 'Le calculateur de plus court chemin',
+    },
+    missions: {
+      name: 'Missions',
+      description: 'Les missions et leurs objectifs',
     },
   },
 } as const satisfies CommandNode;

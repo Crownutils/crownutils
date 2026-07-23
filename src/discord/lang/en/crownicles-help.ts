@@ -9,6 +9,7 @@ export const crowniclesHelp = {
     loadError: 'Could not load Crownicles data. Please try again later.',
     outcomesTitle: 'Choices and outcomes',
     autoOutcome: 'No answer',
+    comingSoon: 'Coming soon!',
     labels: {
       xp: 'XP',
       points: 'points',
@@ -32,7 +33,7 @@ export const crowniclesHelp = {
       description: 'The help center entry point',
       title: 'Crownicles help center',
       welcome:
-        'Pick a category below to explore the game. For now you can browse events and the rewards their choices give.',
+        'Pick a category below to explore the game data: events and their outcomes, equipment and its upgrades, and more.',
     },
 
     events: {
@@ -110,6 +111,63 @@ export const crowniclesHelp = {
       sourceCooking: 'Cooking',
       cookingRecipe: (level: number, quantity: number): string =>
         `(level ${level}, gives ×${quantity})`,
+    },
+
+    equipment: {
+      name: 'Equipment',
+      description: 'The game weapons, armour, potions and objects',
+      intro: 'Pick a category, a rarity, then an item to see its stats.',
+      categoryPlaceholder: 'Choose a category',
+      rarityPlaceholder: 'Choose a rarity',
+      itemPlaceholder: 'Choose an item',
+      categories: {
+        weapons: 'Weapons',
+        armors: 'Armour',
+        potions: 'Potions',
+        objects: 'Objects',
+      },
+      selectedCategory: (name: string): string => `Category: ${name}`,
+      selectedRarity: (name: string): string => `Rarity: ${name}`,
+      itemCount: (count: number): string =>
+        count === 1 ? '1 item' : `${count} items`,
+      noItems: 'No item of this rarity.',
+      previous: 'Previous',
+      next: 'Next',
+      pageIndicator: (current: number, total: number): string =>
+        `Page ${current}/${total}`,
+      backToCategories: 'Back to categories',
+      backToRarities: 'Back to rarities',
+      backToItems: 'Back to items',
+      backToDetail: 'Back to the item',
+      rarityLabel: 'Rarity',
+      valueLabel: 'Sell value',
+      usagesLabel: 'Uses',
+      upgradesButton: 'Upgrade',
+      upgradesTitle: 'Upgrade',
+      levelLabel: (level: number): string => `Level ${level}`,
+      levelIndicator: (current: number, total: number): string =>
+        `Level ${current}/${total}`,
+    },
+
+    rage: {
+      name: 'Rage',
+      description: 'How rage works',
+    },
+    witch: {
+      name: 'Witch',
+      description: 'The witch event and its potions',
+    },
+    leagues: {
+      name: 'Leagues',
+      description: 'Leagues and their rewards',
+    },
+    route: {
+      name: 'Route',
+      description: 'The shortest-path calculator',
+    },
+    missions: {
+      name: 'Missions',
+      description: 'Missions and their goals',
     },
   },
 } as const satisfies CommandNode;

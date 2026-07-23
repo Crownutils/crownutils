@@ -1,5 +1,6 @@
 import type { SupportedLocale } from '@/core/types.js';
 import { cachePerLocale } from './cache.js';
+import type { ItemCategory } from './item-constants.js';
 import { fetchCrowniclesJson } from './source.js';
 
 /** The slices of `Lang/<locale>/models.json` the bot reads. */
@@ -12,6 +13,11 @@ export interface CrowniclesModels {
   readonly materialRarityNames?: Record<string, string>;
   /** Cooking display strings; `recipes` maps a recipe id to its official name. */
   readonly cooking?: { readonly recipes?: Record<string, string> };
+  /** Item id -> official name, one record per item category. */
+  readonly weapons?: Record<string, string>;
+  readonly armors?: Record<string, string>;
+  readonly potions?: Record<string, string>;
+  readonly objects?: Record<string, string>;
 }
 
 /**
@@ -63,6 +69,14 @@ export async function getMaterialRarityNames(
   locale: SupportedLocale,
 ): Promise<Record<string, string>> {
   return (await getModels(locale)).materialRarityNames ?? {};
+}
+
+/** Official item names of one category, keyed by id string (id `0` is the empty-slot placeholder). */
+export async function getItemNames(
+  locale: SupportedLocale,
+  category: ItemCategory,
+): Promise<Record<string, string>> {
+  return (await getModels(locale))[category] ?? {};
 }
 
 /** Official cooking recipe names keyed by recipe id (e.g. `material_alloy_1`). */
