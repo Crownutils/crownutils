@@ -56,6 +56,8 @@ const BACK_TO_CATEGORIES_ID = 'chelp-eq-back-categories';
 const BACK_TO_RARITIES_ID = 'chelp-eq-back-rarities';
 const BACK_TO_ITEMS_ID = 'chelp-eq-back-items';
 const SHOW_UPGRADES_ID = 'chelp-eq-upgrades';
+const UPGRADES_PREV_ID = 'chelp-eq-up-prev';
+const UPGRADES_NEXT_ID = 'chelp-eq-up-next';
 const BACK_TO_DETAIL_ID = 'chelp-eq-back-detail';
 
 function messages(locale: SupportedLocale) {
@@ -318,10 +320,11 @@ function appendItemDetail(
   container.add(row);
 }
 
-/** The upgrade view: per level, the resulting stats and the materials consumed. */
+/** The upgrade view: one level per page, its resulting stats and materials. */
 function appendUpgradeView(
   container: Container,
   item: EquipmentItem,
+  state: HelpState,
   context: HelpRenderContext,
 ): void {
   const t = messages(context.locale);
@@ -332,18 +335,33 @@ function appendUpgradeView(
     new Separator(),
   );
 
-  if (item.detail.kind === 'main') {
-    for (const upgrade of item.detail.upgrades) {
-      const line = new Text(
-        `${md.bold(t.levelLabel(upgrade.level))} : ${statParts(upgrade.stats).join(' | ')}`,
+  if (item.detail.kind === 'main' && item.detail.upgrades.length > 0) {
+    const upgrades = item.detail.upgrades;
+    const page = clampPage(state.upgradesPage ?? 0, upgrades.length);
+    const upgrade = upgrades[page];
+    if (upgrade) {
+      container.add(
+        new Text(
+          `${md.bold(t.levelLabel(upgrade.level))} : ${statParts(upgrade.stats).join(' | ')}`,
+        ),
       );
-      const cost = upgrade.materials
-        .map((material) =>
+      const cost = new Text('');
+      for (const material of upgrade.materials) {
+        cost.newLine(
           `${material.quantity}x ${material.icon ?? ''} ${material.name}`.trim(),
-        )
-        .join(', ');
-      if (cost.length > 0) line.newLine(cost);
-      container.add(line);
+        );
+      }
+      container.add(cost, new Separator());
+      appendPaginationControls(container, {
+        page,
+        pageCount: upgrades.length,
+        prevId: UPGRADES_PREV_ID,
+        nextId: UPGRADES_NEXT_ID,
+        indicator: t.levelIndicator,
+        previousLabel: t.previous,
+        nextLabel: t.next,
+        disabled: context.disabled,
+      });
     }
   }
 
@@ -395,8 +413,8 @@ export const equipmentPage: HelpPage = {
       ).find((entry) => entry.id === state.selectedItemId);
       if (!item) {
         appendBackButton(container, BACK_TO_ITEMS_ID, t.backToItems, context);
-      } else if (state.showUpgrades === true) {
-        appendUpgradeView(container, item, context);
+      } else if (state.upgradesPage !== undefined) {
+        appendUpgradeView(container, item, state, context);
       } else {
         appendItemDetail(container, data, item, context);
       }
@@ -419,7 +437,7 @@ export const equipmentPage: HelpPage = {
               selectedItemRarity: undefined,
               selectedItemId: undefined,
               itemsPage: 0,
-              showUpgrades: undefined,
+              upgradesPage: undefined,
             };
       }
       if (interaction.customId === RARITY_SELECT_ID) {
@@ -436,7 +454,7 @@ export const equipmentPage: HelpPage = {
       if (interaction.customId === ITEM_SELECT_ID) {
         const id = Number(value);
         return Number.isInteger(id)
-          ? { ...state, selectedItemId: id, showUpgrades: undefined }
+          ? { ...state, selectedItemId: id, upgradesPage: undefined }
           : state;
       }
       return state;
@@ -453,6 +471,9 @@ export const equipmentPage: HelpPage = {
               state.selectedItemRarity,
             )
           : [];
+      const selected = items.find((entry) => entry.id === state.selectedItemId);
+      const upgradeCount =
+        selected?.detail.kind === 'main' ? selected.detail.upgrades.length : 0;
       switch (interaction.customId) {
         case ITEMS_PREV_ID:
           return {
@@ -473,25 +494,38 @@ export const equipmentPage: HelpPage = {
             selectedItemCategory: undefined,
             selectedItemRarity: undefined,
             selectedItemId: undefined,
-            showUpgrades: undefined,
+            upgradesPage: undefined,
           };
         case BACK_TO_RARITIES_ID:
           return {
             ...state,
             selectedItemRarity: undefined,
             selectedItemId: undefined,
-            showUpgrades: undefined,
+            upgradesPage: undefined,
           };
         case BACK_TO_ITEMS_ID:
           return {
             ...state,
             selectedItemId: undefined,
-            showUpgrades: undefined,
+            upgradesPage: undefined,
           };
         case SHOW_UPGRADES_ID:
-          return { ...state, showUpgrades: true };
+          return { ...state, upgradesPage: 0 };
+        case UPGRADES_PREV_ID:
+          return {
+            ...state,
+            upgradesPage: Math.max(0, (state.upgradesPage ?? 0) - 1),
+          };
+        case UPGRADES_NEXT_ID:
+          return {
+            ...state,
+            upgradesPage: clampPage(
+              (state.upgradesPage ?? 0) + 1,
+              upgradeCount,
+            ),
+          };
         case BACK_TO_DETAIL_ID:
-          return { ...state, showUpgrades: undefined };
+          return { ...state, upgradesPage: undefined };
         default:
           return state;
       }

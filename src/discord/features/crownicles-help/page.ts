@@ -46,8 +46,8 @@ export interface HelpState {
   readonly selectedItemId?: number | undefined;
   /** Zero-based pagination index of the item picker. */
   readonly itemsPage?: number | undefined;
-  /** True when the item detail shows the upgrade path instead of the stats. */
-  readonly showUpgrades?: boolean | undefined;
+  /** Zero-based upgrade level shown in the upgrade view; `undefined` shows the item detail. */
+  readonly upgradesPage?: number | undefined;
 }
 
 /** Context passed to a page's `render`. */

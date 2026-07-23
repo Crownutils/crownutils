@@ -144,6 +144,8 @@ export const crowniclesHelp = {
       upgradesButton: 'Upgrade',
       upgradesTitle: 'Upgrade',
       levelLabel: (level: number): string => `Level ${level}`,
+      levelIndicator: (current: number, total: number): string =>
+        `Level ${current}/${total}`,
     },
   },
 } as const satisfies CommandNode;
