@@ -32,7 +32,7 @@ export const crowniclesHelp = {
       description: 'The help center entry point',
       title: 'Crownicles help center',
       welcome:
-        'Pick a category below to explore the game. For now you can browse events and the rewards their choices give.',
+        'Pick a category below to explore the game data: events and their outcomes, equipment and its upgrades, and more.',
     },
 
     events: {

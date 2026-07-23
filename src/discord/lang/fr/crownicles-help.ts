@@ -34,7 +34,7 @@ export const crowniclesHelp = {
       description: "Le point d'entrée du centre d'aide",
       title: "Centre d'aide Crownicles",
       welcome:
-        'Choisissez une catégorie ci-dessous pour explorer le jeu. Pour le moment, vous pouvez parcourir les événements et les récompenses de leurs choix.',
+        'Choisissez une catégorie ci-dessous pour explorer les données du jeu : les événements et leurs résultats, les équipements et leurs améliorations, et plus encore.',
     },
 
     events: {
