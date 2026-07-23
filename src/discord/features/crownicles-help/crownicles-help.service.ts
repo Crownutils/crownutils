@@ -19,12 +19,13 @@ import {
 /** Base state after switching category: page reset, every page's loaded data carried over. */
 function pageEntryState(
   pageId: string,
-  carried: Pick<HelpState, 'data' | 'materialsData'>,
+  carried: Pick<HelpState, 'data' | 'materialsData' | 'equipmentData'>,
 ): HelpState {
   return {
     pageId,
     data: carried.data,
     materialsData: carried.materialsData,
+    equipmentData: carried.equipmentData,
     loadError: false,
     locationsPage: 0,
     selectedLocationId: undefined,
@@ -53,6 +54,7 @@ export async function createCrowniclesHelpController(
     locale,
     pages,
     disabled,
+    rank,
   });
 
   const renderTopLevel = (

@@ -8,6 +8,7 @@ import {
   outcomeIcons,
   type ItemCategory,
 } from '@/core/crownicles/index.js';
+import { isAuthorized } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import {
   Button,
@@ -62,6 +63,11 @@ const BACK_TO_DETAIL_ID = 'chelp-eq-back-detail';
 
 function messages(locale: SupportedLocale) {
   return helpMessages(locale).equipment;
+}
+
+/** Whether the viewer's rank unlocks the upgrade view (privileged data, like the materials page). */
+function canViewUpgrades(context: HelpRenderContext): boolean {
+  return isAuthorized('privileged', { rank: context.rank });
 }
 
 /** Localized label of an item category. */
@@ -309,7 +315,7 @@ function appendItemDetail(
     const upgrades = new Button(SHOW_UPGRADES_ID)
       .color('primary')
       .label(t.upgradesButton);
-    if (context.disabled) upgrades.disabled();
+    if (context.disabled || !canViewUpgrades(context)) upgrades.disabled();
     row.add(upgrades);
   }
   const back = new Button(BACK_TO_ITEMS_ID)
@@ -413,7 +419,7 @@ export const equipmentPage: HelpPage = {
       ).find((entry) => entry.id === state.selectedItemId);
       if (!item) {
         appendBackButton(container, BACK_TO_ITEMS_ID, t.backToItems, context);
-      } else if (state.upgradesPage !== undefined) {
+      } else if (state.upgradesPage !== undefined && canViewUpgrades(context)) {
         appendUpgradeView(container, item, state, context);
       } else {
         appendItemDetail(container, data, item, context);
