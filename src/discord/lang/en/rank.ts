@@ -10,5 +10,15 @@ export const rank = {
       `${md.bold('Current rank:')} ${rank} ${rankIcon}`,
     rankLevel: (rankLevel: number) =>
       `${md.bold('Permission level:')} ${rankLevel}`,
+    perks: {
+      title: 'Perks',
+      materials: `Materials category of ${md.code('crownicles-help')}`,
+      upgrades: `Equipment upgrade details in ${md.code('crownicles-help')}`,
+      reminders: (limit: number, base: number) =>
+        `${limit} simultaneous reminders (instead of ${base})`,
+      remindersUnlimited: 'Unlimited reminders',
+      maintenanceAccess: 'Bot access during maintenance',
+      administration: `Administration commands (${md.code('maintenance')}, ${md.code('set-rank')})`,
+    },
   },
 } satisfies CommandNode;
