@@ -163,7 +163,7 @@ export const crowniclesHelp = {
     },
     route: {
       name: 'Route',
-      description: 'The map and its paths',
+      description: 'The shortest-path calculator',
     },
     missions: {
       name: 'Missions',

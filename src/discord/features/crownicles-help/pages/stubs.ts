@@ -8,7 +8,7 @@ import { createComingSoonPage } from './coming-soon.js';
 
 export const ragePage = createComingSoonPage({
   id: 'rage',
-  icon: '💢',
+  icon: '🤬',
   name: (locale) => helpMessages(locale).rage.name,
   description: (locale) => helpMessages(locale).rage.description,
 });
@@ -36,7 +36,7 @@ export const routePage = createComingSoonPage({
 
 export const missionsPage = createComingSoonPage({
   id: 'missions',
-  icon: '🎯',
+  icon: '📜',
   name: (locale) => helpMessages(locale).missions.name,
   description: (locale) => helpMessages(locale).missions.description,
 });

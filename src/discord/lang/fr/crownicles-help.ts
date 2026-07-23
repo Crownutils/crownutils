@@ -166,7 +166,7 @@ export const crowniclesHelp = {
     },
     route: {
       name: 'Itinéraire',
-      description: 'La carte et les trajets',
+      description: 'Le calculateur de plus court chemin',
     },
     missions: {
       name: 'Missions',
