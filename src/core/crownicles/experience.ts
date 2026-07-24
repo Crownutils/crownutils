@@ -95,7 +95,10 @@ function getExperienceNeededToLevelUp(level: number): number {
 /**
  * Get the experience needed to level up from `from` to `to`.
  */
-export function computeExperienceNeededToLevelUp(from: number, to: number): number {
+export function computeExperienceNeededToLevelUp(
+  from: number,
+  to: number,
+): number {
   let experience = 0;
 
   for (let level = from; level < to; level++) {

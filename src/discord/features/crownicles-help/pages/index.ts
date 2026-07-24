@@ -13,6 +13,7 @@ import {
   routePage,
   witchPage,
 } from './stubs.js';
+import { levelPage } from './level.js';
 
 /** All help center pages, in category-select order. */
 export const HELP_PAGES: readonly HelpPage[] = [
@@ -21,6 +22,7 @@ export const HELP_PAGES: readonly HelpPage[] = [
   specialEventsPage,
   materialsPage,
   equipmentPage,
+  levelPage,
   ragePage,
   witchPage,
   leaguesPage,

@@ -3,6 +3,7 @@ import type { ItemCategory } from '@/core/crownicles/index.js';
 import type { Authorization } from '@/core/permissions/index.js';
 import type { Rank, SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
+import type { ReduceContext } from '@/discord/interactions/index.js';
 import type { CrowniclesEquipmentData } from './data/equipment.js';
 import type { CrowniclesEventsData } from './data/events.js';
 import type { CrowniclesMaterialsData } from './data/materials.js';
@@ -48,6 +49,22 @@ export interface HelpState {
   readonly itemsPage?: number | undefined;
   /** Zero-based upgrade level shown in the upgrade view; `undefined` shows the item detail. */
   readonly upgradesPage?: number | undefined;
+
+  /** Starting level to calculate xp needed. */
+  readonly fromLevel?: number | undefined;
+  /** Target level to calculate xp needed. */
+  readonly toLevel?: number | undefined;
+}
+
+/**
+ * The framework reduce context (`stop`, `markHandled`, `showModal`) plus the
+ * ambient locale and rank a page needs to build its components and modals. The
+ * runtime owns the modal sub-flow and its re-render, so a page only declares the
+ * modal and how to fold its submission into the next state.
+ */
+export interface HelpReduceContext extends ReduceContext<HelpState> {
+  readonly locale: SupportedLocale;
+  readonly rank: Rank;
 }
 
 /** Context passed to a page's `render`. */
@@ -82,6 +99,7 @@ export interface HelpPage {
   reduce(
     state: HelpState,
     interaction: MessageComponentInteraction,
+    context: HelpReduceContext,
   ): HelpState | Promise<HelpState>;
   /** Loads this page's data into a state patch on first entry; absent when the page needs no network data. */
   loadData?(locale: SupportedLocale): Promise<Partial<HelpState>>;
