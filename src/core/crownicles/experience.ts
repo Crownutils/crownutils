@@ -17,6 +17,15 @@ const EXPERIENCE = {
   CONFOUNDED_PENALTY: 140,
 } as const;
 
+/**
+ * Constants for level calculations vendored from `Lib/src/constants/Constants.ts`.
+ */
+const XP = {
+  BASE_VALUE: 325,
+  COEFFICIENT: 1.041,
+  MINUS: 188,
+} as const;
+
 /** Effect ids that alter the experience gain, matching the game's `Effect` table. */
 const NO_EFFECT_ID = 'none';
 const OCCUPIED_ID = 'occupied';
@@ -72,4 +81,26 @@ export function computeOutcomeExperience(o: OutcomeExperienceInputs): number {
     experience = 0;
   }
   return experience + (o.bonusExperience ?? 0);
+}
+
+/**
+ * Effective formula a player or a guild need to level up from `level`.
+ */
+function getExperienceNeededToLevelUp(level: number): number {
+  return Math.round(
+    XP.BASE_VALUE * Math.pow(XP.COEFFICIENT, level + 1) - XP.MINUS,
+  );
+}
+
+/**
+ * Get the experience needed to level up from `from` to `to`.
+ */
+export function computeExperienceNeededToLevelUp(from: number, to: number): number {
+  let experience = 0;
+
+  for (let level = from; level < to; level++) {
+    experience += getExperienceNeededToLevelUp(level);
+  }
+
+  return experience;
 }
