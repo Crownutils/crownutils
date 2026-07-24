@@ -4,7 +4,7 @@ import type { Authorization } from '@/core/permissions/index.js';
 import type { Rank, SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
 import type { CrowniclesEquipmentData } from './data/equipment.js';
-import type { CrowniclesHelpData } from './data/events.js';
+import type { CrowniclesEventsData } from './data/events.js';
 import type { CrowniclesMaterialsData } from './data/materials.js';
 
 /**
@@ -16,7 +16,7 @@ import type { CrowniclesMaterialsData } from './data/materials.js';
 export interface HelpState {
   readonly pageId: string;
   /** Events/locations data, loaded on entering the events pages. */
-  readonly data?: CrowniclesHelpData | undefined;
+  readonly data?: CrowniclesEventsData | undefined;
   /** Materials data, loaded on entering the materials page. */
   readonly materialsData?: CrowniclesMaterialsData | undefined;
   /** True when the last data load failed, so pages can show an error. */

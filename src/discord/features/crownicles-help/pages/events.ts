@@ -10,8 +10,8 @@ import {
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
 import {
-  loadCrowniclesHelpData,
-  type CrowniclesHelpData,
+  loadCrowniclesEventsData,
+  type CrowniclesEventsData,
 } from '../data/events.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import {
@@ -50,7 +50,7 @@ function messages(locale: SupportedLocale) {
 /** Step 1: the paginated location picker, listing the current page's locations. */
 function appendLocationPicker(
   container: Container,
-  data: CrowniclesHelpData,
+  data: CrowniclesEventsData,
   state: HelpState,
   context: HelpRenderContext,
 ): void {
@@ -98,7 +98,7 @@ function appendLocationPicker(
 /** Step 2: the events hosted by the chosen location, with a picker. */
 function appendEventPicker(
   container: Container,
-  data: CrowniclesHelpData,
+  data: CrowniclesEventsData,
   locationId: number,
   context: HelpRenderContext,
 ): void {
@@ -151,7 +151,7 @@ function appendEventPicker(
 function appendEventDetailStep(
   container: Container,
   event: CrowniclesEvent,
-  data: CrowniclesHelpData,
+  data: CrowniclesEventsData,
   context: HelpRenderContext,
 ): void {
   const t = messages(context.locale);
@@ -165,7 +165,7 @@ export const eventsPage: HelpPage = {
   authorization: 'normal',
   icon: EVENTS_ICON,
 
-  loadData: async (locale) => ({ data: await loadCrowniclesHelpData(locale) }),
+  loadData: async (locale) => ({ data: await loadCrowniclesEventsData(locale) }),
   hasData: (state) => state.data !== undefined,
 
   name: (locale: SupportedLocale) => messages(locale).name,
