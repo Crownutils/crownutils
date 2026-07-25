@@ -9,7 +9,7 @@ import { md } from '@/discord/theme/markdown.js';
 const privacy = {
   controller: {
     heading: 'Data controller',
-    body: `Crownutils is a non-profit open source project maintained by Ntalcme. To exercise your rights, use the ${md.code('data')} and ${md.code('delete-data')} commands.`,
+    body: `Crownutils is a non-profit project maintained by Ntalcme. To exercise your rights, use the ${md.code('data')} and ${md.code('delete-data')} commands.`,
   },
   dataCollected: {
     heading: 'Data collected',
@@ -85,7 +85,7 @@ const terms = {
   },
   intellectualProperty: {
     heading: 'Intellectual property',
-    body: 'The Crownicles game and its content remain the property of their respective authors. The Crownutils code is distributed under the PolyForm Noncommercial license.',
+    body: 'The Crownicles game and its content remain the property of their respective authors. The Crownutils source code is publicly visible but remains protected: all rights reserved, and its use, copying or redistribution is not permitted without prior agreement.',
   },
   law: {
     heading: 'Governing law',
