@@ -34,6 +34,8 @@ import { help as helpEn } from './en/help.js';
 import { help as helpFr } from './fr/help.js';
 import { users as usersEn } from './en/users.js';
 import { users as usersFr } from './fr/users.js';
+import { guilds as guildsEn } from './en/guilds.js';
+import { guilds as guildsFr } from './fr/guilds.js';
 
 /**
  * Every command's language pack, both locales listed side by side so adding a
@@ -57,6 +59,7 @@ export const commandPacks = {
     commandDeleteData: deleteDataEn,
     commandHelp: helpEn,
     commandUsers: usersEn,
+    commandGuilds: guildsEn,
   },
   fr: {
     commandPing: pingFr,
@@ -75,5 +78,6 @@ export const commandPacks = {
     commandDeleteData: deleteDataFr,
     commandHelp: helpFr,
     commandUsers: usersFr,
+    commandGuilds: guildsFr,
   },
 } as const;
