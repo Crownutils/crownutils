@@ -90,4 +90,8 @@ export const commandDescriptions: Record<string, CommandDescription> = {
     category: 'moderation',
     description: (locale) => lang[locale].commandMaintenance.description,
   },
+  users: {
+    category: 'moderation',
+    description: (locale) => lang[locale].commandUsers.description,
+  },
 };

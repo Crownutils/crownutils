@@ -1,11 +1,18 @@
 import { prisma } from '../persistence/client.js';
 import type { Rank, SupportedLocale } from '../types.js';
+import { RANK, rankLevel } from '../types.js';
 import { isOwner } from '../permissions/index.js';
 import { acceptLegal } from './legal-repository.js';
 import { TtlCache } from '../cache/ttl-cache.js';
 
 const DEFAULT_LANGUAGE: SupportedLocale = 'en';
 const DEFAULT_RANK: Rank = 'normal';
+
+/**
+ * Most rows the owner-facing user listing loads at once. The summary counts
+ * every user regardless, so a truncated list still reports the true total.
+ */
+export const USER_LIST_LIMIT = 500;
 
 /** Bounds the profile cache; comfortably holds every recently active user. */
 const USER_CACHE_MAX_SIZE = 10_000;
@@ -108,6 +115,49 @@ export async function setUserRank(userId: string, rank: Rank): Promise<void> {
   });
 
   patchUserCache(userId, { rank });
+}
+
+/** A stored user row, as the owner-facing listing reads it. */
+export interface StoredUser {
+  readonly userId: string;
+  readonly language: SupportedLocale;
+  readonly rank: Rank;
+}
+
+/** Total number of stored user rows. */
+export async function countUsers(): Promise<number> {
+  return prisma.user.count();
+}
+
+/** How many users hold each rank; ranks nobody holds are reported as `0`. */
+export async function countUsersByRank(): Promise<Record<Rank, number>> {
+  const groups = await prisma.user.groupBy({ by: ['rank'], _count: true });
+  const counts = Object.fromEntries(RANK.map((rank) => [rank, 0])) as Record<
+    Rank,
+    number
+  >;
+  for (const group of groups) counts[group.rank] = group._count;
+  return counts;
+}
+
+/**
+ * Up to `limit` stored user rows, highest rank first then by id. The database
+ * orders by id (its primary key) so a truncated read stays stable across calls;
+ * the rank ordering is applied here, since it follows {@link RANK}'s access
+ * order rather than the enum's alphabetical one.
+ */
+export async function listUsers(
+  limit: number = USER_LIST_LIMIT,
+): Promise<StoredUser[]> {
+  const users = await prisma.user.findMany({
+    take: limit,
+    orderBy: { userId: 'asc' },
+    select: { userId: true, language: true, rank: true },
+  });
+  return users.sort(
+    (a, b) =>
+      rankLevel(b.rank) - rankLevel(a.rank) || a.userId.localeCompare(b.userId),
+  );
 }
 
 /** Deletes `userId`'s row (language and rank) and evicts the cache; returns whether a row existed. */
