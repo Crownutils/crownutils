@@ -53,6 +53,21 @@ export async function buildGdprExport(userId: string): Promise<GdprExport> {
   };
 }
 
+/**
+ * Whether an assembled export holds nothing at all. Unlike
+ * {@link hasErasableUserData} this is a pure check on an export already in hand,
+ * and it counts the ban hash: an empty export has no document worth attaching.
+ */
+export function isGdprExportEmpty(gdprExport: GdprExport): boolean {
+  return (
+    gdprExport.language === null &&
+    gdprExport.rank === null &&
+    gdprExport.legalAcceptance === null &&
+    !gdprExport.hasBanHash &&
+    gdprExport.reminders.length === 0
+  );
+}
+
 /** What a {@link eraseUserData} call removed, for the confirmation summary. */
 export interface GdprErasureSummary {
   readonly deletedUserRow: boolean;
