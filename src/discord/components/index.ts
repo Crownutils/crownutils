@@ -10,4 +10,5 @@ export * from './select.js';
 export * from './action-row.js';
 export * from './section.js';
 export * from './container.js';
+export * from './file.js';
 export * from './modal.js';

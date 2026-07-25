@@ -9,7 +9,7 @@ import { md } from '@/discord/theme/markdown.js';
 const privacy = {
   controller: {
     heading: 'Responsable du traitement',
-    body: `Crownutils est un projet open source à but non lucratif, édité par Ntalcme. Pour exercer vos droits, utilisez les commandes ${md.code('data')} et ${md.code('delete-data')}.`,
+    body: `Crownutils est un projet à but non lucratif, édité par Ntalcme. Pour exercer vos droits, utilisez les commandes ${md.code('data')} et ${md.code('delete-data')}.`,
   },
   dataCollected: {
     heading: 'Données collectées',
@@ -85,7 +85,7 @@ const terms = {
   },
   intellectualProperty: {
     heading: 'Propriété intellectuelle',
-    body: 'Le jeu Crownicles et ses contenus demeurent la propriété de leurs auteurs respectifs. Le code de Crownutils est distribué sous licence PolyForm Noncommercial.',
+    body: 'Le jeu Crownicles et ses contenus demeurent la propriété de leurs auteurs respectifs. Le code source de Crownutils est visible publiquement mais reste protégé : tous droits réservés, son usage, sa copie ou sa redistribution ne sont pas autorisés sans accord préalable.',
   },
   law: {
     heading: 'Droit applicable',

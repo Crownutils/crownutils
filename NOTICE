@@ -1,6 +1,6 @@
 Crownutils
 Copyright 2026 Ntalcme
-Licensed under the PolyForm Noncommercial License 1.0.0 (see LICENSE).
+All Rights Reserved (see LICENSE).
 
 Crownutils is a separate, independent companion bot for the game "Crownicles".
 It is not affiliated with, endorsed by, or part of Crownicles.
@@ -10,10 +10,11 @@ Relationship with Crownicles (AGPL-3.0)
 ================================================================================
 
 Crownicles is licensed under the GNU Affero General Public License v3.0
-(AGPL-3.0). The AGPL forbids adding restrictions (such as "noncommercial") to
-any work derived from it. Crownutils keeps its own code under the PolyForm
-Noncommercial License by NEVER incorporating Crownicles' source code. The
-boundary is deliberate and is maintained as follows.
+(AGPL-3.0). The AGPL forbids adding restrictions (such as making a derived
+work proprietary / all-rights-reserved) to any work derived from it.
+Crownutils keeps its own code proprietary (All Rights Reserved) by NEVER
+incorporating Crownicles' source code. The boundary is deliberate and is
+maintained as follows.
 
 Allowed -- does NOT make Crownutils a work based on Crownicles, and does NOT
 affect Crownutils' license:
@@ -30,6 +31,13 @@ affect Crownutils' license:
     calculator) from scratch in our own code. Algorithms and mathematical
     formulas are not copyrightable; only a specific code expression is.
 
+  - Hardcoding a small, stable table that pairs a game id with a plain Unicode
+    character (e.g. item category/rarity/nature icons, location-type icons),
+    instead of fetching it at runtime. Such short, functional associations are
+    kept deliberately minimal, are not the kind of creative or substantial
+    content described under "assets" below, and are refreshed by hand if the
+    game changes them.
+
 Not done -- would carry Crownicles' AGPL and/or the content's copyright
 obligations, and is therefore avoided in this repository:
 
@@ -37,7 +45,9 @@ obligations, and is therefore avoided in this repository:
     code into Crownutils.
 
   - Vendoring Crownicles' files into this repository: source code, creative
-    descriptions / lore text, images, sprites or other assets.
+    descriptions / lore text, images, sprites or other assets (the small
+    factual/icon tables described as Allowed above are not "files" or "assets"
+    in this sense).
 
 Creative text (descriptions, lore) and graphical assets remain the property of
 their respective authors and are not reproduced verbatim in this repository.
@@ -47,7 +57,7 @@ credited to Crownicles.
 If Crownicles' source code ever needs to be reused verbatim, it must be isolated
 in a clearly separated, AGPL-licensed component (a distinct program/process, not
 a direct import). Such a component remains under AGPL-3.0 and cannot be made
-noncommercial; it must not be merged into the noncommercial Crownutils code.
+proprietary; it must not be merged into the All-Rights-Reserved Crownutils code.
 
 ================================================================================
 The author's own contributions
@@ -58,7 +68,7 @@ this project's author and contributed to Crownicles remains that author's own
 copyright -- contributing it to an AGPL project grants the project a license but
 does not transfer ownership, absent a contributor license agreement (CLA) or
 copyright assignment. As the copyright holder, the author may reuse such code
-here under the PolyForm Noncommercial License.
+here under Crownutils' own All Rights Reserved terms.
 
 This applies only to parts that are:
 
@@ -84,7 +94,7 @@ Crownicles project.
 Warranty and liability
 ================================================================================
 
-As stated in the LICENSE ("No Liability"), the software is provided "as is",
+As stated in the LICENSE ("No Warranty"), the software is provided "as is",
 without any warranty or condition. The authors are not liable for any damages,
 including security vulnerabilities, arising from the use or reuse of this
 software.

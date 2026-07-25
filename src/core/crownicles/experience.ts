@@ -4,8 +4,9 @@
  * then adds `bonusExperience` last. This mirrors Crownicles'
  * `applyOutcomeExperience` so the help page shows the real number.
  *
- * Balance constants vendored from `Lib/src/constants/BigEventConstants.ts`
- * (values are stable; update here if the game rebalances them).
+ * Balance constants taken from `Lib/src/constants/BigEventConstants.ts`
+ * (values are stable; update here if the game rebalances them). Plain numeric
+ * data, not vendored code -- see the project NOTICE.
  */
 const EXPERIENCE = {
   BASE: 172,
@@ -18,7 +19,8 @@ const EXPERIENCE = {
 } as const;
 
 /**
- * Constants for level calculations vendored from `Lib/src/constants/Constants.ts`.
+ * Constants for level calculations taken from `Lib/src/constants/Constants.ts`
+ * (plain numeric data, not vendored code -- see the project NOTICE).
  */
 const XP = {
   BASE_VALUE: 325,

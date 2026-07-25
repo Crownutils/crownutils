@@ -13,7 +13,7 @@ export function buildAboutContainer(language: SupportedLocale): Container {
     new Text(messages.presentation),
     new Separator(),
     new Text(messages.version(config.botVersion))
-      .newLine(messages.license.licenseName(config.license))
+      .newLine(messages.license.licenseName)
       .newLine(
         new Text(messages.license.compatibilityWithCrownicles)
           .italic()

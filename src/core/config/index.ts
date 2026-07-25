@@ -8,7 +8,6 @@ const packageJson = JSON.parse(
   readFileSync(new URL('../../../package.json', import.meta.url), 'utf8'),
 ) as {
   version: string;
-  license: string;
 };
 
 /** Returns `value` narrowed to non-null; throws if it is missing or empty. */
@@ -25,7 +24,6 @@ export const config = {
   isProduction,
 
   botVersion: packageJson.version,
-  license: packageJson.license,
 
   discordToken: required('discordToken', process.env.DISCORD_TOKEN),
   applicationId: required('applicationId', applicationId),

@@ -140,9 +140,10 @@ export interface UpgradeRecipeInputs {
 
 /**
  * Materials consumed to upgrade `item` to `level`, mirroring the game's
- * `MainItem.getUpgradeMaterials`: per material rarity, the vendored total
- * quantity is spread over the picked distinct ids, the first `total % picked`
- * ids taking one extra. Empty for basic items and out-of-range levels.
+ * `MainItem.getUpgradeMaterials`: per material rarity, the total quantity
+ * (from {@link UPGRADE_MATERIAL_TOTALS}) is spread over the picked distinct
+ * ids, the first `total % picked` ids taking one extra. Empty for basic items
+ * and out-of-range levels.
  */
 export function computeUpgradeMaterials(
   item: UpgradeRecipeInputs,

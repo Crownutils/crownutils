@@ -1,7 +1,8 @@
 /**
- * Crownicles-specific emotes, persisted here rather than fetched: the outcome
- * and effect sets are small and stable, so vendoring them keeps event pages
- * rendering without an extra network round-trip. The numerous item/location
+ * Crownicles-specific emotes, hardcoded here rather than fetched: the outcome
+ * and effect sets are small and stable, so keeping them as data keeps event
+ * pages rendering without an extra network round-trip (short id -> emoji
+ * associations, allowed by the project NOTICE). The numerous item/location
  * emotes stay fetched from the game's icon source when a page needs them.
  */
 
@@ -62,8 +63,8 @@ export const effects: Record<string, EffectInfo> = {
 };
 
 /**
- * Emote per item category, in the game's `ItemCategory` order. Vendored from
- * the `itemKinds` table of `CrowniclesIcons.ts`.
+ * Emote per item category, in the game's `ItemCategory` order. Taken from the
+ * `itemKinds` table of `CrowniclesIcons.ts`.
  */
 export const itemCategoryIcons = {
   weapons: '⚔️',
@@ -72,7 +73,7 @@ export const itemCategoryIcons = {
   objects: '🧸',
 } as const satisfies Record<ItemCategory, string>;
 
-/** Emote per item rarity (`0` basic .. `8` mythical), vendored from the `rarity` table. */
+/** Emote per item rarity (`0` basic .. `8` mythical), taken from the `rarity` table. */
 export const itemRarityIcons: readonly string[] = [
   '🔸',
   '🔶',
@@ -85,7 +86,7 @@ export const itemRarityIcons: readonly string[] = [
   '💎',
 ];
 
-/** Emote per `ItemNature` id (`0` none .. `7` energy), vendored from the `itemNatures` table. */
+/** Emote per `ItemNature` id (`0` none .. `7` energy), taken from the `itemNatures` table. */
 export const itemNatureIcons: readonly string[] = [
   '❌',
   '❤️',
@@ -97,7 +98,7 @@ export const itemNatureIcons: readonly string[] = [
   '⚡',
 ];
 
-/** Emotes of the displayed item stats, vendored from the `unitValues` table. */
+/** Emotes of the displayed item stats, taken from the `unitValues` table. */
 export const itemStatIcons = {
   attack: '🗡️',
   defense: '🛡️',
@@ -106,7 +107,7 @@ export const itemStatIcons = {
 
 /**
  * Emote per location `type` code, for the location select. The full `mapTypes`
- * table vendored from the game's `CrowniclesIcons.ts`; unknown (newly added)
+ * table taken from the game's `CrowniclesIcons.ts`; unknown (newly added)
  * types fall back to no emote until this list is refreshed.
  */
 export const locationTypeIcons: Record<string, string> = {

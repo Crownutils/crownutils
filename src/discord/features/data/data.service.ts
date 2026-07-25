@@ -1,7 +1,9 @@
 import {
   buildGdprExport,
   getNextGdprRequestEligibleAt,
+  isGdprExportEmpty,
   recordGdprRequest,
+  type GdprExport,
 } from '@/core/repositories/index.js';
 import { isOwner } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
@@ -16,12 +18,42 @@ import {
   buildDataCooldownContainer,
   buildDataLookupPickerContainer,
 } from './data.ui.js';
+import { buildGdprExportFiles } from './data.export.js';
 import {
   buildErrorContainer,
   buildSuccessContainer,
 } from '@/discord/utils/errors.js';
 import { lang } from '@/discord/lang/index.js';
 import type { User } from 'discord.js';
+
+/**
+ * A subject's export as a response: the short notice plus the two downloadable
+ * files it points at. Both fronts and the owner lookup go through here, so a
+ * data answer is never assembled two different ways.
+ */
+function toExportResponse(
+  gdprExport: GdprExport,
+  language: SupportedLocale,
+  ephemeral: boolean,
+): CommandResponse {
+  /**
+   * An empty export gets the "nothing stored" card, which points at no file,
+   * and Components V2 rejects an attachment no component references.
+   */
+  if (isGdprExportEmpty(gdprExport)) {
+    return {
+      container: buildDataContainer(language, gdprExport, []),
+      ephemeral,
+    };
+  }
+
+  const files = buildGdprExportFiles(gdprExport, language);
+  return {
+    container: buildDataContainer(language, gdprExport, files.names),
+    files: files.attachments,
+    ephemeral,
+  };
+}
 
 /** Sends `response` by DM to `user` and returns a small confirmation/failure notice. */
 async function deliverViaDM(
@@ -64,10 +96,7 @@ export async function runDataCommand(
   const gdprExport = await buildGdprExport(userId);
   await recordGdprRequest(userId);
 
-  return {
-    container: buildDataContainer(language, gdprExport),
-    ephemeral: inGuild,
-  };
+  return toExportResponse(gdprExport, language, inGuild);
 }
 
 /**
@@ -90,10 +119,7 @@ async function buildTargetDataResponse(
   language: SupportedLocale,
 ): Promise<CommandResponse> {
   const gdprExport = await buildGdprExport(targetId);
-  return {
-    container: buildDataContainer(language, gdprExport),
-    ephemeral: true,
-  };
+  return toExportResponse(gdprExport, language, true);
 }
 
 /**

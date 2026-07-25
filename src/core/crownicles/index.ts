@@ -1,7 +1,10 @@
 /**
  * Reads public Crownicles game data at runtime (fetched over the network per
- * the project NOTICE) and caches it in memory. Nothing is vendored except the
- * small, stable emote tables in {@link ./icons.js}.
+ * the project NOTICE) and caches it in memory. The only hardcoded content is
+ * the small, stable emote tables in {@link ./icons.js} and the numeric
+ * balance constants in {@link ./experience.js} and {@link ./item-constants.js}
+ * -- both allowed under the project NOTICE as plain facts/data, never source
+ * code.
  */
 
 export {
