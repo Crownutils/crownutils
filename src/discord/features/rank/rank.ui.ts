@@ -5,12 +5,7 @@ import type { Container } from '../../components/index.js';
 import { createContainer, Separator, Text } from '../../components/index.js';
 import { lang } from '../../lang/index.js';
 import { md } from '../../theme/markdown.js';
-
-const RANK_ICON = {
-  normal: '👤',
-  privileged: '🎟️',
-  owner: '👑',
-} satisfies Record<NotBannedRank, string>;
+import { rankIcons } from '../../theme/icons.js';
 
 /**
  * Renders the `rank` command's answer: the caller's rank, its icon and level,
@@ -42,14 +37,14 @@ export function buildRankContainer(
   const perks = new Text('');
   for (const { rank, label } of perkEntries) {
     perks.newLine(
-      `${RANK_ICON[rank]} ${hasRank(userRank, rank) ? label : md.strikethrough(label)}`,
+      `${rankIcons[rank]} ${hasRank(userRank, rank) ? label : md.strikethrough(label)}`,
     );
   }
 
   return createContainer('brand').add(
     new Text(messages.explanation),
     new Separator(),
-    new Text(messages.userRank(userRank, RANK_ICON[userRank])).newLine(
+    new Text(messages.userRank(userRank, rankIcons[userRank])).newLine(
       messages.rankLevel(userRankLevel),
     ),
     new Separator(),
