@@ -84,3 +84,9 @@ export {
   itemStatIcons,
   type EffectInfo,
 } from './icons.js';
+
+export {
+  computeOutcomeExperience,
+  computeExperienceNeededToLevelUp,
+  type OutcomeExperienceInputs,
+} from './experience.js';

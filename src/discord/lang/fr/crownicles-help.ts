@@ -152,6 +152,27 @@ export const crowniclesHelp = {
         `Niveau ${current}/${total}`,
     },
 
+    level: {
+      name: 'Niveau',
+      description:
+        "Voir la quantité d'expérience requise pour passer des niveaux",
+      intro:
+        "Renseignez un niveau de départ puis un niveau d'arrivée en cliquant sur le bouton ci-dessous.",
+      computeXpButton: "Calculer l'expérience",
+      recomputeXpButton: 'Recalculer',
+      result: (from: number, to: number, xp: string, xpIcon: string): string =>
+        `Du niveau ${from} au niveau ${to}, il vous faut ${xp} ${xpIcon}.`,
+      invalidInput: (max: number): string =>
+        `Veuillez renseigner deux niveaux entiers entre 0 et ${max}, le niveau de départ étant inférieur au niveau d'arrivée.`,
+      modal: {
+        title: 'Choix des niveaux',
+        fromLevelLabel: 'Niveau de départ',
+        toLevelLabel: "Niveau d'arrivée",
+        fromLevelPlaceholder: 'Ex: 12',
+        toLevelPlaceholder: 'Ex: 18',
+      },
+    },
+
     rage: {
       name: 'Rage',
       description: 'Le fonctionnement de la rage',

@@ -7,7 +7,7 @@ import {
   Text,
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
-import { loadCrowniclesHelpData } from '../data/events.js';
+import { loadCrowniclesEventsData } from '../data/events.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import {
   appendBackButton,
@@ -38,7 +38,7 @@ export const specialEventsPage: HelpPage = {
   authorization: 'normal',
   icon: SPECIAL_ICON,
 
-  loadData: async (locale) => ({ data: await loadCrowniclesHelpData(locale) }),
+  loadData: async (locale) => ({ data: await loadCrowniclesEventsData(locale) }),
   hasData: (state) => state.data !== undefined,
 
   name: (locale: SupportedLocale) => messages(locale).name,

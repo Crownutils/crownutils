@@ -17,7 +17,7 @@ import {
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
 import { commandMessages } from '@/discord/lang/index.js';
-import type { CrowniclesHelpData } from './data/events.js';
+import type { CrowniclesEventsData } from './data/events.js';
 import type { HelpRenderContext, HelpState } from './page.js';
 
 /** Discord's hard limits on the text a select option can carry. */
@@ -198,7 +198,7 @@ function effectPart(
 /** The location(s) a forced map link connects, joined by `↔`, or the bare compass. */
 function forcedLinkLabel(
   outcome: EventOutcome,
-  data: CrowniclesHelpData,
+  data: CrowniclesEventsData,
 ): string {
   const link =
     outcome.mapLink !== undefined
@@ -218,7 +218,7 @@ function forcedLinkLabel(
 function travelPart(
   outcome: EventOutcome,
   locale: SupportedLocale,
-  data: CrowniclesHelpData,
+  data: CrowniclesEventsData,
 ): string | undefined {
   const typeLabel = (code: string): string => {
     const icon = locationTypeIcons[code] ?? '';
@@ -244,7 +244,7 @@ function travelPart(
 export function outcomeSummary(
   outcome: EventOutcome,
   locale: SupportedLocale,
-  data: CrowniclesHelpData,
+  data: CrowniclesEventsData,
 ): string {
   const l = helpMessages(locale).labels;
   const parts: string[] = [];
@@ -320,7 +320,7 @@ export function appendEventDetail(
   container: Container,
   event: CrowniclesEvent,
   locale: SupportedLocale,
-  data: CrowniclesHelpData,
+  data: CrowniclesEventsData,
 ): void {
   const t = helpMessages(locale);
 

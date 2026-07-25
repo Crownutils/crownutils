@@ -2,6 +2,8 @@ import { MessageFlags } from 'discord.js';
 import type {
   Message,
   MessageComponentInteraction,
+  ModalBuilder,
+  ModalMessageModalSubmitInteraction,
   RepliableInteraction,
   SendableChannels,
 } from 'discord.js';
@@ -24,15 +26,37 @@ export interface RenderContext {
   readonly disabled: boolean;
 }
 
+/**
+ * Folds a modal submission into the next state. Runs as its own transition
+ * against the latest `state`, so a slow modal never clobbers a newer click.
+ */
+export type ModalApply<State> = (
+  state: State,
+  submit: ModalMessageModalSubmitInteraction,
+  context: ReduceContext<State>,
+) => State | Promise<State>;
+
 /** Lifecycle controls a {@link InteractiveMessage.reduce} may trigger. */
-export interface ReduceContext {
+export interface ReduceContext<State> {
   /** End collection now; the message is re-rendered once more as disabled. */
   stop(): void;
   /**
-   * Declare the interaction already acknowledged (e.g. `reply`, `showModal`), so
-   * the default `update` re-render - which would double-acknowledge - is skipped.
+   * Declare the interaction already acknowledged (e.g. `reply`), so the default
+   * `update` re-render - which would double-acknowledge - is skipped.
    */
   markHandled(): void;
+  /**
+   * Show `modal` as this interaction's response, then fold its submission into a
+   * fresh state transition via `apply`. The runtime awaits the submission off
+   * the transition queue (the message stays responsive) and runs `apply` against
+   * the latest state. This acknowledges the interaction, so return the current
+   * state unchanged afterwards. `options.time` overrides the idle-length wait.
+   */
+  showModal(
+    modal: ModalBuilder,
+    apply: ModalApply<State>,
+    options?: { readonly time?: number },
+  ): void;
 }
 
 /**
@@ -51,7 +75,7 @@ export interface InteractiveMessage<State> {
   reduce(
     state: State,
     interaction: MessageComponentInteraction,
-    context: ReduceContext,
+    context: ReduceContext<State>,
   ): State | Promise<State>;
   /**
    * User ids allowed to interact; others get an ephemeral, localized refusal and
@@ -94,6 +118,11 @@ async function refuse(interaction: MessageComponentInteraction): Promise<void> {
   );
 }
 
+/** Any interaction that can acknowledge by editing the message in place. */
+type MessageUpdatable =
+  | MessageComponentInteraction
+  | ModalMessageModalSubmitInteraction;
+
 /** Attach the collector loop that keeps `message` in sync until stop or timeout. */
 function drive<State>(
   message: Message,
@@ -111,51 +140,118 @@ function drive<State>(
       isAllowed(controller.allowedIds, interaction.user.id),
   });
 
+  /**
+   * Every transition (component clicks and deferred modal submissions) reads and
+   * writes `state`, so they run one at a time through this queue: an in-flight
+   * modal can neither interleave with nor be clobbered by a later click.
+   */
+  let queue: Promise<void> = Promise.resolve();
+  const enqueue = (task: () => Promise<void>): void => {
+    // Run `task` on either outcome, and swallow its rejection so the chain lives on.
+    queue = queue.then(task, task).catch(() => undefined);
+  };
+
+  const payload = (disabled: boolean) => ({
+    flags: MessageFlags.IsComponentsV2 as const,
+    components: componentsOf(controller, state, disabled),
+  });
+
+  /** Re-render through `interaction` unless the reducer already answered it; end collection when stopping. */
+  const rerender = async (
+    interaction: MessageUpdatable,
+    handled: boolean,
+    stopped: boolean,
+  ): Promise<void> => {
+    if (!handled && !interaction.replied && !interaction.deferred) {
+      await safeDiscord(interaction.update(payload(stopped)), {
+        action: 'interactiveUpdate',
+      });
+      if (stopped) disabledRendered = true;
+    }
+    // Tagged so the end handler skips its own re-render over this one.
+    if (stopped) collector.stop(STOP_REASON);
+  };
+
+  /** Show a reducer's modal and, once submitted, enqueue its follow-up transition. */
+  const openModal = (
+    interaction: MessageComponentInteraction,
+    modal: ModalBuilder,
+    apply: ModalApply<State>,
+    time: number,
+  ): void => {
+    void (async () => {
+      await safeDiscord(interaction.showModal(modal), {
+        action: 'interactiveShowModal',
+      });
+      const submit = await interaction
+        .awaitModalSubmit({
+          time,
+          filter: (i) =>
+            i.customId === modal.toJSON().custom_id &&
+            i.user.id === interaction.user.id,
+        })
+        .catch(() => undefined);
+      if (submit === undefined || !submit.isFromMessage()) return;
+      enqueue(() =>
+        runTransition(submit, (context) => apply(state, submit, context)),
+      );
+    })();
+  };
+
+  /** The context a reducer receives, wired to this interaction's transition flags. */
+  const makeContext = (
+    interaction: MessageUpdatable,
+    flags: { handled: boolean; stopped: boolean },
+  ): ReduceContext<State> => ({
+    stop: () => {
+      flags.stopped = true;
+    },
+    markHandled: () => {
+      flags.handled = true;
+    },
+    showModal: (modal, apply, options) => {
+      // showModal is the interaction's own acknowledgement.
+      flags.handled = true;
+      openModal(
+        interaction as MessageComponentInteraction,
+        modal,
+        apply,
+        options?.time ?? controller.idleMs ?? INTERACTIVE_MESSAGE_IDLE_MS,
+      );
+    },
+  });
+
+  /** Run one reducer against the latest state, apply its result, then re-render. */
+  const runTransition = async (
+    interaction: MessageUpdatable,
+    reduce: (context: ReduceContext<State>) => State | Promise<State>,
+  ): Promise<void> => {
+    const flags = { handled: false, stopped: false };
+    state = await reduce(makeContext(interaction, flags));
+    await rerender(interaction, flags.handled, flags.stopped);
+  };
+
   collector.on('ignore', (interaction) => {
     void refuse(interaction);
   });
 
   collector.on('collect', (interaction) => {
-    // Collector callbacks are synchronous; run the async transition detached.
-    void (async () => {
-      let stopped = false;
-      let handled = false;
-      state = await controller.reduce(state, interaction, {
-        stop: () => {
-          stopped = true;
-        },
-        markHandled: () => {
-          handled = true;
-        },
-      });
-
-      // Re-render the next state (disabled when stopping) unless reduce already answered it.
-      if (!handled && !interaction.replied && !interaction.deferred) {
-        await safeDiscord(
-          interaction.update({
-            flags: MessageFlags.IsComponentsV2,
-            components: componentsOf(controller, state, stopped),
-          }),
-          { action: 'interactiveUpdate' },
-        );
-        if (stopped) disabledRendered = true;
-      }
-
-      // Tagged so the end handler skips its own re-render over this one.
-      if (stopped) collector.stop(STOP_REASON);
-    })();
+    enqueue(() =>
+      runTransition(interaction, (context) =>
+        controller.reduce(state, interaction, context),
+      ),
+    );
   });
 
   collector.on('end', (_collected, reason) => {
     // Skip only if an explicit stop already rendered the disabled state.
     if (reason === STOP_REASON && disabledRendered) return;
-    void safeDiscord(
-      message.edit({
-        flags: MessageFlags.IsComponentsV2,
-        components: componentsOf(controller, state, true),
-      }),
-      { action: 'interactiveTimeout' },
-    );
+    // Run after any in-flight transition so the final render reflects the latest state.
+    enqueue(async () => {
+      await safeDiscord(message.edit(payload(true)), {
+        action: 'interactiveTimeout',
+      });
+    });
   });
 }
 

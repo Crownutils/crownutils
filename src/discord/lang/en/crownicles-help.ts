@@ -149,6 +149,26 @@ export const crowniclesHelp = {
         `Level ${current}/${total}`,
     },
 
+    level: {
+      name: 'Level',
+      description: 'See how much experience needed to level up',
+      intro:
+        'Enter a starting level and then a target level by clicking the button below.',
+      computeXpButton: 'Calculate experience',
+      recomputeXpButton: 'Calculate again',
+      result: (from: number, to: number, xp: string, xpIcon: string): string =>
+        `From level ${from} to level ${to}, you need ${xp} ${xpIcon}.`,
+      invalidInput: (max: number): string =>
+        `Please enter two whole levels between 0 and ${max}, with the starting level below the target one.`,
+      modal: {
+        title: 'Choice of levels',
+        fromLevelLabel: 'Starting level',
+        toLevelLabel: 'Target level',
+        fromLevelPlaceholder: 'E.g: 12 ',
+        toLevelPlaceholder: 'E.g: 18',
+      },
+    },
+
     rage: {
       name: 'Rage',
       description: 'How rage works',

@@ -145,7 +145,8 @@ export async function createCrowniclesHelpController(
       }
 
       const page = findHelpPage(pages, state.pageId);
-      return page ? page.reduce(state, interaction) : state;
+      if (!page) return state;
+      return page.reduce(state, interaction, { ...context, locale, rank });
     },
   };
 }
