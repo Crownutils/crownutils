@@ -15,7 +15,7 @@ import type { SupportedLocale } from '@/core/types.js';
  * loaders once per open: the locations that actually host an event (sorted for
  * the picker), the events grouped by location, and the location-less specials.
  */
-export interface CrowniclesHelpData {
+export interface CrowniclesEventsData {
   /** Locations with at least one event, sorted by localized name. */
   readonly locations: readonly CrowniclesLocation[];
   readonly eventsByLocation: ReadonlyMap<number, readonly CrowniclesEvent[]>;
@@ -47,9 +47,9 @@ function referencedMapLinkIds(events: readonly CrowniclesEvent[]): number[] {
  * core loaders' TTL caches, so this only re-groups/sorts in memory - cheap
  * enough to run once per command open and keep in the interactive state.
  */
-export async function loadCrowniclesHelpData(
+export async function loadCrowniclesEventsData(
   locale: SupportedLocale,
-): Promise<CrowniclesHelpData> {
+): Promise<CrowniclesEventsData> {
   const [locations, events, mapTypeNames, locationNames] = await Promise.all([
     getCrowniclesLocations(locale),
     getEvents(locale),

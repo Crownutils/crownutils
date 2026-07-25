@@ -64,6 +64,20 @@ export async function getLegalAcceptance(
   return acceptance;
 }
 
+/**
+ * When each user accepted the legal documents, keyed by user id. Feeds the
+ * owner-facing user listing, where it is the "registered on" date; users with a
+ * stored row but no acceptance are simply absent from the map.
+ */
+export async function listLegalAcceptanceDates(): Promise<Map<string, Date>> {
+  const acceptances = await prisma.legalAcceptance.findMany({
+    select: { userId: true, acceptedAt: true },
+  });
+  return new Map(
+    acceptances.map(({ userId, acceptedAt }) => [userId, acceptedAt]),
+  );
+}
+
 /** Records `userId`'s acceptance of the current {@link LEGAL_VERSION}; idempotent. */
 export async function acceptLegal(userId: string): Promise<void> {
   await prisma.legalAcceptance.upsert({
