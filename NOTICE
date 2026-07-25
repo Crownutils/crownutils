@@ -31,6 +31,13 @@ affect Crownutils' license:
     calculator) from scratch in our own code. Algorithms and mathematical
     formulas are not copyrightable; only a specific code expression is.
 
+  - Hardcoding a small, stable table that pairs a game id with a plain Unicode
+    character (e.g. item category/rarity/nature icons, location-type icons),
+    instead of fetching it at runtime. Such short, functional associations are
+    kept deliberately minimal, are not the kind of creative or substantial
+    content described under "assets" below, and are refreshed by hand if the
+    game changes them.
+
 Not done -- would carry Crownicles' AGPL and/or the content's copyright
 obligations, and is therefore avoided in this repository:
 
@@ -38,7 +45,9 @@ obligations, and is therefore avoided in this repository:
     code into Crownutils.
 
   - Vendoring Crownicles' files into this repository: source code, creative
-    descriptions / lore text, images, sprites or other assets.
+    descriptions / lore text, images, sprites or other assets (the small
+    factual/icon tables described as Allowed above are not "files" or "assets"
+    in this sense).
 
 Creative text (descriptions, lore) and graphical assets remain the property of
 their respective authors and are not reproduced verbatim in this repository.

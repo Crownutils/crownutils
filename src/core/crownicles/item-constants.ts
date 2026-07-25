@@ -1,6 +1,7 @@
 /**
- * Item balance constants vendored from the Crownicles source (values are
- * stable; update here if the game rebalances them). Sources:
+ * Item balance constants taken from the Crownicles source (values are
+ * stable; update here if the game rebalances them). Plain numeric data, not
+ * vendored code -- see the project NOTICE. Sources:
  * `Lib/src/constants/ItemConstants.ts`, `Lib/src/constants/InventoryConstants.ts`,
  * `Lib/src/constants/ItemMaterialCategoryConstants.ts` and the stat formulas of
  * `Core/src/data/Weapon.ts` / `Core/src/data/Armor.ts`.
