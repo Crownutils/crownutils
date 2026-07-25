@@ -17,8 +17,15 @@ import {
 } from '@/discord/components/index.js';
 import { md } from '@/discord/theme/markdown.js';
 import { commandMessages } from '@/discord/lang/index.js';
+import { countPages, paginate } from '@/discord/utils/pagination.js';
 import type { CrowniclesEventsData } from './data/events.js';
 import type { HelpRenderContext, HelpState } from './page.js';
+
+// Re-exported so every help page keeps sourcing its pagination from this module.
+export {
+  appendPaginationControls,
+  clampPage,
+} from '@/discord/utils/pagination.js';
 
 /** Discord's hard limits on the text a select option can carry. */
 export const SELECT_LABEL_MAX = 100;
@@ -62,12 +69,7 @@ export function eventOptionLabel(text: string, fallback: string): string {
 
 /** Total picker pages needed for `length` options (at least one). */
 export function pickerPageCount(length: number): number {
-  return Math.max(1, Math.ceil(length / PICKER_PAGE_SIZE));
-}
-
-/** Clamps `page` into `[0, count - 1]`. */
-export function clampPage(page: number, count: number): number {
-  return Math.min(Math.max(page, 0), count - 1);
+  return countPages(length, PICKER_PAGE_SIZE);
 }
 
 /** The clamped current picker page and its slice of `items`. */
@@ -75,46 +77,7 @@ export function pickerPage<T>(
   items: readonly T[],
   requestedPage: number | undefined,
 ): { page: number; pageCount: number; slice: readonly T[] } {
-  const pageCount = pickerPageCount(items.length);
-  const page = clampPage(requestedPage ?? 0, pageCount);
-  return {
-    page,
-    pageCount,
-    slice: items.slice(page * PICKER_PAGE_SIZE, (page + 1) * PICKER_PAGE_SIZE),
-  };
-}
-
-/** Adds the `Page x/y` indicator and prev/next buttons when several pages exist. */
-export function appendPaginationControls(
-  container: Container,
-  options: {
-    readonly page: number;
-    readonly pageCount: number;
-    readonly prevId: string;
-    readonly nextId: string;
-    readonly indicator: (current: number, total: number) => string;
-    readonly previousLabel: string;
-    readonly nextLabel: string;
-    readonly disabled: boolean;
-  },
-): void {
-  if (options.pageCount <= 1) return;
-  container.add(
-    new Text(options.indicator(options.page + 1, options.pageCount)).size(
-      'subtle',
-    ),
-  );
-  const previous = new Button(options.prevId)
-    .color('secondary')
-    .label(options.previousLabel);
-  const next = new Button(options.nextId)
-    .color('secondary')
-    .label(options.nextLabel);
-  if (options.disabled || options.page <= 0) previous.disabled();
-  if (options.disabled || options.page >= options.pageCount - 1) {
-    next.disabled();
-  }
-  container.add(new ButtonActionRow().add(previous, next));
+  return paginate(items, requestedPage, PICKER_PAGE_SIZE);
 }
 
 /** Adds a single back button below the current step. */
