@@ -37,7 +37,9 @@ export function buildRankContainer(
   const perks = new Text('');
   for (const { rank, label } of perkEntries) {
     perks.newLine(
-      `${rankIcons[rank]} ${hasRank(userRank, rank) ? label : md.strikethrough(label)}`,
+      new Text(hasRank(userRank, rank) ? label : md.strikethrough(label)).icon(
+        rankIcons[rank],
+      ),
     );
   }
 

@@ -36,7 +36,7 @@ export function buildDeleteDataConfirmContainer(
   }
 
   return createContainer('warn').add(
-    new Text(`${icons.warning} ${t.title}`).title(),
+    new Text(t.title).icon(icons.warning).title(),
     new Text(t.warning),
     new Text(t.willDelete).newLine(t.willKeep).size('subtle'),
     new ButtonActionRow().add(confirm, cancel),
@@ -49,7 +49,7 @@ export function buildDeleteDataDoneContainer(
 ): Container {
   const t = messages(locale);
   return createContainer('success').add(
-    new Text(`${icons.success} ${t.doneTitle}`).title(),
+    new Text(t.doneTitle).icon(icons.success).title(),
     new Text(t.doneDescription),
   );
 }

@@ -7,7 +7,7 @@ import {
   Separator,
   Text,
 } from '@/discord/components/index.js';
-import { icons, rankIcons } from '@/discord/theme/icons.js';
+import { icons, rankIcons, withIcon } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import { commandMessages } from '@/discord/lang/index.js';
 import { formatNumber } from '@/discord/lang/number.js';
@@ -29,9 +29,8 @@ function rankBreakdown(census: UserCensus, locale: SupportedLocale): string {
   return [...RANK]
     .reverse()
     .filter((rank) => census.byRank[rank] > 0)
-    .map(
-      (rank) =>
-        `${rankIcons[rank]} ${formatNumber(locale, census.byRank[rank])}`,
+    .map((rank) =>
+      withIcon(rankIcons[rank], formatNumber(locale, census.byRank[rank])),
     )
     .join(' | ');
 }
@@ -47,7 +46,7 @@ function formatEntry(
   locale: SupportedLocale,
 ): string {
   const t = commandMessages(locale, 'commandUsers');
-  const parts = [`${rankIcons[entry.rank]} ${md.code(entry.userId)}`];
+  const parts = [withIcon(rankIcons[entry.rank], md.code(entry.userId))];
   if (username !== undefined) parts.push(md.bold(username));
   parts.push(entry.language);
   parts.push(
@@ -67,7 +66,7 @@ export function buildUserListContainer(
 ): Container {
   const t = commandMessages(locale, 'commandUsers');
   const container = createContainer('brand').add(
-    new Text(`${icons.users} ${t.title}`).title(),
+    new Text(t.title).icon(icons.users).title(),
   );
 
   if (census.entries.length === 0) {

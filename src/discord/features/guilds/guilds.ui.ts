@@ -6,7 +6,7 @@ import {
   Separator,
   Text,
 } from '@/discord/components/index.js';
-import { icons } from '@/discord/theme/icons.js';
+import { icons, withIcon } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import { commandMessages } from '@/discord/lang/index.js';
 import { formatNumber } from '@/discord/lang/number.js';
@@ -32,7 +32,7 @@ function appendEntry(
   const t = commandMessages(locale, 'commandGuilds');
   const facts = [
     md.code(entry.id),
-    `${icons.users} ${formatNumber(locale, entry.memberCount)}`,
+    withIcon(icons.users, formatNumber(locale, entry.memberCount)),
   ];
   if (entry.joinedAt) {
     facts.push(t.joined(time(entry.joinedAt, TimestampStyles.ShortDate)));
@@ -54,7 +54,7 @@ export function buildGuildListContainer(
 ): Container {
   const t = commandMessages(locale, 'commandGuilds');
   const container = createContainer('brand').add(
-    new Text(`${icons.guild} ${t.title}`).title(),
+    new Text(t.title).icon(icons.guild).title(),
   );
 
   if (overview.entries.length === 0) {
