@@ -7,12 +7,11 @@ export const about = {
     title: 'Informations du bot',
     version: (botVersion: string): string =>
       `Version actuelle : ${md.bold(botVersion)}`,
-    githubUrl: (url: string) =>
-      `Le code source du bot est ${md.bold('entièrement')} public, retrouvez le sur le ${md.link('dépôt officiel', url)}.`,
+    sourceCode: `Le code source du bot n'est ${md.bold('pas')} public.`,
     license: {
       licenseName: `Licence : ${md.bold('Tous droits réservés')}`,
       compatibilityWithCrownicles:
-        'La notice de compatibilité avec la licence de Crownicles est disponible sur le dépôt officiel.',
+        "Crownutils est un programme indépendant, qui n'incorpore aucun code source de Crownicles.",
     },
     presentation: `Crownutils est un bot utilitaire créé par ${md.bold('Ntalcme')} pour faciliter la vie des joueurs de Crownicles. Profitez de fonctionnalités pratiques, tout est pensé pour rendre votre expérience de jeu plus agréable. Le respect de votre vie privée reste une priorité : seules les données indispensables au bon fonctionnement du bot sont conservées.`,
     usefulLinks: {

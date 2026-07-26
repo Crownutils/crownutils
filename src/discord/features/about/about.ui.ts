@@ -20,7 +20,7 @@ export function buildAboutContainer(language: SupportedLocale): Container {
           .italic()
           .size('subtle'),
       )
-      .newLine(messages.githubUrl(config.githubUrl)),
+      .newLine(messages.sourceCode),
     new Separator(),
     new Text(messages.usefulLinks.title).size('small'),
     new Text(messages.usefulLinks.projectGithubPage(config.projectUrl)).newLine(

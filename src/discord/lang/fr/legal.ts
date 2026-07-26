@@ -84,7 +84,7 @@ const terms = {
   },
   intellectualProperty: {
     heading: 'Propriété intellectuelle',
-    body: 'Le jeu Crownicles et ses contenus demeurent la propriété de leurs auteurs respectifs. Le code source de Crownutils est visible publiquement mais reste protégé : tous droits réservés, son usage, sa copie ou sa redistribution ne sont pas autorisés sans accord préalable.',
+    body: "Le jeu Crownicles et ses contenus demeurent la propriété de leurs auteurs respectifs. Le code source de Crownutils n'est pas public et reste protégé : tous droits réservés, son usage, sa copie ou sa redistribution ne sont pas autorisés sans accord préalable.",
   },
   law: {
     heading: 'Droit applicable',
