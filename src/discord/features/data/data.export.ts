@@ -43,7 +43,7 @@ function toJsonPayload(gdprExport: GdprExport, generatedAt: Date): unknown {
       formatVersion: EXPORT_FORMAT_VERSION,
       generatedAt: generatedAt.toISOString(),
       controller: 'Crownutils',
-      controllerUrl: config.githubUrl,
+      controllerUrl: config.legalUrl,
       subjectDiscordId: gdprExport.userId,
     },
     data: {
@@ -103,7 +103,7 @@ function toMarkdownDocument(
   const lines = [
     `# ${t.title}`,
     '',
-    t.generatedAt(longDate(locale, generatedAt), config.githubUrl),
+    t.generatedAt(longDate(locale, generatedAt), config.legalUrl),
     '',
     `## ${t.storedSection}`,
     '',
@@ -133,7 +133,7 @@ function toMarkdownDocument(
     `- ${t.rights.erasure}`,
     `- ${t.rights.portability}`,
     '',
-    t.rightsContact(config.githubUrl),
+    t.rightsContact(config.legalUrl),
     '',
     `## ${t.retentionSection}`,
     '',

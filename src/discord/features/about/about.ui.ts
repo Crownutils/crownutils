@@ -16,7 +16,7 @@ export function buildAboutContainer(language: SupportedLocale): Container {
     new Text(messages.version(config.botVersion))
       .newLine(messages.license.licenseName)
       .newLine(
-        new Text(messages.license.compatibilityWithCrownicles)
+        new Text(messages.license.compatibilityWithCrownicles(config.legalUrl))
           .italic()
           .size('subtle'),
       )
