@@ -1,4 +1,3 @@
-import { icons } from '@/discord/theme/icons.js';
 import type { CommandNode } from '../types.js';
 
 export const register = {
@@ -6,13 +5,13 @@ export const register = {
   messages: {
     acceptButtonLabel: 'Accept',
     declineButtonLabel: 'Decline',
-    doneTitle: `${icons.success} Registration complete`,
+    doneTitle: 'Registration complete',
     doneBody:
       'You accepted the documents and now have access to all of the bot features.',
-    cancelledTitle: `${icons.error} Registration cancelled`,
+    cancelledTitle: 'Registration cancelled',
     cancelledBody:
       'You declined the documents. You can register again at any time.',
-    alreadyTitle: `${icons.success} Already registered`,
+    alreadyTitle: 'Already registered',
     alreadyBody: (version: string, date: string) =>
       `You already accepted the documents (version ${version}) on ${date}.`,
     cannotRegister:

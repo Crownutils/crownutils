@@ -1,11 +1,10 @@
-import { icons } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import type { CommandNode } from '../types.js';
 
 export const about = {
   description: 'Shows informations about the bot.',
   messages: {
-    title: `${icons.info} Bot's informations`,
+    title: "Bot's informations",
     version: (botVersion: string): string =>
       `Current version : ${md.bold(botVersion)}`,
     githubUrl: (url: string) =>

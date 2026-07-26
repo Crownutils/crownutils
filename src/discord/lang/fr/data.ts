@@ -1,11 +1,10 @@
-import { icons } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import type { CommandNode } from '../types.js';
 
 export const data = {
   description: 'Consulter les données personnelles conservées par le bot.',
   messages: {
-    title: `${icons.shield} Vos données`,
+    title: 'Vos données',
     noDataStored: "Aucune donnée vous concernant n'a été stockée.",
     attachedIntro:
       "L'ensemble des données que Crownutils conserve à votre sujet est joint à ce message.",

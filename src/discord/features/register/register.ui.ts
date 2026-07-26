@@ -7,6 +7,7 @@ import {
   Separator,
   Text,
 } from '../../components/index.js';
+import { icons } from '../../theme/icons.js';
 import { lang } from '../../lang/index.js';
 import type { LegalDocument } from './register.service.js';
 
@@ -39,9 +40,9 @@ export function buildLegalContainer(
   );
 
   const container = createContainer('brand').add(
-    new Text(
-      isPrivacy ? legalMessages.privacyTitle : legalMessages.cguTitle,
-    ).title(),
+    new Text(isPrivacy ? legalMessages.privacyTitle : legalMessages.cguTitle)
+      .icon(isPrivacy ? icons.shield : icons.scroll)
+      .title(),
     new Text(legalMessages.intro).size('subtle'),
   );
 
@@ -92,7 +93,7 @@ export function buildRegisterDoneContainer(
 ): Container {
   const messages = lang[language].commandRegister.messages;
   return createContainer('success').add(
-    new Text(messages.doneTitle).title(),
+    new Text(messages.doneTitle).icon(icons.success).title(),
     new Separator(),
     new Text(messages.doneBody),
   );
@@ -104,7 +105,7 @@ export function buildRegisterCancelledContainer(
 ): Container {
   const messages = lang[language].commandRegister.messages;
   return createContainer('cancel').add(
-    new Text(messages.cancelledTitle).title(),
+    new Text(messages.cancelledTitle).icon(icons.error).title(),
     new Separator(),
     new Text(messages.cancelledBody),
   );
@@ -122,7 +123,7 @@ export function buildRegisterAlreadyContainer(
     timeStyle: 'short',
   }).format(acceptedAt);
   return createContainer('warn').add(
-    new Text(messages.alreadyTitle).title(),
+    new Text(messages.alreadyTitle).icon(icons.success).title(),
     new Separator(),
     new Text(messages.alreadyBody(version, when)),
   );

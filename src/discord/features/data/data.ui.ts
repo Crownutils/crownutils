@@ -10,6 +10,7 @@ import {
   UserSelectActionRow,
   UserSelectMenu,
 } from '../../components/index.js';
+import { icons } from '../../theme/icons.js';
 import { lang } from '../../lang/index.js';
 
 const DATA_LOOKUP_SELECT_ID = 'data-lookup-select';
@@ -36,14 +37,14 @@ export function buildDataContainer(
 
   if (isGdprExportEmpty(gdprExport)) {
     return createContainer('brand').add(
-      new Text(messages.title).title(),
+      new Text(messages.title).icon(icons.shield).title(),
       new Separator(),
       new Text(messages.noDataStored),
     );
   }
 
   const container = createContainer('brand').add(
-    new Text(messages.title).title(),
+    new Text(messages.title).icon(icons.shield).title(),
     new Text(messages.attachedIntro),
     new Text(messages.attachedReadable)
       .size('subtle')

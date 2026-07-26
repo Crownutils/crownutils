@@ -57,6 +57,27 @@ export default tseslint.config(
     },
   },
 
+  // Language packs hold wording, never glyphs: an emote that decorates a line is
+  // attached by the UI (`Text.icon()` / `withIcon`), and one whose place inside a
+  // sentence is a translation choice arrives as a formatter parameter.
+  {
+    files: ['src/discord/lang/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/discord/theme/icons.js', '**/theme/icons.js'],
+              message:
+                'Lang packs must not embed glyphs: take the icon as a parameter, or let the UI attach it with Text.icon().',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // Config is the single place allowed to read process.env; everywhere else
   // must go through @/core/config so env is loaded and validated exactly once.
   {

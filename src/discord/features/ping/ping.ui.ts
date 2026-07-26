@@ -1,6 +1,7 @@
 import type { SupportedLocale } from '@/core/types.js';
 import type { Container } from '../../components/index.js';
 import { createContainer, Separator, Text } from '../../components/index.js';
+import { icons } from '../../theme/icons.js';
 import { lang } from '../../lang/index.js';
 
 interface PingView {
@@ -17,7 +18,7 @@ export function buildPingContainer(
     lang[language].commandPing.messages;
 
   return createContainer('brand').add(
-    new Text(title).title(),
+    new Text(title).icon(icons.ping).title(),
     new Separator(),
     new Text(discordLatency(view.discordLatencyMs)).newLine(
       totalLatency(view.totalLatencyMs),

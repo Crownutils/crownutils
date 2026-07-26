@@ -8,6 +8,7 @@ import {
   Separator,
   Text,
 } from '../../components/index.js';
+import { icons } from '../../theme/icons.js';
 import { lang } from '../../lang/index.js';
 
 /** Custom id of the language select menu; read back by the controller's `reduce`. */
@@ -33,7 +34,7 @@ export function buildLanguageContainer(
   const messages = lang[language].commandLanguage.messages;
 
   return createContainer('brand').add(
-    new Text(messages.title).title(),
+    new Text(messages.title).icon(icons.language).title(),
     new Separator(),
     new Text(messages.prompt),
     new SelectActionRow().set(

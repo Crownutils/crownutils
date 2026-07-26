@@ -95,7 +95,7 @@ export function buildReminderTriggeredComponents(
 
   return [
     createContainer('brand').add(
-      new Text(t.triggered.title).title(),
+      new Text(t.triggered.title).icon(icons.bell).title(),
       new Text(content),
       new Text(`<@${userId}>`).size('subtle'),
     ),

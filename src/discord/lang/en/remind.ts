@@ -1,5 +1,4 @@
 import { COMMAND_PREFIX } from '@/discord/utils/constants.js';
-import { icons } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import type { CommandNode } from '../types.js';
 
@@ -21,7 +20,7 @@ export const remind = {
         `Your reminder for ${md.code(message)} has been cancelled.`,
     },
     triggered: {
-      title: `${icons.bell} DRING!`,
+      title: 'DRING!',
       relaunchButton: 'Relaunch',
     },
     durationTooLong: 'A reminder cannot be scheduled more than 10 years ahead.',

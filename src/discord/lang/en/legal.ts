@@ -1,4 +1,3 @@
-import { icons } from '@/discord/theme/icons.js';
 import type { CommandNode, LangNode } from '../types.js';
 import { md } from '@/discord/theme/markdown.js';
 
@@ -98,8 +97,8 @@ const documents = { privacy, terms } satisfies LangNode;
 export const legal = {
   cguButtonLabel: 'Terms of Service',
   privacyButtonLabel: 'Privacy',
-  cguTitle: `${icons.scroll} Terms of Service`,
-  privacyTitle: `${icons.shield} Privacy Policy`,
+  cguTitle: 'Terms of Service',
+  privacyTitle: 'Privacy Policy',
   intro:
     'By using Crownutils, you accept the privacy policy and the terms of service below.',
   documents,

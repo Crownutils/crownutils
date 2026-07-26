@@ -1,11 +1,10 @@
-import { icons } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import type { CommandNode } from '../types.js';
 
 export const data = {
   description: 'View the personal data the bot holds about you.',
   messages: {
-    title: `${icons.shield} Your data`,
+    title: 'Your data',
     noDataStored: 'No data about you has been stored.',
     attachedIntro:
       'Everything Crownutils holds about you is attached to this message.',
