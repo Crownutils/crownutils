@@ -1,6 +1,7 @@
 import { TextDisplayBuilder } from 'discord.js';
 import type { ContainerBuilder, SectionBuilder } from 'discord.js';
 import type { ContainerChild } from './component.js';
+import { withIcon } from '../theme/icons.js';
 import { md } from '../theme/markdown.js';
 
 /** `subtle` renders as a small, dimmed line; the others map to Markdown headings. */
@@ -28,6 +29,7 @@ export class Text implements ContainerChild {
   private isCode = false;
   private linkUrl?: string;
   private isQuote = false;
+  private leadingIcon: string | undefined;
   private readonly nextLines: Text[] = [];
 
   public constructor(private readonly content: string) {}
@@ -64,6 +66,18 @@ export class Text implements ContainerChild {
 
   public link(url: string): this {
     this.linkUrl = url;
+    return this;
+  }
+
+  /**
+   * Prefixes the line with `glyph`, outside any inline formatting. Use it
+   * whenever the emote merely decorates the line, so the lang pack keeps the
+   * wording alone; a glyph whose place inside a sentence is a translation
+   * choice belongs to that sentence's formatter instead. An absent or empty
+   * glyph is ignored, so an optional game emote needs no guard.
+   */
+  public icon(glyph: string | undefined): this {
+    this.leadingIcon = glyph;
     return this;
   }
 
@@ -124,6 +138,7 @@ export class Text implements ContainerChild {
     if (this.isUnderline) text = md.underline(text);
     if (this.isStrikethrough) text = md.strikethrough(text);
     if (this.linkUrl !== undefined) text = md.link(text, this.linkUrl);
+    text = withIcon(this.leadingIcon, text);
 
     const prefix = SIZE_PREFIX[this.textSize];
     return prefix ? `${prefix} ${text}` : text;
