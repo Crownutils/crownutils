@@ -13,15 +13,6 @@ export const COMMAND_CATEGORIES = [
 /** One of the {@link COMMAND_CATEGORIES}. */
 export type CommandCategory = (typeof COMMAND_CATEGORIES)[number];
 
-/** Emote shown before each category header in the help overview. */
-export const CATEGORY_ICONS: Record<CommandCategory, string> = {
-  general: '🧩',
-  crownicles: '🎮',
-  reminders: '🔔',
-  privacy: '🔒',
-  moderation: '🛡️',
-};
-
 /** Help metadata for one command: its category and a localized description. */
 export interface CommandDescription {
   readonly category: CommandCategory;

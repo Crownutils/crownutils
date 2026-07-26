@@ -10,11 +10,10 @@ import {
   Separator,
   Text,
 } from '@/discord/components/index.js';
-import { icons } from '@/discord/theme/icons.js';
+import { commandCategoryIcons, icons } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import { lang } from '@/discord/lang/index.js';
 import {
-  CATEGORY_ICONS,
   COMMAND_CATEGORIES,
   type CommandCategory,
 } from './command-descriptions.js';
@@ -81,7 +80,7 @@ export function buildHelpOverview(
 ): Container {
   const t = messages(locale);
   const container = createContainer('brand').add(
-    new Text(`${icons.info} ${t.title}`).title(),
+    new Text(t.title).icon(icons.info).title(),
     new Text(t.intro).size('subtle'),
   );
 
@@ -91,9 +90,9 @@ export function buildHelpOverview(
       .sort((a, b) => a.name.localeCompare(b.name));
     if (inCategory.length === 0) continue;
 
-    const list = new Text(
-      `${CATEGORY_ICONS[category]} ${t.categories[category]}`,
-    ).size('small');
+    const list = new Text(t.categories[category])
+      .icon(commandCategoryIcons[category])
+      .size('small');
     for (const entry of inCategory) {
       const aliases =
         entry.aliases.length > 0
@@ -117,7 +116,7 @@ export function buildHelpDetail(
 ): Container {
   const t = messages(locale);
   const container = createContainer('brand').add(
-    new Text(`${icons.info} ${md.code(entry.name)}`).title(),
+    new Text(md.code(entry.name)).icon(icons.info).title(),
     new Text(entry.description(locale)),
     new Separator(),
   );

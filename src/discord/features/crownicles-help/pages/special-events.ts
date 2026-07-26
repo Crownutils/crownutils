@@ -21,11 +21,12 @@ import {
   PICKER_PAGE_SIZE,
   truncate,
 } from '../crownicles-help.ui.js';
+import { pageIcons } from '../icons.js';
 
 /** Router id of the special-events page. */
 export const SPECIAL_EVENTS_PAGE_ID = 'special-events';
 
-const SPECIAL_ICON = '✨';
+const SPECIAL_ICON = pageIcons.special;
 const EVENT_PREVIEW_MAX = 80;
 
 function messages(locale: SupportedLocale) {
@@ -38,7 +39,9 @@ export const specialEventsPage: HelpPage = {
   authorization: 'normal',
   icon: SPECIAL_ICON,
 
-  loadData: async (locale) => ({ data: await loadCrowniclesEventsData(locale) }),
+  loadData: async (locale) => ({
+    data: await loadCrowniclesEventsData(locale),
+  }),
   hasData: (state) => state.data !== undefined,
 
   name: (locale: SupportedLocale) => messages(locale).name,

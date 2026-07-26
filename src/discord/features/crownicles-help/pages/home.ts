@@ -2,11 +2,12 @@ import type { SupportedLocale } from '@/core/types.js';
 import { createContainer, Text } from '@/discord/components/index.js';
 import type { HelpPage, HelpRenderContext, HelpState } from '../page.js';
 import { helpMessages } from '../crownicles-help.ui.js';
+import { pageIcons } from '../icons.js';
 
 /** Router id of the home page, the fallback of every category resolution. */
 export const HOME_PAGE_ID = 'home';
 
-const HOME_ICON = '🏠';
+const HOME_ICON = pageIcons.home;
 
 /** Landing page: a welcome and a nudge toward the category select below it. */
 export const homePage: HelpPage = {
@@ -21,7 +22,7 @@ export const homePage: HelpPage = {
   render(_state: HelpState, context: HelpRenderContext) {
     const t = helpMessages(context.locale).home;
     return createContainer('brand').add(
-      new Text(`${HOME_ICON} ${t.title}`).title(),
+      new Text(t.title).icon(HOME_ICON).title(),
       new Text(t.welcome),
     );
   },

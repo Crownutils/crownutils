@@ -16,6 +16,7 @@ import {
   createHelpPageContainer,
   helpMessages,
 } from '../crownicles-help.ui.js';
+import { pageIcons } from '../icons.js';
 import type {
   HelpPage,
   HelpReduceContext,
@@ -26,7 +27,7 @@ import type {
 /** Router id of the level page. */
 export const LEVEL_PAGE_ID = 'level';
 
-const LEVEL_ICON = '⭐';
+const LEVEL_ICON = pageIcons.level;
 
 const LEVEL_BUTTON_ID = 'chelp-level-button';
 const LEVEL_MODAL_ID = 'chelp-level-modal';

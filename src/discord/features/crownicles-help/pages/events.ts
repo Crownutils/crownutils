@@ -35,11 +35,12 @@ import {
   SELECT_LABEL_MAX,
   truncate,
 } from '../crownicles-help.ui.js';
+import { pageIcons } from '../icons.js';
 
 /** Router id of the events page. */
 export const EVENTS_PAGE_ID = 'events';
 
-const EVENTS_ICON = '🎭';
+const EVENTS_ICON = pageIcons.events;
 /** Truncation width of an event's intro in the location's event list. */
 const EVENT_PREVIEW_MAX = 80;
 
@@ -67,7 +68,7 @@ function appendLocationPicker(
 
   const list = new Text('');
   for (const location of slice) {
-    list.newLine(`${location.icon ?? ''} ${location.name}`.trim());
+    list.newLine(new Text(location.name).icon(location.icon));
   }
   container.add(list, new Separator());
 
@@ -165,7 +166,9 @@ export const eventsPage: HelpPage = {
   authorization: 'normal',
   icon: EVENTS_ICON,
 
-  loadData: async (locale) => ({ data: await loadCrowniclesEventsData(locale) }),
+  loadData: async (locale) => ({
+    data: await loadCrowniclesEventsData(locale),
+  }),
   hasData: (state) => state.data !== undefined,
 
   name: (locale: SupportedLocale) => messages(locale).name,

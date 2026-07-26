@@ -15,10 +15,11 @@ import {
   Separator,
   Text,
 } from '@/discord/components/index.js';
-import { md } from '@/discord/theme/markdown.js';
+import { withIcon } from '@/discord/theme/icons.js';
 import { commandMessages } from '@/discord/lang/index.js';
 import { countPages, paginate } from '@/discord/utils/pagination.js';
 import type { CrowniclesEventsData } from './data/events.js';
+import { helpIcons } from './icons.js';
 import type { HelpRenderContext, HelpState } from './page.js';
 
 // Re-exported so every help page keeps sourcing its pagination from this module.
@@ -39,8 +40,6 @@ const OCCUPIED_EFFECT_ID = 'occupied';
 const MAX_SHOWN_DURATION_MINUTES = 100_000;
 /** Separator between an outcome's stats. */
 const STAT_SEPARATOR = ' | ';
-/** Stand-in emote for the auto-resolved `end` choice, which has no reaction icon. */
-const END_CHOICE_EMOJI = '🔚';
 
 /** Custom ids of the help center's controls, matched by the router and its pages. */
 export const CATEGORY_SELECT_ID = 'chelp-category';
@@ -99,7 +98,7 @@ export function createHelpPageContainer(
   intro: string,
 ): Container {
   return createContainer('brand').add(
-    new Text(`${icon} ${name}`).title(),
+    new Text(name).icon(icon).title(),
     new Text(intro).size('subtle'),
     new Separator(),
   );
@@ -139,7 +138,10 @@ function timeLostPart(
   const minutes = outcome.lostTime ?? 0;
   if (minutes <= 0) return undefined;
   const t = helpMessages(locale);
-  return `${outcomeIcons.time} ${formatDuration(minutes, locale)} ${t.labels.timeLost}`;
+  return withIcon(
+    outcomeIcons.time,
+    `${formatDuration(minutes, locale)} ${t.labels.timeLost}`,
+  );
 }
 
 /** An alteration effect, as its icon and duration (e.g. `😴 3 h`); icon alone if permanent. */
@@ -154,7 +156,7 @@ function effectPart(
   if (info === undefined) return undefined;
   return info.durationMinutes > 0 &&
     info.durationMinutes <= MAX_SHOWN_DURATION_MINUTES
-    ? `${info.icon} ${formatDuration(info.durationMinutes, locale)}`
+    ? withIcon(info.icon, formatDuration(info.durationMinutes, locale))
     : info.icon;
 }
 
@@ -173,7 +175,7 @@ function forcedLinkLabel(
         .filter((name): name is string => Boolean(name))
     : [];
   return names.length > 0
-    ? `${outcomeIcons.travel} ${names.join(' ↔ ')}`
+    ? withIcon(outcomeIcons.travel, names.join(' ↔ '))
     : outcomeIcons.travel;
 }
 
@@ -186,14 +188,20 @@ function travelPart(
   const typeLabel = (code: string): string => {
     const icon = locationTypeIcons[code] ?? '';
     const name = data.mapTypeNames[code];
-    return name ? `${icon} ${name}`.trim() : icon || code;
+    return name ? withIcon(icon, name) : icon || code;
   };
   if (outcome.mapTypeDestinations?.length) {
-    return `${outcomeIcons.travel} ${outcome.mapTypeDestinations.map(typeLabel).join(', ')}`;
+    return withIcon(
+      outcomeIcons.travel,
+      outcome.mapTypeDestinations.map(typeLabel).join(', '),
+    );
   }
   if (outcome.mapTypeExclusions?.length) {
     const except = helpMessages(locale).labels.travelExcept;
-    return `${outcomeIcons.travel} ${except} ${outcome.mapTypeExclusions.map(typeLabel).join(', ')}`;
+    return withIcon(
+      outcomeIcons.travel,
+      `${except} ${outcome.mapTypeExclusions.map(typeLabel).join(', ')}`,
+    );
   }
   return outcome.mapLink !== undefined
     ? forcedLinkLabel(outcome, data)
@@ -212,7 +220,7 @@ export function outcomeSummary(
   const l = helpMessages(locale).labels;
   const parts: string[] = [];
   const stat = (icon: string, value: string, label: string): void => {
-    parts.push(`${icon} ${value} ${label}`);
+    parts.push(withIcon(icon, `${value} ${label}`));
   };
 
   if (outcome.experience > 0) {
@@ -238,13 +246,13 @@ export function outcomeSummary(
 
   const effect = effectPart(outcome, locale);
   if (effect) parts.push(effect);
-  if (outcome.givesItem) parts.push(`${outcomeIcons.item} ${l.item}`);
-  if (outcome.givesPet) parts.push(`${outcomeIcons.pet} ${l.pet}`);
+  if (outcome.givesItem) parts.push(withIcon(outcomeIcons.item, l.item));
+  if (outcome.givesPet) parts.push(withIcon(outcomeIcons.pet, l.pet));
   if (outcome.oneshot) parts.push(outcomeIcons.oneshot);
   const travel = travelPart(outcome, locale, data);
   if (travel) parts.push(travel);
   if (outcome.nextEventId !== undefined) {
-    parts.push(`${outcomeIcons.nextEvent} #${outcome.nextEventId}`);
+    parts.push(withIcon(outcomeIcons.nextEvent, `#${outcome.nextEventId}`));
   }
 
   return parts.join(STAT_SEPARATOR);
@@ -296,9 +304,10 @@ export function appendEventDetail(
   );
   for (const possibility of ordered) {
     const emoji =
-      possibility.emoji ?? (possibility.key === 'end' ? END_CHOICE_EMOJI : '');
+      possibility.emoji ??
+      (possibility.key === 'end' ? helpIcons.endChoice : '');
     const name = possibility.text ?? t.autoOutcome;
-    const block = new Text(`${emoji} ${md.bold(name)}`.trimStart());
+    const block = new Text(name).bold().icon(emoji);
     possibility.outcomes.forEach((outcome, index) => {
       const summary = outcomeSummary(outcome, locale, data);
       block.newLine(`${index + 1}. ${summary.length > 0 ? summary : '-'}`);

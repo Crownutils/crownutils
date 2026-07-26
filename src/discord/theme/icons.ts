@@ -1,4 +1,5 @@
 import type { Rank } from '@/core/types.js';
+import type { CommandCategory } from '@/discord/features/help/command-descriptions.js';
 
 /**
  * Joins a glyph to the text it decorates -- the single rule for that spacing,
@@ -40,3 +41,12 @@ export const rankIcons = {
   privileged: '🎟️',
   owner: '👑',
 } as const satisfies Record<Rank, string>;
+
+/** Emote shown before each category header of the help listing. */
+export const commandCategoryIcons = {
+  general: '🧩',
+  crownicles: '🎮',
+  reminders: '🔔',
+  privacy: '🔒',
+  moderation: '🛡️',
+} as const satisfies Record<CommandCategory, string>;

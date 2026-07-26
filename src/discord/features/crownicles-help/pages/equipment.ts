@@ -19,6 +19,7 @@ import {
   Separator,
   Text,
 } from '@/discord/components/index.js';
+import { withIcon } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import {
   loadEquipmentData,
@@ -40,13 +41,12 @@ import {
   SELECT_LABEL_MAX,
   truncate,
 } from '../crownicles-help.ui.js';
+import { helpIcons, pageIcons } from '../icons.js';
 
 /** Router id of the equipment page. */
 export const EQUIPMENT_PAGE_ID = 'equipment';
 
-const EQUIPMENT_ICON = '⚔️';
-/** Emote of the fight-potion usage count line. */
-const USAGES_ICON = '🔁';
+const EQUIPMENT_ICON = pageIcons.equipment;
 
 const CATEGORY_SELECT_ID = 'chelp-eq-category';
 const RARITY_SELECT_ID = 'chelp-eq-rarity';
@@ -112,11 +112,13 @@ function rarityIcon(rarity: number): string {
 /** Nonzero stats as `emote value` parts (e.g. `🗡️ 42 | 🚀 15`). */
 function statParts(stats: EquipmentStats): string[] {
   const parts: string[] = [];
-  if (stats.attack !== 0) parts.push(`${itemStatIcons.attack} ${stats.attack}`);
-  if (stats.defense !== 0) {
-    parts.push(`${itemStatIcons.defense} ${stats.defense}`);
+  if (stats.attack !== 0) {
+    parts.push(withIcon(itemStatIcons.attack, stats.attack));
   }
-  if (stats.speed !== 0) parts.push(`${itemStatIcons.speed} ${stats.speed}`);
+  if (stats.defense !== 0) {
+    parts.push(withIcon(itemStatIcons.defense, stats.defense));
+  }
+  if (stats.speed !== 0) parts.push(withIcon(itemStatIcons.speed, stats.speed));
   return parts;
 }
 
@@ -146,7 +148,9 @@ function appendCategoryPicker(
   const list = new Text('');
   for (const category of ITEM_CATEGORIES) {
     list.newLine(
-      `${itemCategoryIcons[category]} ${categoryLabel(context.locale, category)} (${counts.get(category) ?? 0})`,
+      new Text(
+        `${categoryLabel(context.locale, category)} (${counts.get(category) ?? 0})`,
+      ).icon(itemCategoryIcons[category]),
     );
   }
   container.add(list, new Separator());
@@ -182,7 +186,9 @@ function appendRarityPicker(
   const list = new Text('');
   for (const { rarity, count } of rarities) {
     list.newLine(
-      `${rarityIcon(rarity)} ${rarityName(data, rarity)} (${count})`.trim(),
+      new Text(`${rarityName(data, rarity)} (${count})`).icon(
+        rarityIcon(rarity),
+      ),
     );
   }
   container.add(list, new Separator());
@@ -235,7 +241,7 @@ function appendItemPicker(
 
   const list = new Text('');
   for (const item of slice) {
-    list.newLine(`${item.icon ?? ''} ${item.name}`.trim());
+    list.newLine(new Text(item.name).icon(item.icon));
   }
   container.add(list, new Separator());
 
@@ -279,32 +285,41 @@ function appendItemDetail(
   context: HelpRenderContext,
 ): void {
   const t = messages(context.locale);
-  container.add(
-    new Text(`${item.icon ?? ''} ${md.bold(item.name)}`.trim()),
-    new Separator(),
-  );
+  container.add(new Text(item.name).bold().icon(item.icon), new Separator());
 
   const facts = new Text(
-    `${md.bold(t.rarityLabel)} : ${rarityIcon(item.rarity)} ${rarityName(data, item.rarity)}`.trim(),
+    `${md.bold(t.rarityLabel)} : ${withIcon(
+      rarityIcon(item.rarity),
+      rarityName(data, item.rarity),
+    )}`,
   );
   if (item.detail.kind === 'main') {
     const stats = statParts(item.detail.stats);
     if (stats.length > 0) facts.newLine(stats.join(' | '));
     facts.newLine(
-      `${outcomeIcons.money} ${md.bold(t.valueLabel)} : ${item.detail.value}`,
+      withIcon(
+        outcomeIcons.money,
+        `${md.bold(t.valueLabel)} : ${item.detail.value}`,
+      ),
     );
   } else {
     facts.newLine(
-      `${itemNatureIcons[item.detail.nature] ?? ''} ${item.detail.effect}`.trim(),
+      withIcon(itemNatureIcons[item.detail.nature], item.detail.effect),
     );
     if (item.detail.usages !== undefined) {
       facts.newLine(
-        `${USAGES_ICON} ${md.bold(t.usagesLabel)} : ${item.detail.usages}`,
+        withIcon(
+          helpIcons.usages,
+          `${md.bold(t.usagesLabel)} : ${item.detail.usages}`,
+        ),
       );
     }
     if (item.detail.value !== undefined) {
       facts.newLine(
-        `${outcomeIcons.money} ${md.bold(t.valueLabel)} : ${item.detail.value}`,
+        withIcon(
+          outcomeIcons.money,
+          `${md.bold(t.valueLabel)} : ${item.detail.value}`,
+        ),
       );
     }
   }
@@ -335,9 +350,7 @@ function appendUpgradeView(
 ): void {
   const t = messages(context.locale);
   container.add(
-    new Text(
-      `${item.icon ?? ''} ${md.bold(item.name)} - ${t.upgradesTitle}`.trim(),
-    ),
+    new Text(withIcon(item.icon, `${md.bold(item.name)} - ${t.upgradesTitle}`)),
     new Separator(),
   );
 
@@ -354,7 +367,7 @@ function appendUpgradeView(
       const cost = new Text('');
       for (const material of upgrade.materials) {
         cost.newLine(
-          `${material.quantity}x ${material.icon ?? ''} ${material.name}`.trim(),
+          `${material.quantity}x ${withIcon(material.icon, material.name)}`,
         );
       }
       container.add(cost, new Separator());

@@ -11,6 +11,7 @@ import {
   Separator,
   Text,
 } from '@/discord/components/index.js';
+import { withIcon } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import {
   loadMaterialsData,
@@ -30,11 +31,18 @@ import {
   SELECT_LABEL_MAX,
   truncate,
 } from '../crownicles-help.ui.js';
+import {
+  expeditionIcons,
+  materialRarityIcons,
+  materialSourceIcons,
+  materialTypeIcons,
+  pageIcons,
+} from '../icons.js';
 
 /** Router id of the materials page. */
 export const MATERIALS_PAGE_ID = 'materials';
 
-const MATERIALS_ICON = '⛏️';
+const MATERIALS_ICON = pageIcons.materials;
 
 const TYPE_SELECT_ID = 'chelp-mat-type';
 const MATERIAL_SELECT_ID = 'chelp-material';
@@ -42,44 +50,6 @@ const MATERIALS_PREV_ID = 'chelp-mat-prev';
 const MATERIALS_NEXT_ID = 'chelp-mat-next';
 const BACK_TO_TYPES_ID = 'chelp-mat-back-types';
 const BACK_TO_MATERIALS_ID = 'chelp-mat-back-materials';
-
-/** Emote per material type, for the type picker (glyphs live in code, not lang). */
-const TYPE_ICONS: Record<string, string> = {
-  metal: '⚙️',
-  alloy: '🔩',
-  nature: '🌿',
-  spiritual: '🔮',
-  magic: '✨',
-  leather: '🟫',
-  rope: '🪢',
-  poison: '☠️',
-  explosive: '🧨',
-  wood: '🪵',
-};
-
-/** Emote per rarity level (`1`..`3`); index `0` is unused. */
-const RARITY_ICONS = ['', '🟢', '🔵', '🟣'];
-
-/** Emote per material source line in the "how to obtain" section. */
-const SOURCE_ICONS = {
-  smallEvent: '🔎',
-  expedition: '🧭',
-  boss: '👹',
-  compost: '♻️',
-  cooking: '🍳',
-};
-
-/** Emote per expedition terrain, from the game's `expedition.locations` icon set. */
-const EXPEDITION_ICONS: Record<string, string> = {
-  forest: '🌲',
-  mountain: '⛰️',
-  desert: '🏜️',
-  swamp: '🌿',
-  ruins: '🏛️',
-  cave: '🕳️',
-  plains: '🌾',
-  coast: '🌊',
-};
 
 /** A `0..1` probability as a trimmed percentage (e.g. `0.167` -> `16.7%`, `0.2` -> `20%`). */
 function formatPercent(chance: number): string {
@@ -109,13 +79,16 @@ function terrainParts(
 ): string {
   return entries
     .map((entry) =>
-      `${EXPEDITION_ICONS[entry.terrain] ?? ''} ${terrainLabel(locale, entry.terrain)} ${formatPercent(entry.chance)}`.trim(),
+      withIcon(
+        expeditionIcons[entry.terrain],
+        `${terrainLabel(locale, entry.terrain)} ${formatPercent(entry.chance)}`,
+      ),
     )
     .join(', ');
 }
 
 function rarityIcon(rarity: number): string {
-  return RARITY_ICONS[rarity] ?? '';
+  return materialRarityIcons[rarity] ?? '';
 }
 
 /** Step 1: the type picker, listing each type and its material count. */
@@ -129,7 +102,9 @@ function appendTypePicker(
   for (const type of MATERIAL_TYPES) {
     const count = data.materialsByType.get(type)?.length ?? 0;
     list.newLine(
-      `${TYPE_ICONS[type] ?? ''} ${typeLabel(context.locale, type)} (${count})`.trim(),
+      new Text(`${typeLabel(context.locale, type)} (${count})`).icon(
+        materialTypeIcons[type],
+      ),
     );
   }
   container.add(list, new Separator());
@@ -140,7 +115,7 @@ function appendTypePicker(
       MATERIAL_TYPES.map((type) => ({
         label: typeLabel(context.locale, type),
         value: type,
-        ...(TYPE_ICONS[type] ? { emoji: TYPE_ICONS[type] } : {}),
+        ...(materialTypeIcons[type] ? { emoji: materialTypeIcons[type] } : {}),
       })),
     );
   if (context.disabled) select.disabled();
@@ -172,7 +147,9 @@ function appendMaterialPicker(
   const list = new Text('');
   for (const material of slice) {
     list.newLine(
-      `${material.icon ?? ''} ${material.name} ${rarityIcon(material.rarity)}`.trim(),
+      new Text(
+        `${material.name} ${rarityIcon(material.rarity)}`.trimEnd(),
+      ).icon(material.icon),
     );
   }
   container.add(list, new Separator());
@@ -219,15 +196,18 @@ function appendMaterialDetail(
     data.rarityNames[String(material.rarity)] ?? String(material.rarity);
 
   container.add(
-    new Text(`${material.icon ?? ''} ${md.bold(material.name)}`.trim()),
+    new Text(material.name).bold().icon(material.icon),
     new Separator(),
   );
 
   const facts = new Text(
-    `${md.bold(t.rarityLabel)} : ${rarityIcon(material.rarity)} ${rarityName}`.trim(),
+    `${md.bold(t.rarityLabel)} : ${withIcon(rarityIcon(material.rarity), rarityName)}`,
   );
   facts.newLine(
-    `${md.bold(t.typeLabel)} : ${TYPE_ICONS[material.type] ?? ''} ${typeLabel(context.locale, material.type)}`.trim(),
+    `${md.bold(t.typeLabel)} : ${withIcon(
+      materialTypeIcons[material.type],
+      typeLabel(context.locale, material.type),
+    )}`,
   );
   container.add(facts, new Separator());
 
@@ -238,39 +218,47 @@ function appendMaterialDetail(
     if (obtain.smallEvents.length > 0) {
       container.add(
         new Text(
-          `${SOURCE_ICONS.smallEvent} ${md.bold(t.sourceSmallEvent)} : ${terrainParts(context.locale, obtain.smallEvents)}`,
-        ).size('subtle'),
+          `${md.bold(t.sourceSmallEvent)} : ${terrainParts(context.locale, obtain.smallEvents)}`,
+        )
+          .icon(materialSourceIcons.smallEvent)
+          .size('subtle'),
       );
     }
     if (obtain.expeditions.length > 0) {
       container.add(
         new Text(
-          `${SOURCE_ICONS.expedition} ${md.bold(t.sourceExpeditions)} : ${terrainParts(context.locale, obtain.expeditions)}`,
-        ).size('subtle'),
+          `${md.bold(t.sourceExpeditions)} : ${terrainParts(context.locale, obtain.expeditions)}`,
+        )
+          .icon(materialSourceIcons.expedition)
+          .size('subtle'),
       );
     }
     if (obtain.bosses.length > 0) {
       const parts = obtain.bosses
         .map((boss) =>
-          `${boss.icon} ${boss.name} ${formatPercent(boss.chance)}`.trim(),
+          withIcon(boss.icon, `${boss.name} ${formatPercent(boss.chance)}`),
         )
         .join(', ');
       container.add(
-        new Text(
-          `${SOURCE_ICONS.boss} ${md.bold(t.sourceBosses)} : ${parts}`,
-        ).size('subtle'),
+        new Text(`${md.bold(t.sourceBosses)} : ${parts}`)
+          .icon(materialSourceIcons.boss)
+          .size('subtle'),
       );
     }
     container.add(
       new Text(
-        `${SOURCE_ICONS.compost} ${md.bold(t.sourceCompost)} : ${formatPercent(obtain.compostChance)}`,
-      ).size('subtle'),
+        `${md.bold(t.sourceCompost)} : ${formatPercent(obtain.compostChance)}`,
+      )
+        .icon(materialSourceIcons.compost)
+        .size('subtle'),
     );
     if (obtain.cooking) {
       container.add(
         new Text(
-          `${SOURCE_ICONS.cooking} ${md.bold(t.sourceCooking)} : ${obtain.cooking.name} ${t.cookingRecipe(obtain.cooking.level, obtain.cooking.quantity)}`,
-        ).size('subtle'),
+          `${md.bold(t.sourceCooking)} : ${obtain.cooking.name} ${t.cookingRecipe(obtain.cooking.level, obtain.cooking.quantity)}`,
+        )
+          .icon(materialSourceIcons.cooking)
+          .size('subtle'),
       );
     }
   }
