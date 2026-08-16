@@ -11,8 +11,15 @@ export interface CrowniclesModels {
   readonly materials?: Record<string, string>;
   /** Material rarity level (`1`..`3`) -> official name. */
   readonly materialRarityNames?: Record<string, string>;
-  /** Cooking display strings; `recipes` maps a recipe id to its official name. */
-  readonly cooking?: { readonly recipes?: Record<string, string> };
+  /** Cooking display strings, keyed by recipe id and by cooking grade id. */
+  readonly cooking?: {
+    readonly recipes?: Record<string, string>;
+    readonly grades?: Record<string, string>;
+  };
+  /** Cooking plant id -> official name. */
+  readonly plants?: Record<string, string>;
+  /** Pet-food names, keyed `<foodType>_one`, `_other` and `_capitalized`. */
+  readonly foods?: Record<string, string>;
   /** Item id -> official name, one record per item category. */
   readonly weapons?: Record<string, string>;
   readonly armors?: Record<string, string>;
@@ -84,4 +91,28 @@ export async function getRecipeNames(
   locale: SupportedLocale,
 ): Promise<Record<string, string>> {
   return (await getModels(locale)).cooking?.recipes ?? {};
+}
+
+/** Official cooking grade titles keyed by grade id (e.g. `scullion` -> `Marmiton`). */
+export async function getCookingGradeNames(
+  locale: SupportedLocale,
+): Promise<Record<string, string>> {
+  return (await getModels(locale)).cooking?.grades ?? {};
+}
+
+/** Official cooking plant names keyed by id string. */
+export async function getPlantNames(
+  locale: SupportedLocale,
+): Promise<Record<string, string>> {
+  return (await getModels(locale)).plants ?? {};
+}
+
+/**
+ * Official pet-food names, keyed `<foodType>_one`, `_other` and `_capitalized`
+ * (the game stores the singular, plural and capitalized forms side by side).
+ */
+export async function getFoodNames(
+  locale: SupportedLocale,
+): Promise<Record<string, string>> {
+  return (await getModels(locale)).foods ?? {};
 }

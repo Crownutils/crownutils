@@ -138,6 +138,24 @@ export function parseIconIdBlock(
   return icons;
 }
 
+/**
+ * Parses a flat `<name>: "<emote>"` icon block into a name -> emote record;
+ * empty when the block is absent. Companion of {@link parseIconIdBlock} for the
+ * blocks the game keys by identifier (recipe types, pet-food kinds, ...).
+ */
+export function parseIconNameBlock(
+  source: string,
+  key: string,
+): Record<string, string> {
+  const block = extractIconBlock(source, key);
+  const icons: Record<string, string> = {};
+  if (block === undefined) return icons;
+  for (const [, name, emote] of block.matchAll(/(\w+):\s*"([^"\\]*)"/g)) {
+    if (name !== undefined && emote !== undefined) icons[name] = emote;
+  }
+  return icons;
+}
+
 /** Parses `<id>.json` file names into a sorted, de-duplicated list of numeric ids. */
 export function numericIds(fileNames: readonly string[]): number[] {
   const ids = new Set<number>();

@@ -17,6 +17,9 @@ export {
   getLocationNames,
   getMaterialRarityNames,
   getRecipeNames,
+  getCookingGradeNames,
+  getPlantNames,
+  getFoodNames,
   getItemNames,
 } from './models.js';
 
@@ -57,6 +60,28 @@ export {
   type CrowniclesMaterial,
   type MaterialType,
 } from './materials.js';
+
+export { getPlants, type CrowniclesPlant } from './plants.js';
+
+export {
+  getCookingRecipes,
+  getCookingRules,
+  getRecipeShopCosts,
+  getRecipeTypeIcons,
+  getFoodIcons,
+  RECIPE_OUTPUT_TYPES,
+  type CookingGrade,
+  type CookingRules,
+  type RecipeShopCosts,
+  type CrowniclesRecipe,
+  type MaterialRecipe,
+  type PotionRecipe,
+  type PetFoodRecipe,
+  type RecipeOutputType,
+  type RecipePlantCost,
+  type RecipeMaterialCost,
+  type RecipePetFood,
+} from './recipes.js';
 
 export {
   getExpeditionLootTables,
