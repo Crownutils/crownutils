@@ -231,6 +231,8 @@ export const crowniclesHelp = {
       gradeRiskFlat: (worst: string, best: string): string =>
         `No grade takes a penalty on this recipe: you botch it ${worst} of the time at the lowest grade, ${best} at the highest.`,
       unlockLabel: 'Learnt from',
+      /** Shown in place of the unlock lines when the viewer is not privileged. */
+      unlockLocked: 'Reserved for privileged members',
       lovePointsLabel: 'Love points',
       ingredientsLabel: 'Ingredients',
       plantsLabel: 'Plants',

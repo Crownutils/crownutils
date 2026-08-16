@@ -4,10 +4,11 @@ import {
   RECIPE_OUTPUT_TYPES,
   type RecipeOutputType,
 } from '@/core/crownicles/index.js';
+import { isAuthorized } from '@/core/permissions/index.js';
 import type { SupportedLocale } from '@/core/types.js';
 import { type Container, Separator, Text } from '@/discord/components/index.js';
 import { formatNumber, formatPercent } from '@/discord/lang/number.js';
-import { withIcon } from '@/discord/theme/icons.js';
+import { rankIcons, withIcon } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import type {
   CrowniclesRecipesData,
@@ -169,6 +170,15 @@ function ingredientParts(
   return entries
     .map((entry) => withIcon(entry.icon, t.amount(entry.name, entry.quantity)))
     .join(', ');
+}
+
+/**
+ * Whether the viewer's rank unlocks how a recipe is learnt: which source hands
+ * it over, and at which milestone or price. Privileged data, like the materials
+ * page and the equipment upgrade view; the `rank` command advertises it.
+ */
+function canViewDiscovery(context: HelpRenderContext): boolean {
+  return isAuthorized('privileged', { rank: context.rank });
 }
 
 /** Localized way of learning the recipe, prefixed by its emote. */
@@ -468,11 +478,15 @@ function appendRecipeFacts(
       ),
     );
   }
+  /** How the recipe is learnt is a privileged perk; others see it locked. */
+  const showsDiscovery = canViewDiscovery(context);
   facts.newLine(
-    withIcon(
-      recipeFactIcons.unlock,
-      fact(t.unlockLabel, unlockLine(recipe, context.locale)),
-    ),
+    showsDiscovery
+      ? withIcon(
+          recipeFactIcons.unlock,
+          fact(t.unlockLabel, unlockLine(recipe, context.locale)),
+        )
+      : withIcon(rankIcons.privileged, fact(t.unlockLabel, t.unlockLocked)),
   );
   container.add(facts);
 
@@ -494,8 +508,10 @@ function appendRecipeFacts(
     );
   }
 
-  for (const line of unlockDetail(recipe, data, context.locale)) {
-    container.add(new Text(line).size('subtle'));
+  if (showsDiscovery) {
+    for (const line of unlockDetail(recipe, data, context.locale)) {
+      container.add(new Text(line).size('subtle'));
+    }
   }
   container.add(new Separator());
 }
