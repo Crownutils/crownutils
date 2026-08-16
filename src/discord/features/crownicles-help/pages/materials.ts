@@ -11,6 +11,7 @@ import {
   Separator,
   Text,
 } from '@/discord/components/index.js';
+import { formatPercent } from '@/discord/lang/number.js';
 import { withIcon } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
 import {
@@ -51,11 +52,6 @@ const MATERIALS_NEXT_ID = 'chelp-mat-next';
 const BACK_TO_TYPES_ID = 'chelp-mat-back-types';
 const BACK_TO_MATERIALS_ID = 'chelp-mat-back-materials';
 
-/** A `0..1` probability as a trimmed percentage (e.g. `0.167` -> `16.7%`, `0.2` -> `20%`). */
-function formatPercent(chance: number): string {
-  return `${+(chance * 100).toFixed(1)}%`;
-}
-
 function messages(locale: SupportedLocale) {
   return helpMessages(locale).materials;
 }
@@ -81,7 +77,7 @@ function terrainParts(
     .map((entry) =>
       withIcon(
         expeditionIcons[entry.terrain],
-        `${terrainLabel(locale, entry.terrain)} ${formatPercent(entry.chance)}`,
+        `${terrainLabel(locale, entry.terrain)} ${formatPercent(locale, entry.chance)}`,
       ),
     )
     .join(', ');
@@ -236,7 +232,10 @@ function appendMaterialDetail(
     if (obtain.bosses.length > 0) {
       const parts = obtain.bosses
         .map((boss) =>
-          withIcon(boss.icon, `${boss.name} ${formatPercent(boss.chance)}`),
+          withIcon(
+            boss.icon,
+            `${boss.name} ${formatPercent(context.locale, boss.chance)}`,
+          ),
         )
         .join(', ');
       container.add(
@@ -247,7 +246,7 @@ function appendMaterialDetail(
     }
     container.add(
       new Text(
-        `${md.bold(t.sourceCompost)} : ${formatPercent(obtain.compostChance)}`,
+        `${md.bold(t.sourceCompost)} : ${formatPercent(context.locale, obtain.compostChance)}`,
       )
         .icon(materialSourceIcons.compost)
         .size('subtle'),
