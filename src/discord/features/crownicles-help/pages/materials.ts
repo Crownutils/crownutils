@@ -4,13 +4,7 @@ import {
   type CrowniclesMaterial,
 } from '@/core/crownicles/index.js';
 import type { SupportedLocale } from '@/core/types.js';
-import {
-  type Container,
-  SelectActionRow,
-  SelectMenu,
-  Separator,
-  Text,
-} from '@/discord/components/index.js';
+import { type Container, Separator, Text } from '@/discord/components/index.js';
 import { formatPercent } from '@/discord/lang/number.js';
 import { withIcon } from '@/discord/theme/icons.js';
 import { md } from '@/discord/theme/markdown.js';
@@ -24,13 +18,12 @@ import {
   appendBackButton,
   appendLoadFallback,
   appendPaginationControls,
+  appendPickerStep,
   clampPage,
   createHelpPageContainer,
   helpMessages,
   pickerPage,
   pickerPageCount,
-  SELECT_LABEL_MAX,
-  truncate,
 } from '../crownicles-help.ui.js';
 import {
   expeditionIcons,
@@ -94,28 +87,20 @@ function appendTypePicker(
   context: HelpRenderContext,
 ): void {
   const t = messages(context.locale);
-  const list = new Text('');
-  for (const type of MATERIAL_TYPES) {
-    const count = data.materialsByType.get(type)?.length ?? 0;
-    list.newLine(
-      new Text(`${typeLabel(context.locale, type)} (${count})`).icon(
-        materialTypeIcons[type],
-      ),
-    );
-  }
-  container.add(list, new Separator());
-
-  const select = new SelectMenu(TYPE_SELECT_ID)
-    .placeholder(t.typePlaceholder)
-    .options(
-      MATERIAL_TYPES.map((type) => ({
+  appendPickerStep(container, {
+    selectId: TYPE_SELECT_ID,
+    placeholder: t.typePlaceholder,
+    disabled: context.disabled,
+    entries: MATERIAL_TYPES.map((type) => {
+      const count = data.materialsByType.get(type)?.length ?? 0;
+      return {
+        line: `${typeLabel(context.locale, type)} (${count})`,
         label: typeLabel(context.locale, type),
         value: type,
-        ...(materialTypeIcons[type] ? { emoji: materialTypeIcons[type] } : {}),
-      })),
-    );
-  if (context.disabled) select.disabled();
-  container.add(new SelectActionRow().set(select));
+        icon: materialTypeIcons[type],
+      };
+    }),
+  });
 }
 
 /** Step 2: the materials of the chosen type, paginated, with a picker. */
@@ -140,31 +125,18 @@ function appendMaterialPicker(
 
   const { page, pageCount, slice } = pickerPage(materials, state.materialsPage);
 
-  const list = new Text('');
-  for (const material of slice) {
-    list.newLine(
-      new Text(
-        `${material.name} ${rarityIcon(material.rarity)}`.trimEnd(),
-      ).icon(material.icon),
-    );
-  }
-  container.add(list, new Separator());
-
-  const select = new SelectMenu(MATERIAL_SELECT_ID)
-    .placeholder(t.materialPlaceholder)
-    .options(
-      slice.map((material) => {
-        const rarityName = data.rarityNames[String(material.rarity)];
-        return {
-          label: truncate(material.name, SELECT_LABEL_MAX),
-          value: String(material.id),
-          ...(rarityName ? { description: rarityName } : {}),
-          ...(material.icon ? { emoji: material.icon } : {}),
-        };
-      }),
-    );
-  if (context.disabled) select.disabled();
-  container.add(new SelectActionRow().set(select));
+  appendPickerStep(container, {
+    selectId: MATERIAL_SELECT_ID,
+    placeholder: t.materialPlaceholder,
+    disabled: context.disabled,
+    entries: slice.map((material) => ({
+      line: `${material.name} ${rarityIcon(material.rarity)}`.trimEnd(),
+      label: material.name,
+      value: String(material.id),
+      description: data.rarityNames[String(material.rarity)],
+      icon: material.icon,
+    })),
+  });
 
   appendPaginationControls(container, {
     page,

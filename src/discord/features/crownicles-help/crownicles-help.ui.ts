@@ -79,6 +79,57 @@ export function pickerPage<T>(
   return paginate(items, requestedPage, PICKER_PAGE_SIZE);
 }
 
+/** One choice of a picker step: its line in the list, and its select option. */
+export interface PickerEntry {
+  /** Line shown in the list above the menu, already composed. */
+  readonly line: string;
+  /** Option label; truncated to Discord's limit. */
+  readonly label: string;
+  /** Option value, echoed back by the interaction. */
+  readonly value: string;
+  /** Option description; truncated, and omitted when empty. */
+  readonly description?: string | undefined;
+  /** Emote for both the list line and the option; omitted when absent. */
+  readonly icon?: string | undefined;
+}
+
+/**
+ * The listing-plus-menu every browse step is built from: the choices spelled
+ * out as readable lines, then the same choices as a select menu. Shared by the
+ * materials, equipment and recipes pages, which differ only in how they compose
+ * each entry.
+ */
+export function appendPickerStep(
+  container: Container,
+  options: {
+    readonly selectId: string;
+    readonly placeholder: string;
+    readonly entries: readonly PickerEntry[];
+    readonly disabled: boolean;
+  },
+): void {
+  const list = new Text('');
+  for (const entry of options.entries) {
+    list.newLine(new Text(entry.line).icon(entry.icon));
+  }
+  container.add(list, new Separator());
+
+  const select = new SelectMenu(options.selectId)
+    .placeholder(options.placeholder)
+    .options(
+      options.entries.map((entry) => ({
+        label: truncate(entry.label, SELECT_LABEL_MAX),
+        value: entry.value,
+        ...(entry.description
+          ? { description: truncate(entry.description, SELECT_DESCRIPTION_MAX) }
+          : {}),
+        ...(entry.icon ? { emoji: entry.icon } : {}),
+      })),
+    );
+  if (options.disabled) select.disabled();
+  container.add(new SelectActionRow().set(select));
+}
+
 /** Adds a single back button below the current step. */
 export function appendBackButton(
   container: Container,
