@@ -23,6 +23,7 @@ export {
 export {
   ITEM_CATEGORIES,
   FIGHT_ITEM_NATURES,
+  TIME_SPEEDUP_NATURE,
   MAX_UPGRADE_LEVEL,
   type ItemCategory,
 } from './item-constants.js';

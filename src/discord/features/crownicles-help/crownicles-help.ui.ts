@@ -19,6 +19,7 @@ import { withIcon } from '@/discord/theme/icons.js';
 import { commandMessages } from '@/discord/lang/index.js';
 import { countPages, paginate } from '@/discord/utils/pagination.js';
 import type { CrowniclesEventsData } from './data/events.js';
+import { formatDuration } from './format.js';
 import { helpIcons } from './icons.js';
 import type { HelpRenderContext, HelpState } from './page.js';
 
@@ -170,15 +171,6 @@ export function appendLoadFallback(
 /** `+n` for a gain, `-n` for a loss (the value already carries its sign). */
 function signed(value: number): string {
   return value > 0 ? `+${value}` : String(value);
-}
-
-/** A minute count as `X min`, `X h` or `X h Y min`. */
-function formatDuration(minutes: number, locale: SupportedLocale): string {
-  const t = helpMessages(locale);
-  if (minutes < 60) return t.minutes(minutes);
-  const hours = Math.floor(minutes / 60);
-  const rest = minutes % 60;
-  return rest === 0 ? t.hours(hours) : t.hoursMinutes(hours, rest);
 }
 
 /** Time lost (occupied effect), as `🕑 30 min perdues`, or `undefined` if none. */
