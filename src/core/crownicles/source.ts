@@ -1,3 +1,6 @@
+import { TtlCache } from '@/core/cache/ttl-cache.js';
+import { GAME_DATA_TTL_MS } from './cache.js';
+
 const RAW_BASE =
   'https://raw.githubusercontent.com/Crownicles/Crownicles/master';
 const CONTENTS_API =
@@ -51,13 +54,8 @@ export async function fetchCrowniclesText(path: string): Promise<string> {
   return response.text();
 }
 
-/**
- * Lists the file names in a Crownicles repo directory via the GitHub contents
- * API. Used to discover ids without assuming a contiguous range. One call per
- * directory, meant to be cached by the caller (the API is rate-limited to 60
- * requests/hour unauthenticated).
- */
-export async function listCrowniclesDir(path: string): Promise<string[]> {
+/** Fetches one directory listing from the GitHub contents API. */
+async function fetchDirListing(path: string): Promise<readonly string[]> {
   const response = await crowniclesFetch(
     `${CONTENTS_API}/${path}`,
     'application/vnd.github+json',
@@ -69,6 +67,35 @@ export async function listCrowniclesDir(path: string): Promise<string[]> {
   }
   const entries = (await response.json()) as { name: string }[];
   return entries.map((entry) => entry.name);
+}
+
+/**
+ * One slot per resource directory the bot lists (events, locations, materials,
+ * the four item categories, cooking recipes), with room to spare.
+ */
+const DIRECTORY_CACHE_SIZE = 16;
+
+/**
+ * Directory listings, cached by path for {@link GAME_DATA_TTL_MS}. Listing a
+ * resource directory is the only thing the bot asks of the GitHub API, which
+ * allows 60 requests/hour unauthenticated -- and a listing is the same in every
+ * language, while the loaders needing it are cached per locale. Caching here
+ * rather than in each loader is what keeps serving a second language free.
+ */
+const directoryListings = new TtlCache<string, readonly string[]>(
+  DIRECTORY_CACHE_SIZE,
+  GAME_DATA_TTL_MS,
+);
+
+/**
+ * Lists the file names in a Crownicles repo directory, so ids are discovered
+ * without assuming a contiguous range. Cached across locales and de-duplicated
+ * across concurrent callers; see {@link directoryListings}.
+ */
+export async function listCrowniclesDir(
+  path: string,
+): Promise<readonly string[]> {
+  return directoryListings.getOrLoad(path, fetchDirListing);
 }
 
 /**
