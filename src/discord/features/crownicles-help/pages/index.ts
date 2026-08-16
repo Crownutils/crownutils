@@ -5,6 +5,7 @@ import { homePage, HOME_PAGE_ID } from './home.js';
 import { eventsPage } from './events.js';
 import { specialEventsPage } from './special-events.js';
 import { materialsPage } from './materials.js';
+import { recipesPage } from './recipes/index.js';
 import { equipmentPage } from './equipment.js';
 import {
   leaguesPage,
@@ -21,6 +22,7 @@ export const HELP_PAGES: readonly HelpPage[] = [
   eventsPage,
   specialEventsPage,
   materialsPage,
+  recipesPage,
   equipmentPage,
   levelPage,
   ragePage,

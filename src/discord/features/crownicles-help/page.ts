@@ -1,5 +1,8 @@
 import type { MessageComponentInteraction } from 'discord.js';
-import type { ItemCategory } from '@/core/crownicles/index.js';
+import type {
+  ItemCategory,
+  RecipeOutputType,
+} from '@/core/crownicles/index.js';
 import type { Authorization } from '@/core/permissions/index.js';
 import type { Rank, SupportedLocale } from '@/core/types.js';
 import type { Container } from '@/discord/components/index.js';
@@ -7,6 +10,10 @@ import type { ReduceContext } from '@/discord/interactions/index.js';
 import type { CrowniclesEquipmentData } from './data/equipment.js';
 import type { CrowniclesEventsData } from './data/events.js';
 import type { CrowniclesMaterialsData } from './data/materials.js';
+import type { CrowniclesRecipesData } from './data/recipes.js';
+
+/** The three things the recipes page answers, picked at its first step. */
+export type RecipesSection = 'browse' | 'xp' | 'failure';
 
 /**
  * Shared state of the help center, threaded through every page. Optional fields
@@ -20,6 +27,8 @@ export interface HelpState {
   readonly data?: CrowniclesEventsData | undefined;
   /** Materials data, loaded on entering the materials page. */
   readonly materialsData?: CrowniclesMaterialsData | undefined;
+  /** Cooking recipes data, loaded on entering the recipes page. */
+  readonly recipesData?: CrowniclesRecipesData | undefined;
   /** True when the last data load failed, so pages can show an error. */
   readonly loadError?: boolean | undefined;
 
@@ -36,6 +45,17 @@ export interface HelpState {
   readonly selectedMaterialId?: number | undefined;
   /** Zero-based pagination index of the material picker. */
   readonly materialsPage?: number | undefined;
+
+  /** Which part of the recipes page is open: the listing or one of its rules sections. */
+  readonly recipesSection?: RecipesSection | undefined;
+  /** Recipe output category currently browsed. */
+  readonly selectedRecipeOutput?: RecipeOutputType | undefined;
+  /** Recipe family (`RecipeType`) currently browsed; unused by single-family categories. */
+  readonly selectedRecipeFamily?: string | undefined;
+  /** Recipe whose details are being shown. */
+  readonly selectedRecipeId?: string | undefined;
+  /** Zero-based pagination index of the recipe picker. */
+  readonly recipesPage?: number | undefined;
 
   /** Equipment data, loaded on entering the equipment page. */
   readonly equipmentData?: CrowniclesEquipmentData | undefined;

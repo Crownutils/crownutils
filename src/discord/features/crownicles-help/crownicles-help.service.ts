@@ -19,12 +19,16 @@ import {
 /** Base state after switching category: page reset, every page's loaded data carried over. */
 function pageEntryState(
   pageId: string,
-  carried: Pick<HelpState, 'data' | 'materialsData' | 'equipmentData'>,
+  carried: Pick<
+    HelpState,
+    'data' | 'materialsData' | 'recipesData' | 'equipmentData'
+  >,
 ): HelpState {
   return {
     pageId,
     data: carried.data,
     materialsData: carried.materialsData,
+    recipesData: carried.recipesData,
     equipmentData: carried.equipmentData,
     loadError: false,
     locationsPage: 0,
@@ -33,6 +37,11 @@ function pageEntryState(
     selectedType: undefined,
     selectedMaterialId: undefined,
     materialsPage: 0,
+    recipesSection: undefined,
+    selectedRecipeOutput: undefined,
+    selectedRecipeFamily: undefined,
+    selectedRecipeId: undefined,
+    recipesPage: 0,
   };
 }
 

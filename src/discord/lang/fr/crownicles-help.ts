@@ -1,5 +1,26 @@
 import type { CommandNode } from '../types.js';
 
+/**
+ * Milestone counts of the recipe discovery lines. Each names how many of a
+ * thing the player has to have gone through, so the singular reads as an
+ * occasion rather than a quantity. `boss` is invariable, `final` is not.
+ */
+function finalBosses(count: number): string {
+  return count === 1
+    ? 'votre premier boss final'
+    : `${count} boss finaux différents`;
+}
+
+function campaignMissions(count: number): string {
+  return count === 1
+    ? 'votre première mission de campagne'
+    : `${count} missions de campagne`;
+}
+
+function purchases(count: number): string {
+  return count === 1 ? 'votre premier achat' : `${count} achats`;
+}
+
 export const crowniclesHelp = {
   description:
     'Parcourez les données de Crownicles (événements et leurs résultats).',
@@ -113,6 +134,182 @@ export const crowniclesHelp = {
       sourceCooking: 'Cuisine',
       cookingRecipe: (level: number, quantity: number): string =>
         `(niveau ${level}, donne ×${quantity})`,
+    },
+
+    recipes: {
+      name: 'Cuisine',
+      description: 'Tout savoir sur la cuisine.',
+      intro: "Tout sur la cuisine : les recettes, l'expérience et les échecs.",
+      sectionPlaceholder: 'Choisissez une section',
+      sections: {
+        browse: 'Les recettes',
+        xp: "Gagner de l'XP de cuisine",
+        failure: 'Rater ou réussir un plat',
+      },
+      sectionDescriptions: {
+        browse: 'Ingrédients, résultat et moyen de débloquer chaque recette',
+        xp: 'Ce que chaque plat rapporte en expérience de cuisine',
+        failure: 'Comment le jeu calcule vos chances de rater',
+      },
+      backToSections: 'Retour aux sections',
+      xp: {
+        formula: (plantShare: string, materialShare: string): string =>
+          `Un plat réussi rapporte ${plantShare} de l'expérience de ses plantes, plus ${materialShare} de celle de ses matériaux.`,
+        onFailure: (perLevel: number): string =>
+          `Un plat raté rapporte quand même ${perLevel} XP par niveau de difficulté.`,
+        noXp: (threshold: number): string =>
+          `Aucune expérience si la difficulté dépasse de ${threshold} niveaux ou plus ce que votre grade encaisse.`,
+        plantsTitle: 'Expérience par plante',
+        materialsTitle: 'Expérience par matériau, selon sa rareté',
+        amount: (xp: string): string => `${xp} XP`,
+      },
+      failure: {
+        formula: (perLevel: string): string =>
+          `Vos chances de rater partent du taux de votre grade, puis montent de ${perLevel} par niveau de difficulté au-dessus de ce qu'il encaisse.`,
+        capped: 'Le résultat est plafonné à 100 %.',
+        gradesTitle: 'Les grades de cuisine',
+        gradeStats: (rate: string, maxDifficulty: number): string =>
+          `${rate} d'échec, jusqu'à la difficulté ${maxDifficulty}`,
+        /** Worked example; every value comes from the game's own tables. */
+        example: (
+          difficulty: number,
+          grade: string,
+          maxDifficulty: number,
+          base: string,
+          extraLevels: number,
+          perLevel: string,
+          total: string,
+        ): string =>
+          `Exemple : une recette de difficulté ${difficulty} tentée en ${grade} (encaisse ${maxDifficulty}) donne ${base} + ${extraLevels} × ${perLevel} = ${total} d'échec.`,
+      },
+      gradeSpan: (from: number, to: number): string =>
+        `niveaux ${from} à ${to}`,
+      gradeSpanOpen: (from: number): string => `niveau ${from} et plus`,
+      categoryPlaceholder: 'Choisissez une catégorie',
+      familyPlaceholder: 'Choisissez un type',
+      recipePlaceholder: 'Choisissez une recette',
+      categories: {
+        material: 'Matériaux',
+        potion: 'Potions',
+        petFood: 'Nourriture pour familier',
+      },
+      families: {
+        POTION_HEALTH: 'Soin',
+        POTION_ENERGY: 'Vigueur',
+        POTION_TIME_SPEEDUP: 'Célérité',
+        POTION_DEFENSE: 'Protection',
+        POTION_ATTACK: 'Force',
+        POTION_SPEED: 'Vélocité',
+        PETFOOD_SALAD: 'Salade',
+        PETFOOD_CANDY: 'Friandise',
+        PETFOOD_MEAT: 'Viande',
+        PETFOOD_ULTIMATE: 'Soupe ultime',
+        MATERIAL_CRAFT: 'Artisanat',
+      },
+      selectedCategory: (name: string): string => `Catégorie : ${name}`,
+      selectedFamily: (name: string): string => `Type : ${name}`,
+      recipeCount: (count: number): string =>
+        count === 1 ? '1 recette' : `${count} recettes`,
+      noRecipes: 'Aucune recette dans cette catégorie.',
+      previous: 'Précédent',
+      next: 'Suivant',
+      pageIndicator: (current: number, total: number): string =>
+        `Page ${current}/${total}`,
+      backToCategories: 'Retour aux catégories',
+      backToFamilies: 'Retour aux types',
+      backToRecipes: 'Retour aux recettes',
+      outputLabel: 'Résultat',
+      levelLabel: 'Difficulté',
+      levelValue: (level: number, hardest: number): string =>
+        `${level} sur ${hardest}`,
+      gradeLabel: 'Sans pénalité de difficulté à partir de',
+      gradeValue: (grade: string, cookingLevel: number): string =>
+        `${grade} - niveau de cuisine ${cookingLevel}`,
+      /** The anchors that make a difficulty concrete: odds here, odds at the bottom. */
+      gradeRisk: (atGrade: string, worst: string): string =>
+        `Vous la ratez ${atGrade} du temps à ce grade, contre ${worst} au grade le plus bas.`,
+      /** Used when no grade takes a penalty, so only the base rates separate them. */
+      gradeRiskFlat: (worst: string, best: string): string =>
+        `Aucun grade ne subit de pénalité sur cette recette : vous la ratez ${worst} du temps au grade le plus bas, ${best} au plus haut.`,
+      unlockLabel: 'Apprentissage',
+      lovePointsLabel: "Points d'amour",
+      ingredientsLabel: 'Ingrédients',
+      plantsLabel: 'Plantes',
+      materialsLabel: 'Matériaux',
+      noIngredients: 'Aucun ingrédient.',
+      amount: (name: string, quantity: number): string =>
+        `${name} ×${quantity}`,
+      foodAmount: (quantity: number, name: string): string =>
+        `${quantity} ${name}`,
+      randomPotion: (rarity: string): string =>
+        `Une potion au hasard - rareté ${rarity}`,
+      namedPotion: (name: string, rarity: string): string =>
+        `${name} - rareté ${rarity}`,
+      potionCandidatesLabel: 'Potions possibles',
+      /** Joins a fact's label to its value; the space before the colon is French. */
+      fact: (label: string, value: string): string => `${label} : ${value}`,
+      recipeNotFound: 'Cette recette est introuvable.',
+      optionSummary: (level: number, output: string): string =>
+        `Difficulté ${level} - ${output}`,
+      discoverySources: {
+        DEFAULT: 'Connue dès le départ',
+        WITCH: 'En obtenant une potion de la sorcière',
+        FARMER: "En l'achetant au fermier, lors de sa rencontre",
+        GASPARD_JO: "En l'achetant à Gaspard Jo, lors de sa rencontre",
+        ISLAND_BOSS: "En battant un boss final d'île",
+        COOKING_LEVEL:
+          'Apprise automatiquement en atteignant le niveau de cuisine requis',
+        PLAYER_LEVEL_MILESTONE: 'En gagnant un niveau de joueur',
+        CAMPAIGN_MILESTONE: 'En terminant une mission de campagne',
+      },
+      /**
+       * `rule` states how a source parts with its recipes, then how far the
+       * player has to go to hold this one. `position` states that milestone
+       * outright; `atLatest` is used when several recipes share this difficulty,
+       * since the game's order between them is not reproducible and only the
+       * last milestone is certain. Counts are of *distinct* milestones: beating
+       * the same island boss twice advances nothing.
+       */
+      discoveryDetails: {
+        cookingLevel: (level: number): string =>
+          `Apprise dès que votre niveau de cuisine atteint ${level}.`,
+        witch:
+          'La recette obtenue suit la nature de la potion que vous recevez.',
+        playerLevel: {
+          rule: 'Chaque niveau gagné vous apprend une recette, de la plus facile à la plus difficile.',
+          position: (level: number): string =>
+            `Apprise après avoir atteint le niveau ${level}.`,
+          atLatest: (level: number): string =>
+            `Apprise au plus tard après avoir atteint le niveau ${level}.`,
+        },
+        campaign: {
+          rule: 'Chaque mission de campagne terminée vous apprend une recette, de la plus facile à la plus difficile.',
+          position: (count: number): string =>
+            `Apprise après avoir terminé ${campaignMissions(count)}.`,
+          atLatest: (count: number): string =>
+            `Apprise au plus tard après avoir terminé ${campaignMissions(count)}.`,
+        },
+        islandBoss: {
+          rule: "Chaque boss final d'île vous apprend une recette la première fois que vous le battez, de la plus facile à la plus difficile.",
+          position: (count: number): string =>
+            `Apprise après avoir vaincu ${finalBosses(count)}.`,
+          atLatest: (count: number): string =>
+            `Apprise au plus tard après avoir vaincu ${finalBosses(count)}.`,
+        },
+        shop: {
+          rule: (merchant: string): string =>
+            `${merchant} vend ses recettes de la plus facile à la plus difficile, à prix croissant.`,
+          position: (count: number, price: string): string =>
+            `Achetée après ${purchases(count)} chez lui, pour ${price} pièces.`,
+          atLatest: (count: number, price: string): string =>
+            `Achetée au plus tard après ${purchases(count)} chez lui, pour ${price} pièces.`,
+        },
+      },
+      /** Subject form, so the merchant can open the sentence stating its rule. */
+      merchants: {
+        FARMER: 'Le fermier',
+        GASPARD_JO: 'Gaspard Jo',
+      },
     },
 
     equipment: {
