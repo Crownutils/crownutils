@@ -14,6 +14,7 @@ export const rank = {
       title: 'Avantages',
       materials: `Catégorie Matériaux de ${md.code('crownicles-help')}`,
       upgrades: `Détail des améliorations d'équipement dans ${md.code('crownicles-help')}`,
+      recipeDiscovery: `Apprentissage des recettes dans ${md.code('crownicles-help')}`,
       reminders: (limit: number, base: number) =>
         `${limit} rappels simultanés (au lieu de ${base})`,
       remindersUnlimited: 'Rappels illimités',

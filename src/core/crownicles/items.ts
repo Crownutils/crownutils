@@ -192,7 +192,14 @@ export const getItemLangStrings = cachePerLocale(
   },
 );
 
-/** Substitutes the `{{power}}` / `{{power, number}}` placeholder of a nature line. */
-export function formatNatureEffect(template: string, power: number): string {
+/**
+ * Substitutes the `{{power}}` / `{{power, number}}` placeholder of a nature
+ * line. Pass an already-formatted string for a nature whose power is not a
+ * plain amount -- see {@link TIME_SPEEDUP_NATURE}.
+ */
+export function formatNatureEffect(
+  template: string,
+  power: number | string,
+): string {
   return template.replace(/\{\{power[^}]*\}\}/g, String(power));
 }

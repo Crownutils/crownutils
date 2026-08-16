@@ -22,6 +22,7 @@ export function buildRankContainer(
   const perkEntries: { rank: NotBannedRank; label: string }[] = [
     { rank: 'privileged', label: messages.perks.materials },
     { rank: 'privileged', label: messages.perks.upgrades },
+    { rank: 'privileged', label: messages.perks.recipeDiscovery },
     {
       rank: 'privileged',
       label: messages.perks.reminders(

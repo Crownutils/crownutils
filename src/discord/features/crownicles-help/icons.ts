@@ -1,3 +1,6 @@
+import type { RecipeOutputType } from '@/core/crownicles/index.js';
+import type { RecipesSection } from './page.js';
+
 /**
  * Every glyph the help center picks for itself, gathered here so no page
  * declares one inline. Each table is keyed exactly like the lang node holding
@@ -15,6 +18,7 @@ export const pageIcons = {
   events: '🎭',
   special: '✨',
   materials: '⛏️',
+  recipes: '🍳',
   equipment: '⚔️',
   level: '⭐',
   rage: '🤬',
@@ -48,6 +52,49 @@ export const materialSourceIcons = {
   boss: '👹',
   compost: '♻️',
   cooking: '🍳',
+} as const;
+
+/**
+ * Emote per section of the recipes page; keys mirror the `recipes.sections`
+ * lang node. Keyed by the closed union rather than by `string`, so every
+ * section is required here and a lookup never comes back empty.
+ */
+export const recipeSectionIcons: Record<RecipesSection, string> = {
+  browse: '📖',
+  xp: '⭐',
+  failure: '🎲',
+};
+
+/** Emote per recipe output category; keys mirror the `recipes.categories` lang node. */
+export const recipeCategoryIcons: Record<RecipeOutputType, string> = {
+  material: '🧱',
+  potion: '⚗️',
+  petFood: '🦴',
+};
+
+/**
+ * Emote per way of learning a recipe; keys mirror the
+ * `recipes.discoverySources` lang node and the game's `RecipeDiscoverySource`.
+ */
+export const recipeDiscoveryIcons: Record<string, string> = {
+  DEFAULT: '📖',
+  WITCH: '🧹',
+  FARMER: '🧑‍🌾',
+  GASPARD_JO: '🧑‍🍳',
+  ISLAND_BOSS: '👹',
+  COOKING_LEVEL: '🍳',
+  PLAYER_LEVEL_MILESTONE: '⭐',
+  CAMPAIGN_MILESTONE: '📜',
+};
+
+/** Emote per fact line of a recipe detail; keys mirror the `recipes` lang node. */
+export const recipeFactIcons = {
+  level: '📈',
+  grade: '🎓',
+  unlock: '🔓',
+  lovePoints: '💗',
+  plants: '🌱',
+  materials: '⛏️',
 } as const;
 
 /** Emote per expedition terrain; keys mirror the `materials.terrains` lang node. */
