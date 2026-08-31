@@ -140,3 +140,10 @@ export const UPGRADE_MATERIAL_TOTALS: readonly (readonly (readonly [
  * ENERGY` (ids `0`..`7`), matching the `nature` field of potions and objects.
  */
 export const FIGHT_ITEM_NATURES: readonly number[] = [2, 3, 4];
+
+/**
+ * `ItemNature.TIME_SPEEDUP`, whose power is a duration in minutes rather than a
+ * plain amount: the game substitutes it as a formatted duration, so its lang
+ * template carries a bare `{{power}}` where the others carry `{{power, number}}`.
+ */
+export const TIME_SPEEDUP_NATURE = 5;

@@ -12,6 +12,13 @@ export class TtlCache<K, V> {
   private readonly entries = new Map<K, CacheEntry<V>>();
 
   /**
+   * Loads currently running, keyed like the entries. Concurrent callers join
+   * the run in flight instead of starting their own, so a cache miss costs one
+   * load however many callers race for it.
+   */
+  private readonly loading = new Map<K, Promise<V>>();
+
+  /**
    * @param maxSize Max live entries; the least-recently-used is evicted past it.
    * @param ttlMs Lifetime of an entry, in milliseconds, after it is written.
    */
@@ -49,12 +56,28 @@ export class TtlCache<K, V> {
     this.entries.delete(key);
   }
 
-  /** Cached value for `key`, else runs and caches `load`. `V` must exclude `undefined` (the miss marker). */
+  /**
+   * Cached value for `key`, else runs and caches `load`. `V` must exclude
+   * `undefined` (the miss marker). Callers arriving while a load is already
+   * running share it rather than launching a second one; a rejected load is
+   * not cached, so the next call retries.
+   */
   public async getOrLoad(key: K, load: (key: K) => Promise<V>): Promise<V> {
     const cached = this.get(key);
     if (cached !== undefined) return cached;
-    const value = await load(key);
-    this.set(key, value);
-    return value;
+
+    const running = this.loading.get(key);
+    if (running !== undefined) return running;
+
+    const pending = load(key)
+      .then((value) => {
+        this.set(key, value);
+        return value;
+      })
+      .finally(() => {
+        this.loading.delete(key);
+      });
+    this.loading.set(key, pending);
+    return pending;
   }
 }

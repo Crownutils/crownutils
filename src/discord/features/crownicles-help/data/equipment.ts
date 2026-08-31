@@ -4,7 +4,6 @@ import {
   computeItemValue,
   computeUpgradeMaterials,
   FIGHT_ITEM_NATURES,
-  formatNatureEffect,
   getItemLangStrings,
   getItemMaterialPools,
   getItems,
@@ -20,6 +19,7 @@ import {
   type ItemLangStrings,
 } from '@/core/crownicles/index.js';
 import type { SupportedLocale } from '@/core/types.js';
+import { natureEffectLine } from '../format.js';
 
 /** An item's attack/defense/speed at a given upgrade level. */
 export interface EquipmentStats {
@@ -144,6 +144,7 @@ function mainDetail(
 function supportDetail(
   item: CrowniclesSupportItem,
   lang: ItemLangStrings,
+  locale: SupportedLocale,
 ): EquipmentSupportDetail {
   const templates =
     item.category === 'potions' ? lang.potionNatures : lang.objectNatures;
@@ -154,7 +155,12 @@ function supportDetail(
   return {
     kind: 'support',
     nature: item.nature,
-    effect: formatNatureEffect(templates[item.nature] ?? '', item.power),
+    effect: natureEffectLine(
+      templates[item.nature] ?? '',
+      item.nature,
+      item.power,
+      locale,
+    ),
     ...(item.category === 'objects'
       ? { value: computeItemValue(item.rarity, item.power) }
       : {}),
@@ -185,7 +191,7 @@ export async function loadEquipmentData(
     rarity: item.rarity,
     detail: isMainItem(item)
       ? mainDetail(item, materialById, pools, distinctCounts)
-      : supportDetail(item, lang),
+      : supportDetail(item, lang, locale),
   });
 
   for (const item of items) {

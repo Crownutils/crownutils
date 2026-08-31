@@ -120,8 +120,7 @@ async function refuse(interaction: MessageComponentInteraction): Promise<void> {
 
 /** Any interaction that can acknowledge by editing the message in place. */
 type MessageUpdatable =
-  | MessageComponentInteraction
-  | ModalMessageModalSubmitInteraction;
+  MessageComponentInteraction | ModalMessageModalSubmitInteraction;
 
 /** Attach the collector loop that keeps `message` in sync until stop or timeout. */
 function drive<State>(

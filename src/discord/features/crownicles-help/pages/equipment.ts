@@ -14,8 +14,6 @@ import {
   Button,
   ButtonActionRow,
   type Container,
-  SelectActionRow,
-  SelectMenu,
   Separator,
   Text,
 } from '@/discord/components/index.js';
@@ -32,14 +30,12 @@ import {
   appendBackButton,
   appendLoadFallback,
   appendPaginationControls,
+  appendPickerStep,
   clampPage,
   createHelpPageContainer,
   helpMessages,
   pickerPage,
   pickerPageCount,
-  SELECT_DESCRIPTION_MAX,
-  SELECT_LABEL_MAX,
-  truncate,
 } from '../crownicles-help.ui.js';
 import { helpIcons, pageIcons } from '../icons.js';
 
@@ -145,27 +141,17 @@ function appendCategoryPicker(
     counts.set(category, total);
   }
 
-  const list = new Text('');
-  for (const category of ITEM_CATEGORIES) {
-    list.newLine(
-      new Text(
-        `${categoryLabel(context.locale, category)} (${counts.get(category) ?? 0})`,
-      ).icon(itemCategoryIcons[category]),
-    );
-  }
-  container.add(list, new Separator());
-
-  const select = new SelectMenu(CATEGORY_SELECT_ID)
-    .placeholder(t.categoryPlaceholder)
-    .options(
-      ITEM_CATEGORIES.map((category) => ({
-        label: categoryLabel(context.locale, category),
-        value: category,
-        emoji: itemCategoryIcons[category],
-      })),
-    );
-  if (context.disabled) select.disabled();
-  container.add(new SelectActionRow().set(select));
+  appendPickerStep(container, {
+    selectId: CATEGORY_SELECT_ID,
+    placeholder: t.categoryPlaceholder,
+    disabled: context.disabled,
+    entries: ITEM_CATEGORIES.map((category) => ({
+      line: `${categoryLabel(context.locale, category)} (${counts.get(category) ?? 0})`,
+      label: categoryLabel(context.locale, category),
+      value: category,
+      icon: itemCategoryIcons[category],
+    })),
+  });
 }
 
 /** Step 2: the rarity picker of the chosen category, with item counts. */
@@ -182,29 +168,18 @@ function appendRarityPicker(
     ),
   );
 
-  const rarities = raritiesOf(data, category);
-  const list = new Text('');
-  for (const { rarity, count } of rarities) {
-    list.newLine(
-      new Text(`${rarityName(data, rarity)} (${count})`).icon(
-        rarityIcon(rarity),
-      ),
-    );
-  }
-  container.add(list, new Separator());
-
-  const select = new SelectMenu(RARITY_SELECT_ID)
-    .placeholder(t.rarityPlaceholder)
-    .options(
-      rarities.map(({ rarity, count }) => ({
-        label: truncate(rarityName(data, rarity), SELECT_LABEL_MAX),
-        value: String(rarity),
-        description: t.itemCount(count),
-        ...(itemRarityIcons[rarity] ? { emoji: itemRarityIcons[rarity] } : {}),
-      })),
-    );
-  if (context.disabled) select.disabled();
-  container.add(new SelectActionRow().set(select));
+  appendPickerStep(container, {
+    selectId: RARITY_SELECT_ID,
+    placeholder: t.rarityPlaceholder,
+    disabled: context.disabled,
+    entries: raritiesOf(data, category).map(({ rarity, count }) => ({
+      line: `${rarityName(data, rarity)} (${count})`,
+      label: rarityName(data, rarity),
+      value: String(rarity),
+      description: t.itemCount(count),
+      icon: rarityIcon(rarity),
+    })),
+  });
 
   appendBackButton(
     container,
@@ -239,29 +214,18 @@ function appendItemPicker(
 
   const { page, pageCount, slice } = pickerPage(items, state.itemsPage);
 
-  const list = new Text('');
-  for (const item of slice) {
-    list.newLine(new Text(item.name).icon(item.icon));
-  }
-  container.add(list, new Separator());
-
-  const select = new SelectMenu(ITEM_SELECT_ID)
-    .placeholder(t.itemPlaceholder)
-    .options(
-      slice.map((item) => {
-        const summary = itemSummary(item);
-        return {
-          label: truncate(item.name, SELECT_LABEL_MAX),
-          value: String(item.id),
-          ...(summary
-            ? { description: truncate(summary, SELECT_DESCRIPTION_MAX) }
-            : {}),
-          ...(item.icon ? { emoji: item.icon } : {}),
-        };
-      }),
-    );
-  if (context.disabled) select.disabled();
-  container.add(new SelectActionRow().set(select));
+  appendPickerStep(container, {
+    selectId: ITEM_SELECT_ID,
+    placeholder: t.itemPlaceholder,
+    disabled: context.disabled,
+    entries: slice.map((item) => ({
+      line: item.name,
+      label: item.name,
+      value: String(item.id),
+      description: itemSummary(item),
+      icon: item.icon,
+    })),
+  });
 
   appendPaginationControls(container, {
     page,

@@ -1,11 +1,6 @@
 import { cacheShared } from './cache.js';
-import {
-  fetchCrowniclesJson,
-  fetchCrowniclesText,
-  HTTP_CONCURRENCY,
-  listCrowniclesDir,
-  mapWithConcurrency,
-} from './source.js';
+import { getCookingRecipes } from './recipes.js';
+import { fetchCrowniclesText } from './source.js';
 
 /** Material ids that can drop, keyed by expedition terrain type (forest, cave, ...). */
 export type ExpeditionLootTables = Readonly<Record<string, readonly number[]>>;
@@ -28,7 +23,6 @@ export interface MaterialCraftRecipe {
 const EXPEDITION_CONSTANTS_PATH = 'Lib/src/constants/ExpeditionConstants.ts';
 const PVE_CONSTANTS_PATH = 'Lib/src/constants/PVEConstants.ts';
 const SMALL_EVENT_CONSTANTS_PATH = 'Lib/src/constants/SmallEventConstants.ts';
-const RECIPES_DIR = 'Core/resources/cooking/recipes';
 
 /** The brace-matched value object of a `NAME ... = { ... }` or `NAME: { ... }` constant. */
 function extractConstBlock(source: string, name: string): string | undefined {
@@ -102,40 +96,19 @@ export const getBiomeMaterialTypes = cacheShared(
   },
 );
 
-/** Raw shape of a `cooking/recipes/material_*.json` file, narrowed to what we read. */
-interface RawCraftRecipe {
-  readonly level?: number;
-  readonly outputMaterialId?: number;
-  readonly outputMaterialQuantity?: number;
-}
-
-/** Every cooking recipe that crafts a material, fetched once and cached. */
+/** The material-crafting subset of {@link getCookingRecipes}, cached and reshaped. */
 export const getMaterialCraftRecipes = cacheShared(
-  async (): Promise<readonly MaterialCraftRecipe[]> => {
-    const files = (await listCrowniclesDir(RECIPES_DIR)).filter((name) =>
-      name.startsWith('material_'),
-    );
-    const recipes = await mapWithConcurrency(
-      files,
-      HTTP_CONCURRENCY,
-      async (file) => ({
-        file,
-        recipe: await fetchCrowniclesJson<RawCraftRecipe>(
-          `${RECIPES_DIR}/${file}`,
-        ),
-      }),
-    );
-    return recipes.flatMap(({ file, recipe }) =>
-      recipe.outputMaterialId === undefined
-        ? []
-        : [
+  async (): Promise<readonly MaterialCraftRecipe[]> =>
+    (await getCookingRecipes()).flatMap((recipe) =>
+      recipe.outputType === 'material'
+        ? [
             {
-              id: file.replace(/\.json$/, ''),
+              id: recipe.id,
               outputMaterialId: recipe.outputMaterialId,
-              level: recipe.level ?? 0,
-              quantity: recipe.outputMaterialQuantity ?? 1,
+              level: recipe.level,
+              quantity: recipe.outputMaterialQuantity,
             },
-          ],
-    );
-  },
+          ]
+        : [],
+    ),
 );
