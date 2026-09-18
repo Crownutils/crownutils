@@ -216,13 +216,21 @@ function appendMaterialDetail(
           .size('subtle'),
       );
     }
-    container.add(
-      new Text(
-        `${md.bold(t.sourceCompost)} : ${formatPercent(context.locale, obtain.compostChance)}`,
-      )
-        .icon(materialSourceIcons.compost)
-        .size('subtle'),
-    );
+    if (obtain.compost.length > 0) {
+      const parts = obtain.compost
+        .map((plant) =>
+          withIcon(
+            plant.icon,
+            `${plant.name} ${formatPercent(context.locale, plant.chance)}`,
+          ),
+        )
+        .join(', ');
+      container.add(
+        new Text(`${md.bold(t.sourceCompost)} : ${parts}`)
+          .icon(materialSourceIcons.compost)
+          .size('subtle'),
+      );
+    }
     if (obtain.cooking) {
       container.add(
         new Text(

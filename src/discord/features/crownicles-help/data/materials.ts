@@ -6,9 +6,11 @@ import {
   getMaterialCraftRecipes,
   getMaterialRarityNames,
   getMaterials,
+  getPlants,
   getRecipeNames,
   poolDropChance,
   rarityDropChance,
+  uniformDropChance,
   type CrowniclesMaterial,
   type MaterialCraftRecipe,
 } from '@/core/crownicles/index.js';
@@ -31,6 +33,15 @@ export interface MaterialExpeditionSource {
   readonly chance: number;
 }
 
+/** A plant whose compost can yield a material, with the chance it does. */
+export interface MaterialCompostSource {
+  /** The plant's emote, or `undefined` when the game has none. */
+  readonly icon: string | undefined;
+  readonly name: string;
+  /** Probability that composting one such plant yields the material (`0`..`1`). */
+  readonly chance: number;
+}
+
 /** The cooking recipe that crafts a material (deterministic, no chance). */
 export interface MaterialCookingInfo {
   /** Official recipe name. */
@@ -47,8 +58,8 @@ export interface MaterialObtainInfo {
   readonly smallEvents: readonly MaterialExpeditionSource[];
   readonly expeditions: readonly MaterialExpeditionSource[];
   readonly bosses: readonly MaterialBossSource[];
-  /** Chance from composting (rarity-first, across all materials of that rarity). */
-  readonly compostChance: number;
+  /** Plants whose compost can yield it, best chance first. */
+  readonly compost: readonly MaterialCompostSource[];
   /** Present when a cooking recipe crafts this material. */
   readonly cooking?: MaterialCookingInfo;
 }
@@ -75,6 +86,29 @@ function resolvePool(
     );
 }
 
+/**
+ * Reverses the plants' compost pools into compost sources by material id. A
+ * composted plant yields one member of its own pool, picked uniformly, so every
+ * member of a three-material pool comes out one time in three.
+ */
+function compostSourcesByMaterial(
+  plants: Awaited<ReturnType<typeof getPlants>>,
+): Map<number, MaterialCompostSource[]> {
+  const byMaterial = new Map<number, MaterialCompostSource[]>();
+  for (const plant of plants) {
+    const chance = uniformDropChance(plant.compostMaterials.length);
+    for (const materialId of new Set(plant.compostMaterials)) {
+      const sources = byMaterial.get(materialId) ?? [];
+      sources.push({ icon: plant.icon, name: plant.name, chance });
+      byMaterial.set(materialId, sources);
+    }
+  }
+  for (const sources of byMaterial.values()) {
+    sources.sort((a, b) => b.chance - a.chance || a.name.localeCompare(b.name));
+  }
+  return byMaterial;
+}
+
 /** Composes the materials page data for `locale` (fetches sit behind TTL caches). */
 export async function loadMaterialsData(
   locale: SupportedLocale,
@@ -88,6 +122,7 @@ export async function loadMaterialsData(
     biomeTypes,
     craftRecipes,
     recipeNames,
+    plants,
   ] = await Promise.all([
     getMaterials(locale),
     getMaterialRarityNames(locale),
@@ -97,19 +132,15 @@ export async function loadMaterialsData(
     getBiomeMaterialTypes(),
     getMaterialCraftRecipes(),
     getRecipeNames(locale),
+    getPlants(locale),
   ]);
 
   const materialsByType = new Map<string, CrowniclesMaterial[]>();
-  const countByRarity = new Map<number, number>();
   const countByTypeRarity = new Map<string, number>();
   for (const material of materials) {
     const byType = materialsByType.get(material.type) ?? [];
     byType.push(material);
     materialsByType.set(material.type, byType);
-    countByRarity.set(
-      material.rarity,
-      (countByRarity.get(material.rarity) ?? 0) + 1,
-    );
     const typeRarity = `${material.type}:${material.rarity}`;
     countByTypeRarity.set(
       typeRarity,
@@ -138,6 +169,7 @@ export async function loadMaterialsData(
       craftByMaterial.set(recipe.outputMaterialId, recipe);
     }
   }
+  const compostByMaterial = compostSourcesByMaterial(plants);
 
   const obtainByMaterial = new Map<number, MaterialObtainInfo>(
     materials.map((material) => {
@@ -175,10 +207,7 @@ export async function loadMaterialsData(
               name: location!.name,
               chance: poolDropChance(material, pool),
             })),
-          compostChance: rarityDropChance(
-            material,
-            countByRarity.get(material.rarity) ?? 0,
-          ),
+          compost: compostByMaterial.get(material.id) ?? [],
           ...(craft
             ? {
                 cooking: {

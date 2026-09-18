@@ -5,9 +5,11 @@ import type { CrowniclesMaterial } from './materials.js';
  *
  * - Fixed pools (PVE bosses, pet expeditions) roll one member weighted by rarity
  *   ({@link RARITY_WEIGHTS}), so a member's chance is its weight over the pool's.
- * - Rarity-first sources (the `findMaterial` small event within a type, compost)
- *   roll a rarity ({@link RARITY_DROP_RATES}) then pick uniformly among the
- *   materials of that rarity in scope.
+ * - Rarity-first sources (the `findMaterial` small event within a type) roll a
+ *   rarity ({@link RARITY_DROP_RATES}) then pick uniformly among the materials
+ *   of that rarity in scope.
+ * - Flat pools (a plant's compost list) pick one member uniformly, rarity
+ *   playing no part.
  */
 
 /** Relative weights biasing a fixed-pool roll toward common materials (60/30/10). */
@@ -39,4 +41,9 @@ export function rarityDropChance(
 ): number {
   if (sameRarityCount <= 0) return 0;
   return (RARITY_DROP_RATES[material.rarity] ?? 0) / sameRarityCount;
+}
+
+/** Chance of one member of a flat pool of `poolSize` being picked (`0` if empty). */
+export function uniformDropChance(poolSize: number): number {
+  return poolSize <= 0 ? 0 : 1 / poolSize;
 }

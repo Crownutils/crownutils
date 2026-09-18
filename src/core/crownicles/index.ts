@@ -94,7 +94,11 @@ export {
   type MaterialCraftRecipe,
 } from './material-sources.js';
 
-export { poolDropChance, rarityDropChance } from './material-drops.js';
+export {
+  poolDropChance,
+  rarityDropChance,
+  uniformDropChance,
+} from './material-drops.js';
 
 export {
   getEvents,
