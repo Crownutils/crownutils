@@ -52,6 +52,11 @@ export {
   type UpgradeMaterialNeed,
 } from './item-upgrades.js';
 
+export {
+  computeScrapMaterials,
+  type ScrapRecipeInputs,
+} from './scrap-dealer.js';
+
 export { getMapLinks, type MapLink } from './map-links.js';
 
 export {

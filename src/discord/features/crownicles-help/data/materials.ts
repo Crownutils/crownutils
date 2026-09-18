@@ -1,13 +1,19 @@
 import {
+  computeScrapMaterials,
   getBiomeMaterialTypes,
   getBossLootTables,
   getCrowniclesLocations,
   getExpeditionLootTables,
+  getItemMaterialPools,
+  getItems,
   getMaterialCraftRecipes,
   getMaterialRarityNames,
   getMaterials,
   getPlants,
   getRecipeNames,
+  getUpgradeDistinctCounts,
+  isMainItem,
+  MAX_UPGRADE_LEVEL,
   poolDropChance,
   rarityDropChance,
   uniformDropChance,
@@ -42,6 +48,17 @@ export interface MaterialCompostSource {
   readonly chance: number;
 }
 
+/** An equipment the scrap dealer recycles into a material (deterministic). */
+export interface MaterialScrapSource {
+  /** The item's emote, or `undefined` when the game has none. */
+  readonly icon: string | undefined;
+  readonly name: string;
+  /** Units recovered from one recycle, at the upgrade level yielding the most. */
+  readonly quantity: number;
+  /** That best upgrade level (`0`..`5`). */
+  readonly level: number;
+}
+
 /** The cooking recipe that crafts a material (deterministic, no chance). */
 export interface MaterialCookingInfo {
   /** Official recipe name. */
@@ -60,6 +77,8 @@ export interface MaterialObtainInfo {
   readonly bosses: readonly MaterialBossSource[];
   /** Plants whose compost can yield it, best chance first. */
   readonly compost: readonly MaterialCompostSource[];
+  /** Equipment recyclable into it, richest recycle first. */
+  readonly scrapDealer: readonly MaterialScrapSource[];
   /** Present when a cooking recipe crafts this material. */
   readonly cooking?: MaterialCookingInfo;
 }
@@ -109,6 +128,53 @@ function compostSourcesByMaterial(
   return byMaterial;
 }
 
+/**
+ * Reverses the scrap-dealer payouts into recycle sources by material id: every
+ * weapon and armor is scrapped at each upgrade level it can hold, and only the
+ * level giving the most of a material is kept -- that is the one worth telling
+ * a player about.
+ */
+function scrapSourcesByMaterial(
+  items: Awaited<ReturnType<typeof getItems>>,
+  pools: Awaited<ReturnType<typeof getItemMaterialPools>>,
+  distinctCounts: Awaited<ReturnType<typeof getUpgradeDistinctCounts>>,
+  rarityById: ReadonlyMap<number, number>,
+): Map<number, MaterialScrapSource[]> {
+  const byMaterial = new Map<number, MaterialScrapSource[]>();
+  for (const item of items) {
+    if (!isMainItem(item)) continue;
+    const best = new Map<number, { quantity: number; level: number }>();
+    for (let level = 0; level <= MAX_UPGRADE_LEVEL; level++) {
+      for (const need of computeScrapMaterials(
+        item,
+        level,
+        pools,
+        distinctCounts,
+        rarityById,
+      )) {
+        const current = best.get(need.materialId);
+        if (current === undefined || need.quantity > current.quantity) {
+          best.set(need.materialId, { quantity: need.quantity, level });
+        }
+      }
+    }
+    for (const [materialId, { quantity, level }] of best) {
+      const sources = byMaterial.get(materialId) ?? [];
+      sources.push({ icon: item.icon, name: item.name, quantity, level });
+      byMaterial.set(materialId, sources);
+    }
+  }
+  for (const sources of byMaterial.values()) {
+    sources.sort(
+      (a, b) =>
+        b.quantity - a.quantity ||
+        a.level - b.level ||
+        a.name.localeCompare(b.name),
+    );
+  }
+  return byMaterial;
+}
+
 /** Composes the materials page data for `locale` (fetches sit behind TTL caches). */
 export async function loadMaterialsData(
   locale: SupportedLocale,
@@ -123,6 +189,9 @@ export async function loadMaterialsData(
     craftRecipes,
     recipeNames,
     plants,
+    items,
+    materialPools,
+    distinctCounts,
   ] = await Promise.all([
     getMaterials(locale),
     getMaterialRarityNames(locale),
@@ -133,6 +202,9 @@ export async function loadMaterialsData(
     getMaterialCraftRecipes(),
     getRecipeNames(locale),
     getPlants(locale),
+    getItems(locale),
+    getItemMaterialPools(),
+    getUpgradeDistinctCounts(),
   ]);
 
   const materialsByType = new Map<string, CrowniclesMaterial[]>();
@@ -170,6 +242,12 @@ export async function loadMaterialsData(
     }
   }
   const compostByMaterial = compostSourcesByMaterial(plants);
+  const scrapByMaterial = scrapSourcesByMaterial(
+    items,
+    materialPools,
+    distinctCounts,
+    new Map(materials.map((material) => [material.id, material.rarity])),
+  );
 
   const obtainByMaterial = new Map<number, MaterialObtainInfo>(
     materials.map((material) => {
@@ -208,6 +286,7 @@ export async function loadMaterialsData(
               chance: poolDropChance(material, pool),
             })),
           compost: compostByMaterial.get(material.id) ?? [],
+          scrapDealer: scrapByMaterial.get(material.id) ?? [],
           ...(craft
             ? {
                 cooking: {

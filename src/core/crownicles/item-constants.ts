@@ -55,6 +55,31 @@ export const UPGRADE_LEVEL_STATS_MULTIPLIER = [
 /** Highest upgrade level an item can reach. */
 export const MAX_UPGRADE_LEVEL = 5;
 
+/** Lowest level an upgrade recipe exists for; below it an item consumes nothing. */
+export const MIN_UPGRADE_LEVEL = 1;
+
+/**
+ * Blacksmith price of one bought material, indexed by material rarity (`1`..`3`;
+ * index `0` is unused) -- `BlacksmithConstants.MATERIAL_BASE_PRICE`.
+ */
+export const MATERIAL_BASE_PRICE: readonly number[] = [0, 340, 1850, 3650];
+
+/**
+ * Price increase, in percent of the base price, per material already bought in
+ * the same purchase (`MATERIAL_BULK_PRICE_INCREASE_PERCENT`).
+ */
+export const MATERIAL_BULK_PRICE_INCREASE_PERCENT = 10;
+
+/**
+ * Scrap-dealer payout coefficients (`ScrapDealerConstants`): the materials
+ * handed back are worth `BASE_VALUE_MULTIPLIER + level * VALUE_MULTIPLIER_PER_LEVEL`
+ * times the item's coin value, counted at the blacksmith's buying price.
+ */
+export const SCRAP_DEALER = {
+  BASE_VALUE_MULTIPLIER: 8,
+  VALUE_MULTIPLIER_PER_LEVEL: 4,
+} as const;
+
 /** Number of blacksmith material pools (`ITEM_MATERIAL_CATEGORY_COUNT`, ids `1`..`15`). */
 export const ITEM_MATERIAL_CATEGORY_COUNT = 15;
 

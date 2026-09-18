@@ -131,9 +131,14 @@ export const crowniclesHelp = {
       sourceExpeditions: 'Expéditions',
       sourceBosses: 'Boss PVE',
       sourceCompost: 'Compost',
+      sourceScrapDealer: 'Gorim le Brise-Fer',
       sourceCooking: 'Cuisine',
       cookingRecipe: (level: number, quantity: number): string =>
         `(niveau ${level}, donne ×${quantity})`,
+      scrapItem: (name: string, quantity: number, level: number): string =>
+        `${name} ×${quantity} (niv. ${level})`,
+      scrapMore: (count: number): string =>
+        `(+${count} autre${count > 1 ? 's' : ''})`,
     },
 
     recipes: {

@@ -45,6 +45,13 @@ const MATERIALS_NEXT_ID = 'chelp-mat-next';
 const BACK_TO_TYPES_ID = 'chelp-mat-back-types';
 const BACK_TO_MATERIALS_ID = 'chelp-mat-back-materials';
 
+/**
+ * How many recyclable equipments the scrap-dealer line names. A common material
+ * is scrapped out of dozens of items, so only the richest recycles are worth a
+ * line; the rest are summed up as a count.
+ */
+const SCRAP_SOURCES_SHOWN = 3;
+
 function messages(locale: SupportedLocale) {
   return helpMessages(locale).materials;
 }
@@ -228,6 +235,25 @@ function appendMaterialDetail(
       container.add(
         new Text(`${md.bold(t.sourceCompost)} : ${parts}`)
           .icon(materialSourceIcons.compost)
+          .size('subtle'),
+      );
+    }
+    if (obtain.scrapDealer.length > 0) {
+      const shown = obtain.scrapDealer.slice(0, SCRAP_SOURCES_SHOWN);
+      const parts = shown
+        .map((entry) =>
+          withIcon(
+            entry.icon,
+            t.scrapItem(entry.name, entry.quantity, entry.level),
+          ),
+        )
+        .join(', ');
+      const hidden = obtain.scrapDealer.length - shown.length;
+      container.add(
+        new Text(
+          `${md.bold(t.sourceScrapDealer)} : ${parts}${hidden > 0 ? ` ${t.scrapMore(hidden)}` : ''}`,
+        )
+          .icon(materialSourceIcons.scrapDealer)
           .size('subtle'),
       );
     }

@@ -51,6 +51,7 @@ export const materialSourceIcons = {
   expedition: '🧭',
   boss: '👹',
   compost: '♻️',
+  scrapDealer: '🔨',
   cooking: '🍳',
 } as const;
 
