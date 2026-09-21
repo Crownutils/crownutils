@@ -63,7 +63,6 @@ const getPlantCompostPools = cacheShared(
     return pools;
   },
 );
-
 /**
  * Every cooking plant for `locale`, cached per locale. Plants have no resource
  * directory of their own, so the id set is the one `models.json` names -- also

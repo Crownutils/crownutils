@@ -51,7 +51,6 @@ const BACK_TO_MATERIALS_ID = 'chelp-mat-back-materials';
  * line; the rest are summed up as a count.
  */
 const SCRAP_SOURCES_SHOWN = 3;
-
 function messages(locale: SupportedLocale) {
   return helpMessages(locale).materials;
 }
