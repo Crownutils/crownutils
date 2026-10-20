@@ -5,11 +5,12 @@ export const about = {
   description: 'Shows informations about the bot.',
   messages: {
     title: "Bot's informations",
+    archived: `${md.bold('Archived')} project: the bot will not evolve any further and will get no new feature.`,
     version: (botVersion: string): string =>
       `Current version : ${md.bold(botVersion)}`,
-    sourceCode: `The bot's source code is ${md.bold('not')} public.`,
+    sourceCode: `The bot's source code is ${md.bold('public')}.`,
     license: {
-      licenseName: `License: ${md.bold('All Rights Reserved')}`,
+      licenseName: `License: ${md.bold('MIT')}`,
       compatibilityWithCrownicles: (url: string): string =>
         `Crownutils is an independent program, incorporating no Crownicles source code. The ${md.link('compatibility notice', url)} stays public.`,
     },

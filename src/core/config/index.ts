@@ -40,12 +40,13 @@ export const config = {
   ownerDiscordId: required('ownerDiscordId', process.env.OWNER_DISCORD_ID),
 
   /**
-   * Public repository carrying what has to stay reachable now that the bot's
-   * own source is private: the Crownicles compatibility notice, the license,
-   * and the issue tracker the GDPR export points data subjects to.
+   * Repository carrying the legal surface that has to stay reachable on its
+   * own: the Crownicles compatibility notice, the license, and the issue
+   * tracker the GDPR export points data subjects to.
    */
   legalUrl: 'https://github.com/Crownutils/legal',
-  projectUrl: 'https://github.com/Crownutils',
+  /** The bot's own source, public and archived. */
+  projectUrl: 'https://github.com/Crownutils/crownutils',
   ownerUrl: 'https://github.com/Ntalcme',
 
   inviteUrl: applicationId

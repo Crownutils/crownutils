@@ -23,7 +23,7 @@
   },
   "keywords": [],
   "author": "Ntalcme",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.1.0",

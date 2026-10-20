@@ -32,6 +32,7 @@ export const icons = {
   relaunch: '🔄',
   users: '👥',
   guild: '🏰',
+  archive: '📦',
 } as const;
 
 /** Emote standing for each rank, used wherever a rank is shown next to a user. */

@@ -5,13 +5,15 @@ import { icons } from '../../theme/icons.js';
 import { lang } from '../../lang/index.js';
 import { config } from '@/core/config/index.js';
 
-/** The about card: presentation, version, license and project links. */
+/** The about card: presentation, archive notice, version, license and project links. */
 export function buildAboutContainer(language: SupportedLocale): Container {
   const messages = lang[language].commandAbout.messages;
 
   return createContainer('brand').add(
     new Text(messages.title).icon(icons.info).title(),
     new Text(messages.presentation),
+    new Separator(),
+    new Text(messages.archived).icon(icons.archive),
     new Separator(),
     new Text(messages.version(config.botVersion))
       .newLine(messages.license.licenseName)
