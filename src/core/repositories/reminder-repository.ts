@@ -42,7 +42,7 @@ export interface ActiveReminder {
   readonly dueAt: Date;
 }
 
-/** A reminder as included in a user's GDPR data export, whatever its status. */
+/** A reminder as included in a user's GDPR data export, whatever its status (delivered ones are gone). */
 export interface GdprReminder {
   readonly content: string;
   readonly dueAt: Date;
@@ -95,7 +95,7 @@ export async function listActiveReminders(
   });
 }
 
-/** Every reminder stored for `userId`, any status, newest first - for the GDPR export. */
+/** Every reminder still stored for `userId`, any status, newest first - for the GDPR export. */
 export async function listRemindersForGdpr(
   userId: string,
 ): Promise<GdprReminder[]> {
@@ -166,15 +166,12 @@ export async function claimReminder(id: string): Promise<boolean> {
   return count === 1;
 }
 
-/** Settles a claimed reminder as delivered. */
-export async function markReminderDelivered(
-  id: string,
-  now: Date = new Date(),
-): Promise<void> {
-  await prisma.reminder.updateMany({
-    where: { id, status: 'delivering' },
-    data: { status: 'delivered', deliveredAt: now },
-  });
+/**
+ * Settles a claimed reminder by erasing it: a delivered reminder has served its
+ * purpose, so nothing of it is kept in the database.
+ */
+export async function deleteDeliveredReminder(id: string): Promise<void> {
+  await prisma.reminder.deleteMany({ where: { id, status: 'delivering' } });
 }
 
 /** Settles a claimed reminder as permanently failed, recording the reason. */

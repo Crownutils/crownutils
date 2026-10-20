@@ -57,13 +57,12 @@ export function isAssignableRank(value: string): value is AssignableRank {
   return isOneOf(ASSIGNABLE_RANKS, value);
 }
 
-/** Reminder lifecycle states; mirrors the Prisma `ReminderStatus` enum. */
-export const REMINDER_STATUSES = [
-  'pending',
-  'delivering',
-  'delivered',
-  'failed',
-] as const;
+/**
+ * Reminder lifecycle states; mirrors the Prisma `ReminderStatus` enum. There is
+ * no delivered state: a delivered reminder is erased from the database rather
+ * than kept as history.
+ */
+export const REMINDER_STATUSES = ['pending', 'delivering', 'failed'] as const;
 
 /** A reminder's lifecycle state. */
 export type ReminderStatus = (typeof REMINDER_STATUSES)[number];

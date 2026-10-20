@@ -1,9 +1,9 @@
 import {
   claimReminder,
+  deleteDeliveredReminder,
   DUE_BATCH_SIZE,
   getDueReminders,
   getNextReminderDueAt,
-  markReminderDelivered,
   markReminderFailed,
   reclaimStuckReminders,
   requeueReminder,
@@ -175,7 +175,7 @@ export class ReminderScheduler {
     }
 
     if (outcome.ok) {
-      await markReminderDelivered(reminder.id);
+      await deleteDeliveredReminder(reminder.id);
       return;
     }
     if (outcome.kind === 'terminal' || attempts >= MAX_DELIVERY_ATTEMPTS) {

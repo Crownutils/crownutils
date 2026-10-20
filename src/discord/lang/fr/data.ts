@@ -42,7 +42,6 @@ export const data = {
       reminderStatus: {
         pending: 'en attente',
         delivering: "en cours d'envoi",
-        delivered: 'envoyé',
         failed: 'échec',
       },
       rightsSection: 'Vos droits',
